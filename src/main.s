@@ -19,6 +19,7 @@
 ;; Include all CPCtelera constant definitions, macros and variables
 .include "cpctelera.h.s"
 .include "common.h.s"
+.include "sys/system.h.s"
 ;;.include "sys/render.h.s"
 ;;.include "sys/board.h.s"
 ;;.include "sys/input.h.s"
@@ -28,7 +29,6 @@
 ;;.include "man/game.h.s"
 ;;.include "sys/audio.h.s"
 ;;.include "sys/score.h.s"
-;;.include "sys/system.h.s"
 ;;.include "sys/files.h.s"
 
 .module main
@@ -92,7 +92,7 @@ _main_init_keypress:
 ;;
 _main::
 
-   call cpct_disableFirmware_asm
+   call sys_system_disable_firmware
 
    call _main_init
 
