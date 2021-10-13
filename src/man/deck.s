@@ -31,6 +31,7 @@ default_card:
     .db 0                       ;; defense
     .dw #0x0000                 ;; sprite
     .ds 40                      ;; text definition
+
 ;;
 ;; Definition of model deck
 ;;
@@ -40,9 +41,15 @@ sword:
     .db 1                       ;; type
     .db 3                       ;; attack
     .db 0                       ;; defense
-    .dw #0x0000                 ;; sprite
+    .dw #_s_cards_0                ;; sprite
     .asciz "SINGLE ATTACK"     ;; text definition
-
+sheild:
+    .db #e_type_card_in_hand    ;; status
+    .db 2                       ;; type
+    .db 0                       ;; attack
+    .db 3                       ;; defense
+    .dw #_s_cards_1                ;; sprite
+    .asciz "SINGLE DEFENCE"     ;; text definition
 
 ;;-----------------------------------------------------------------
 ;;

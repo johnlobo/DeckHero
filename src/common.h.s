@@ -20,6 +20,8 @@
 .globl _g_palette1
 .globl _s_font_0
 .globl _s_font_1
+.globl _s_cards_0
+.globl _s_cards_1
 
 ;;===============================================================================
 ;; CPCTELERA FUNCTIONS
@@ -54,4 +56,13 @@ e_type_invalid              = 0x00
 e_type_card_in_hand         = 0x01
 e_type_card_in_cemetery     = 0x02
 e_type_card_in_sacrifice    = 0x04
+
+;;tipos de componentes
+e_cmp_render = 0x01     ;;entidad renderizable
+e_cmp_movable = 0x02    ;;entidad que se puede mover
+e_cmp_input = 0x04      ;;entidad controlable por input  
+e_cmp_ia = 0x08         ;;entidad controlable con ia
+e_cmp_animated = 0x10   ;;entidad animada
+e_cmp_collider = 0x20   ;;entidad que puede colisionar
+e_cmp_default = e_cmp_render | e_cmp_movable | e_cmp_collider  ;;componente por defecto
 
