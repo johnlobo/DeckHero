@@ -49,3 +49,9 @@
 ;; DEFINED CONSTANTS
 ;;===============================================================================
 
+;;tipos de entidades
+e_type_invalid              = 0x00
+e_type_card_in_hand         = 0x01
+e_type_card_in_cemetery     = 0x02
+e_type_card_in_sacrifice    = 0x04
+
