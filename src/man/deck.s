@@ -18,38 +18,20 @@
 .include "cpctelera.h.s"
 .include "common.h.s"
 .include "man/deck.h.s"
+.include "man/card.h.s"
 .include "comp/component.h.s"
-
 
 DefineComponentArrayStructure_Size _deck, MAX_CARDS, CARD_SIZE     
 .db 0   ;;ponemos este aqui como trampita para que siempre haya un tipo invalido al final
-
-default_card:
-    .db #e_type_card_in_hand    ;; status
-    .db 0                       ;; type
-    .db 0                       ;; attack
-    .db 0                       ;; defense
-    .dw #0x0000                 ;; sprite
-    .ds 40                      ;; text definition
 
 ;;
 ;; Definition of model deck
 ;;
 model_deck:
-sword:
-    .db #e_type_card_in_hand    ;; status
-    .db 1                       ;; type
-    .db 3                       ;; attack
-    .db 0                       ;; defense
-    .dw #_s_cards_0                ;; sprite
-    .asciz "SINGLE ATTACK"     ;; text definition
-sheild:
-    .db #e_type_card_in_hand    ;; status
-    .db 2                       ;; type
-    .db 0                       ;; attack
-    .db 3                       ;; defense
-    .dw #_s_cards_1                ;; sprite
-    .asciz "SINGLE DEFENCE"     ;; text definition
+;;         _status,             _class  _sprite     _name   _rarity _type   _energy _description,       _damage _block, _vulnerable _weak   _strengh    _exhaust    _add_card
+DefineCard e_type_card_in_hand, 1,      _s_cards_0, STRIKE, 1,      1,      1,      ^/SINGLE ATTACK/,   3,      0,      0,          0,      0,          0,          0
+DefineCard e_type_card_in_hand, 2,      _s_cards_1, DEFEND, 1,      1,      1,      ^/SIMPLE DEFENCE/,  0,      3,      0,          0,      0,          0,          0
+
 
 ;;-----------------------------------------------------------------
 ;;

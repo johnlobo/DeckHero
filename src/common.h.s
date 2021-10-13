@@ -66,3 +66,22 @@ e_cmp_animated = 0x10   ;;entidad animada
 e_cmp_collider = 0x20   ;;entidad que puede colisionar
 e_cmp_default = e_cmp_render | e_cmp_movable | e_cmp_collider  ;;componente por defecto
 
+;;===============================================================================
+;; DEFINED MACROS
+;;===============================================================================
+.mdelete BeginStruct
+.macro BeginStruct struct
+    struct'_offset = 0
+.endm
+
+.mdelete Field
+.macro Field struct, field, size
+    struct'_'field = struct'_offset
+    struct'_offset = struct'_offset + size
+.endm
+
+.mdelete EndStruct
+.macro EndStruct struct
+    sizeof_'struct = struct'_offset
+.endm
+
