@@ -16,13 +16,12 @@
 ;;  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;-------------------------------------------------------------------------------
 
-.module deck_manager
+.module render_system
 
-CARD_SIZE = 22
-MAX_CARDS = 10
 
 ;;===============================================================================
 ;; PUBLIC METHODS
 ;;===============================================================================
-.globl man_deck_init
-.globl man_deck_create_card
+.globl sys_render_init
+.globl sys_render_update
+.globl sys_render_deck

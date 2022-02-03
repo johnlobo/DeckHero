@@ -15,11 +15,22 @@
 ;;  You should have received a copy of the GNU Lesser General Public License
 ;;  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;-------------------------------------------------------------------------------
-.include "cpctelera.h.s"
-.include "common.h.s"
 .include "man/deck.h.s"
+;;.include "cpctelera.h.s"
+.include "common.h.s"
 .include "man/card.h.s"
 .include "comp/component.h.s"
+
+.module deck_manager
+
+;;
+;; Start of _DATA area 
+;;  SDCC requires at least _DATA and _CODE areas to be declared, but you may use
+;;  any one of them for any purpose. Usually, compiler puts _DATA area contents
+;;  right after _CODE area contents.
+;;
+.area _DATA
+
 
 DefineComponentArrayStructure_Size _deck, MAX_CARDS, CARD_SIZE     
 .db 0   ;;ponemos este aqui como trampita para que siempre haya un tipo invalido al final
@@ -32,6 +43,11 @@ model_deck:
 DefineCard e_type_card_in_hand, 1,      _s_cards_0, STRIKE, 1,      1,      1,      ^/SINGLE ATTACK/,   3,      0,      0,          0,      0,          0,          0
 DefineCard e_type_card_in_hand, 2,      _s_cards_1, DEFEND, 1,      1,      1,      ^/SIMPLE DEFENCE/,  0,      3,      0,          0,      0,          0,          0
 
+
+;;
+;; Start of _CODE area
+;; 
+.area _CODE
 
 ;;-----------------------------------------------------------------
 ;;

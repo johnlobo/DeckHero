@@ -16,8 +16,11 @@
 ;;  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;-------------------------------------------------------------------------------
 
-.module game_manager
+.module render_system
 
+.include "sys/render.h.s"
+.include "cpctelera.h.s"
+.include "common.h.s"
 
 ;;
 ;; Start of _DATA area 
@@ -34,32 +37,48 @@
 
 ;;-----------------------------------------------------------------
 ;;
-;; man_game_init
+;; sys_render_init
 ;;
-;;   gets a random number between 0 and 18
+;;  Initilizes render system
 ;;  Input: 
 ;;  Output: a random piece
 ;;  Modified: AF, BC, DE, HL
 ;;
-man_game_init::
+sys_render_init::
+    
+    ld c,#0                                 ;; Set video mode
+    call cpct_setVideoMode_asm              ;;
+    
+    ld hl, #_g_palette0                     ;; Set palette
+    ld de, #16                              ;;
+    call cpct_setPalette_asm                ;;
+
+    cpctm_setBorder_asm HW_BLACK            ;; Set Border
+
+    cpctm_clearScreen_asm 0                 ;; Clear screen
+
     ret
 
 ;;-----------------------------------------------------------------
 ;;
-;; man_game_update
+;; sys_render_update
 ;;
-;;   gets a random number between 0 and 18
+;;  Updates the render system
 ;;  Input: 
 ;;  Output: a random piece
 ;;  Modified: AF, BC, DE, HL
 ;;
-man_game_update::
+sys_render_update::
+    ret
+
+;;-----------------------------------------------------------------
 ;;
-;; Turn structure
-;; 1) Show foes intentions
-;; 2) hero play cards
-;; 3) Foes execute intention
-;; 4) Upate effects
-;; 5) Check end of combat
+;; sys_render_deck
 ;;
+;;  Updates the render system
+;;  Input: 
+;;  Output: a random piece
+;;  Modified: AF, BC, DE, HL
+;;
+sys_render_deck::
     ret

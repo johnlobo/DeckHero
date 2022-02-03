@@ -16,5 +16,7 @@
 ;;  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;-------------------------------------------------------------------------------
 
+.module system_system
+
 .globl sys_system_enable_firmware
 .globl sys_system_disable_firmware

@@ -16,9 +16,12 @@
 ;;  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;-------------------------------------------------------------------------------
 
-.include "cpctelera.h.s"
+.module system_system
+
+;;.include "cpctelera.h.s"
 ;;.include "sys/audio.h.s"
 .include "common.h.s"
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;DESCRIPTION
@@ -44,7 +47,7 @@ set_int_handler:
 ;;
 ;;DESTROYS: AF, BC, DE
 ;;
-int_handler1::
+int_handler1:
 	ld hl, #int_handler2
  	call cpct_setInterruptHandler_asm	
 	ret
@@ -55,7 +58,7 @@ int_handler1::
 ;;
 ;;DESTROYS: AF, BC, DE
 ;;
-int_handler2::
+int_handler2:
 	call cpct_scanKeyboard_if_asm
 
 
@@ -69,7 +72,7 @@ int_handler2::
 ;;
 ;;DESTROYS: AF, BC, DE
 ;;
-int_handler3::
+int_handler3:
 	ld hl, #int_handler4
    call cpct_setInterruptHandler_asm
 	ret
@@ -80,7 +83,7 @@ int_handler3::
 ;;
 ;;DESTROYS: AF, BC, DE
 ;;
-int_handler4::	
+int_handler4:
 	ld hl, #int_handler5
    call cpct_setInterruptHandler_asm
 	ret
@@ -91,7 +94,7 @@ int_handler4::
 ;;
 ;;DESTROYS: AF, BC, DE
 ;;
-int_handler5::
+int_handler5:
 ;;  ld a, (music_switch)
 ;;  or a
 ;;  jr z, int_handler5_exit
@@ -119,7 +122,7 @@ int_handler5_exit:
 ;;
 ;;DESTROYS: AF, BC, DE
 ;;
-int_handler6::
+int_handler6:
 	ld hl, #int_handler1
    call cpct_setInterruptHandler_asm
 	ret

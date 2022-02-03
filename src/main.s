@@ -17,14 +17,15 @@
 ;;-------------------------------------------------------------------------------
 
 ;; Include all CPCtelera constant definitions, macros and variables
-.include "cpctelera.h.s"
+
 .include "common.h.s"
+.include "cpctelera.h.s"
 .include "sys/system.h.s"
-;;.include "sys/render.h.s"
+.include "sys/render.h.s"
 ;;.include "sys/board.h.s"
 ;;.include "sys/input.h.s"
 ;;.include "sys/text.h.s"
-;;.include "sys/messages.h.s"
+.include "sys/messages.h.s"
 ;;.include "man/entity.h.s"
 ;;.include "man/game.h.s"
 ;;.include "sys/audio.h.s"
@@ -42,6 +43,9 @@
 ;;
 .area _DATA
 
+_game_loaded_string: .asciz "GAME LOADED - PRESS ANY KEY"      ;;27 chars, 54 bytes
+
+
 ;;
 ;; Start of _CODE area
 ;; 
@@ -56,11 +60,19 @@
 ;;  Output: 
 ;;  Destroyed: af, bc,de, hl
 ;;
-_main_init::
+main_init:
 
 ;;   call sys_audio_init
 ;;
-;;   call sys_render_init
+   call sys_render_init
+
+   ld e, #10                           ;; x
+   ld d, #78                           ;; y
+   ld b, #44                           ;; h
+   ld c, #60                           ;; w
+   ld hl, #_game_loaded_string    ;; message
+   xor a                               ;; don't wait for a key
+   call sys_messages_show
 
    ;; set random seed
    xor a
@@ -94,7 +106,7 @@ _main::
 
    call sys_system_disable_firmware
 
-   call _main_init
+   call main_init
 
 start:
 ;;   call man_game_init

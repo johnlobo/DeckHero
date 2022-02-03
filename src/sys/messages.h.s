@@ -16,18 +16,21 @@
 ;;  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;-------------------------------------------------------------------------------
 
-.module card_manager
+.module messages_system
+
+;;------------------------------------------------------------------------------
+;; Global constants
+;;------------------------------------------------------------------------------
 
 
-;;
-;; Start of _DATA area 
-;;  SDCC requires at least _DATA and _CODE areas to be declared, but you may use
-;;  any one of them for any purpose. Usually, compiler puts _DATA area contents
-;;  right after _CODE area contents.
-;;
-.area _DATA
+;;------------------------------------------------------------------------------
+;; Global variables
+;;------------------------------------------------------------------------------
 
-;;
-;; Start of _CODE area
-;; 
-.area _CODE
+;;------------------------------------------------------------------------------
+;; Global routines
+;;------------------------------------------------------------------------------
+
+.globl sys_messages_draw_window
+.globl sys_messages_show
+.globl sys_messages_draw_box

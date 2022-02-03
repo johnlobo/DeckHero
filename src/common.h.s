@@ -16,6 +16,8 @@
 ;;  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;-------------------------------------------------------------------------------
 
+.module main
+
 .globl _g_palette0
 .globl _g_palette1
 .globl _s_font_0
@@ -65,6 +67,13 @@ e_cmp_ia = 0x08         ;;entidad controlable con ia
 e_cmp_animated = 0x10   ;;entidad animada
 e_cmp_collider = 0x20   ;;entidad que puede colisionar
 e_cmp_default = e_cmp_render | e_cmp_movable | e_cmp_collider  ;;componente por defecto
+
+;; Keyboard constants
+BUFFER_SIZE = 10
+ZERO_KEYS_ACTIVATED = #0xFF
+
+;; Score constants
+SCORE_NUM_BYTES = 4
 
 ;;===============================================================================
 ;; DEFINED MACROS

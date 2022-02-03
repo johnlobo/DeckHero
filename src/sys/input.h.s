@@ -16,13 +16,21 @@
 ;;  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;-------------------------------------------------------------------------------
 
-.module deck_manager
+;;------------------------------------------------------------------------------
+;; Global variables
+;;------------------------------------------------------------------------------
+;;.globl sys_input_key_actions
 
-CARD_SIZE = 22
-MAX_CARDS = 10
+;;------------------------------------------------------------------------------
+;; Global routines
+;;------------------------------------------------------------------------------
+.globl sys_input_init
+.globl sys_input_clean_buffer
+.globl sys_input_wait4anykey
+.globl sys_input_waitKeyPressed
+.globl sys_input_getKeyPressed
 
-;;===============================================================================
-;; PUBLIC METHODS
-;;===============================================================================
-.globl man_deck_init
-.globl man_deck_create_card
+;;.globl sys_input_main_screen_keys
+;;.globl sys_input_update
+;;.globl sys_input_score_entry_update
+

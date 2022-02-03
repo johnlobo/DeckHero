@@ -16,18 +16,8 @@
 ;;  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;-------------------------------------------------------------------------------
 
-.module card_manager
 
-
-;;
-;; Start of _DATA area 
-;;  SDCC requires at least _DATA and _CODE areas to be declared, but you may use
-;;  any one of them for any purpose. Usually, compiler puts _DATA area contents
-;;  right after _CODE area contents.
-;;
-.area _DATA
-
-;;
-;; Start of _CODE area
-;; 
-.area _CODE
+.globl sys_text_str_length
+.globl sys_text_str_copy
+.globl sys_text_str_cmp
+.globl sys_text_draw_string
