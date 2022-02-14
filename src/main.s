@@ -114,6 +114,7 @@ start:
 
    ;; Loop forever
 loop:
-;;   call man_game_update
+   
+   call man_game_update
 
    jr    loop

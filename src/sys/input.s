@@ -25,6 +25,7 @@
 .include "sys/util.h.s"
 .include "sys/render.h.s"
 ;;.include "sys/score.h.s"
+.include "man/deck.h.s"
 
 ;;
 ;; Start of _DATA area 
@@ -63,6 +64,20 @@
 ;;    .dw Joy0_Down,  _score_move_down
 ;;    .dw Joy0_Fire1, _score_fire
 ;;    .dw 0
+
+sys_input_debug_key_actions::
+    ;;.dw Key_O,      _score_move_left
+    ;;.dw Key_P,      _score_move_right
+    .dw Key_Q,      _add_card
+    .dw Key_A,      _remove_card
+    ;;.dw Key_Space,  _score_fire
+    ;;.dw Key_Esc,    _score_cancel_entry
+    ;;.dw Joy0_Left,  _score_move_left
+    ;;.dw Joy0_Right, _score_move_right
+    ;;.dw Joy0_Up,    _score_move_up
+    ;;.dw Joy0_Down,  _score_move_down
+    ;;.dw Joy0_Fire1, _score_fire
+    .dw 0
 
 ;;
 ;; Start of _CODE area
@@ -598,6 +613,33 @@ sys_input_init::
 ;;    call _input_update_moved
 ;;    ret
 
+;;-----------------------------------------------------------------
+;;
+;;  _add_card
+;;
+;;  Add card to deck
+;;  Output:
+;;  Modified: iy, bc
+;;
+_add_card::
+    ld hl, #model_deck_01           ;; load in hl the first card of the model deck
+    call man_deck_create_card       ;; create a card in the deck
+
+    call sys_render_deck
+    ret
+
+;;-----------------------------------------------------------------
+;;
+;;  _remove_card
+;;
+;;  Add card to deck
+;;  Output:
+;;  Modified: iy, bc
+;;
+_remove_card::
+    ld a, #1
+    call man_deck_remove_card
+    ret
 
 ;;-----------------------------------------------------------------
 ;;
@@ -609,29 +651,28 @@ sys_input_init::
 ;;  Output:
 ;;  Modified: iy, bc
 ;;
+sys_input_generic_update:
+    jr first_key
+keys_loop:
+    ld bc, #4
+    add iy, bc
+first_key:
+    ld l, 0(iy)                     ;; Lower part of the key pointer
+    ld h, 1(iy)                     ;; Lower part of the key pointer
+    ;; Check if key is null
+    ld a, l
+    or h
+    ret z                           ;; Return if key is null
+    ;; Check if key is pressed
+    call cpct_isKeyPressed_asm      ;;
+    jr z, keys_loop
+    ;; Key pressed execute action
+    ld hl, #keys_loop               ;;
+    push hl                         ;; return addres from executed function
+    ld l, 2(iy)                     ;;
+    ld h, 3(iy)                     ;; retrieve function address    
+    jp (hl)                         ;; jump to function
 
-;;sys_input_generic_update:
-;;    jr first_key
-;;keys_loop:
-;;    ld bc, #4
-;;    add iy, bc
-;;first_key:
-;;    ld l, 0(iy)                     ;; Lower part of the key pointer
-;;    ld h, 1(iy)                     ;; Lower part of the key pointer
-;;    ;; Check if key is null
-;;    ld a, l
-;;    or h
-;;    ret z                           ;; Return if key is null
-;;    ;; Check if key is pressed
-;;    call cpct_isKeyPressed_asm      ;;
-;;    jr z, keys_loop
-;;    ;; Key pressed execute action
-;;    ld hl, #keys_loop               ;;
-;;    push hl                         ;; return addres from executed function
-;;    ld l, 2(iy)                     ;;
-;;    ld h, 3(iy)                     ;; retrieve function address    
-;;    jp (hl)                         ;; jump to function
-;;
 ;;;;-----------------------------------------------------------------
 ;;;;
 ;;;; sys_input_update
@@ -691,5 +732,23 @@ sys_input_init::
 ;;    ld a, #1
 ;;_exit:
 ;;    ret
+
+
+;;-----------------------------------------------------------------
+;;
+;; sys_input_score_entry_update
+;;
+;;   Initializes input
+;;  Input: 
+;;  Output:
+;;  Modified: iy, bc
+;;
+sys_input_debug_update::
+    ;;ld ix, #score_marker                     ;; get player1 struct
+    ld iy, #sys_input_debug_key_actions
+    call sys_input_generic_update
+    ret
+
+
 
 

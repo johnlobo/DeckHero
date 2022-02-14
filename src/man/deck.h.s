@@ -31,6 +31,8 @@ MAX_CARDS = 10
 .globl deck_num
 .globl deck_pend
 .globl deck_array
+.globl deck_X_start
+
 .globl model_deck
 .globl model_deck_01
 .globl model_deck_02
@@ -40,3 +42,4 @@ MAX_CARDS = 10
 ;;===============================================================================
 .globl man_deck_init
 .globl man_deck_create_card
+.globl man_deck_remove_card

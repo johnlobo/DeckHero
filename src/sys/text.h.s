@@ -20,4 +20,5 @@
 .globl sys_text_str_length
 .globl sys_text_str_copy
 .globl sys_text_str_cmp
+.globl sys_text_draw_char
 .globl sys_text_draw_string

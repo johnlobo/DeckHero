@@ -46,11 +46,11 @@ BeginStruct c
 Field c, status , 1
 Field c, class , 1
 Field c, sprite , 2
-Field c, name , 1
+Field c, name , 11
 Field c, rarity , 1
 Field c, type , 1
 Field c, energy , 1
-Field c, description , 1
+Field c, description , 21
 Field c, damage , 1
 Field c, block , 1
 Field c, vulnerable , 1

@@ -21,6 +21,8 @@
 .include "sys/render.h.s"
 .include "man/deck.h.s"
 .include "man/card.h.s"
+.include "sys/text.h.s"
+.include "sys/util.h.s"
 .include "cpctelera.h.s"
 .include "common.h.s"
 
@@ -32,10 +34,14 @@
 ;;
 .area _DATA
 
+FONT_NUMBERS: .dw #0000
+
 ;;
 ;; Start of _CODE area
 ;; 
 .area _CODE
+
+
 
 ;;-----------------------------------------------------------------
 ;;
@@ -75,6 +81,47 @@ sys_render_update::
 
 ;;-----------------------------------------------------------------
 ;;
+;; sys_render_card
+;;
+;;  Renders a specific card
+;;  Input:  b: y coord
+;;          c: x coord
+;;          ix: points to card
+;;  Output: 
+;;  Modified: AF, BC, DE, HL
+;;
+sys_render_card:
+    ;; Get screen address of the card
+    ld de, #CPCT_VMEM_START_ASM     ;; DE = Pointer to start of the screen
+    call cpct_getScreenPtr_asm      ;; Calculate video memory location and return it in HL
+
+    ex de, hl
+
+    push de
+
+    ld l, c_sprite(ix)
+    ld h, c_sprite+1(ix)
+    ld c, #S_CARD_WIDTH
+    ld b, #S_CARD_HEIGHT
+    call cpct_drawSprite_asm
+
+    ld h, #(S_CARD_ENERGY_WIDTH * S_CARD_ENERGY_HEIGHT)
+    ld e, c_energy(ix)
+    call sys_util_h_times_e
+    ld a, l
+    ld hl,#_s_cards_energy_0
+    add_hl_a
+    pop de
+    ld c, #S_CARD_ENERGY_WIDTH
+    ld b, #S_CARD_ENERGY_HEIGHT
+    call cpct_drawSprite_asm
+
+    ret
+
+
+
+;;-----------------------------------------------------------------
+;;
 ;; sys_render_deck
 ;;
 ;;  Updates the render system
@@ -85,34 +132,32 @@ sys_render_update::
 sys_render_deck::
     ld ix, #deck_array
 
-    ld b, #deck_num
-    ld c, #DECK_X                    ;; C = x coordinate 
+    ld a,(#deck_num)            ;; retrieve num cards in deck
+    or a                        ;; If no cards ret
+    ret z                       ;;
+
+    ld b, a                     ;; store num cards in b
+
+    ld a,(#deck_X_start)        ;; retrieve X start position of the deck
+    ld c, a                     ;; c = x coordinate 
 
 s_r_d_loop:
     push bc     
-    push ix                      ;; Save b and c values 
-    ;; Get screen address of the card
-    ld de, #CPCT_VMEM_START_ASM     ;; DE = Pointer to start of the screen
-    ld b, #DECK_Y                    ;; B = y coordinate
-    call cpct_getScreenPtr_asm      ;; Calculate video memory location and return it in HL
+    push ix                     ;; Save b and c values 
 
-    ex de, hl
+    ld b, #DECK_Y               ;; c = y coordinate
 
-    ld l, c_sprite(ix)
-    ld h, c_sprite+1(ix)
-    ld c, #S_CARD_WIDTH
-    ld b, #S_CARD_HEIGHT
-    call cpct_drawSprite_asm
+    call  sys_render_card
 
-    pop ix
-    ld de, #sizeof_c
-    add ix, de
+    pop ix                      ;; Move ix to the next card
+    ld de, #sizeof_c            ;;
+    add ix, de                  ;;
 
-    pop bc                  ;; retrive b value for the loop
+    pop bc                      ;; retrive b value for the loop
 
-    ld a, #S_CARD_WIDTH     ;; Calculate x coord in C
-    add c
-    ld c, a 
+    ld a, #S_CARD_WIDTH         ;; Calculate x coord in C
+    add c                       ;;
+    ld c, a                     ;;
 
     djnz s_r_d_loop
     

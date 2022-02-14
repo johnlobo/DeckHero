@@ -33,7 +33,7 @@
                 "${workspaceRoot}/src",
                 "/usr/local/include",
                 "/usr/include",
-                "${env:CPCT_PATH}/src"
+                "/mnt/c/sources/retro/cpctelera/cpctelera/src"
             ],
             "defines": [],
             "browse": {
@@ -57,7 +57,8 @@
             "name": "Win32",
             "includePath": [
                 "${workspaceRoot}/src",
-                "C:/Program Files (x86)/Microsoft Visual Studio*/VC/include"
+                "C:/Program Files (x86)/Microsoft Visual Studio*/VC/include",
+                "C:/sources/retro/cpctelera/cpctelera"
             ],
             "defines": [
                 "_DEBUG",

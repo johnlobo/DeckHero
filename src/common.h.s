@@ -24,6 +24,13 @@
 .globl _s_font_1
 .globl _s_cards_0
 .globl _s_cards_1
+.globl _s_cards_energy_0
+.globl _s_cards_energy_1
+.globl _s_cards_energy_2
+.globl _s_cards_energy_3
+.globl _s_cards_energy_4
+.globl _s_cards_energy_5
+
 
 ;;===============================================================================
 ;; CPCTELERA FUNCTIONS
@@ -78,10 +85,16 @@ SCORE_NUM_BYTES = 4
 ;; Sprites sizes
 S_CARD_WIDTH = 8
 S_CARD_HEIGHT = 41
+S_CARD_ENERGY_WIDTH = 3
+S_CARD_ENERGY_HEIGHT = 8
 
 ;; Deck Position
-DECK_X = 2
+DECK_X = 0
 DECK_Y = 150
+
+;; Font constants
+FONT_WIDTH = 2
+FONT_HEIGHT = 9
 
 ;;===============================================================================
 ;; DEFINED MACROS
