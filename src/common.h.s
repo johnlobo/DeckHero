@@ -75,6 +75,14 @@ ZERO_KEYS_ACTIVATED = #0xFF
 ;; Score constants
 SCORE_NUM_BYTES = 4
 
+;; Sprites sizes
+S_CARD_WIDTH = 8
+S_CARD_HEIGHT = 41
+
+;; Deck Position
+DECK_X = 2
+DECK_Y = 150
+
 ;;===============================================================================
 ;; DEFINED MACROS
 ;;===============================================================================

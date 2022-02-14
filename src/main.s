@@ -31,6 +31,7 @@
 ;;.include "sys/audio.h.s"
 ;;.include "sys/score.h.s"
 ;;.include "sys/files.h.s"
+.include "man/game.h.s"
 
 .module main
 
@@ -92,9 +93,9 @@ _main_init_keypress:
    pop af                              ;; retrieve last a value to set the seed
    call cpct_setSeed_xsp40_u8_asm      ;; change seed
 
-   cpctm_clearScreen_asm 255
+   cpctm_clearScreen_asm 0
    
-   ;;call sys_input_init
+   call man_game_init
 
    ret
 ;;-----------------------------------------------------------------

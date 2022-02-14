@@ -24,7 +24,7 @@
 .macro DefineCard _status, _class, _sprite, _name, _rarity, _type, _energy, _description, _damage, _block, _vulnerable, _weak, _strengh, _exhaust, _add_card
     .db _status
     .db _class
-    .db _sprite
+    .dw _sprite
     .asciz "_name"
     .db _rarity
     .db _type
@@ -45,7 +45,7 @@
 BeginStruct c
 Field c, status , 1
 Field c, class , 1
-Field c, sprite , 1
+Field c, sprite , 2
 Field c, name , 1
 Field c, rarity , 1
 Field c, type , 1

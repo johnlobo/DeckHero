@@ -19,6 +19,8 @@
 .module render_system
 
 .include "sys/render.h.s"
+.include "man/deck.h.s"
+.include "man/card.h.s"
 .include "cpctelera.h.s"
 .include "common.h.s"
 
@@ -81,4 +83,37 @@ sys_render_update::
 ;;  Modified: AF, BC, DE, HL
 ;;
 sys_render_deck::
+    ld ix, #deck_array
+
+    ld b, #deck_num
+    ld c, #DECK_X                    ;; C = x coordinate 
+
+s_r_d_loop:
+    push bc     
+    push ix                      ;; Save b and c values 
+    ;; Get screen address of the card
+    ld de, #CPCT_VMEM_START_ASM     ;; DE = Pointer to start of the screen
+    ld b, #DECK_Y                    ;; B = y coordinate
+    call cpct_getScreenPtr_asm      ;; Calculate video memory location and return it in HL
+
+    ex de, hl
+
+    ld l, c_sprite(ix)
+    ld h, c_sprite+1(ix)
+    ld c, #S_CARD_WIDTH
+    ld b, #S_CARD_HEIGHT
+    call cpct_drawSprite_asm
+
+    pop ix
+    ld de, #sizeof_c
+    add ix, de
+
+    pop bc                  ;; retrive b value for the loop
+
+    ld a, #S_CARD_WIDTH     ;; Calculate x coord in C
+    add c
+    ld c, a 
+
+    djnz s_r_d_loop
+    
     ret

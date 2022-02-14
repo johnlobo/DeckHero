@@ -32,15 +32,17 @@
 .area _DATA
 
 
-DefineComponentArrayStructure_Size _deck, MAX_CARDS, CARD_SIZE     
+DefineComponentArrayStructure_Size deck, MAX_CARDS, CARD_SIZE     
 .db 0   ;;ponemos este aqui como trampita para que siempre haya un tipo invalido al final
 
 ;;
 ;; Definition of model deck
 ;;
-model_deck:
+model_deck::
+model_deck_01::
 ;;         _status,             _class  _sprite     _name   _rarity _type   _energy _description,       _damage _block, _vulnerable _weak   _strengh    _exhaust    _add_card
 DefineCard e_type_card_in_hand, 1,      _s_cards_0, STRIKE, 1,      1,      1,      ^/SINGLE ATTACK/,   3,      0,      0,          0,      0,          0,          0
+model_deck_02::
 DefineCard e_type_card_in_hand, 2,      _s_cards_1, DEFEND, 1,      1,      1,      ^/SIMPLE DEFENCE/,  0,      3,      0,          0,      0,          0,          0
 
 
@@ -60,10 +62,10 @@ DefineCard e_type_card_in_hand, 2,      _s_cards_1, DEFEND, 1,      1,      1,  
 ;;
 man_deck_init::
     xor a
-    ld  (_deck_num), a
+    ld  (deck_num), a
 
-    ld  hl, #_deck_array      ;;ponemos el puntero de la ultima entidad a la primera posicion del array
-    ld  (_deck_pend), hl
+    ld  hl, #deck_array      ;;ponemos el puntero de la ultima entidad a la primera posicion del array
+    ld  (deck_pend), hl
 
     ld  (hl), #e_type_invalid   ;;ponemos el primer elemento del array con tipo invalido
 ret
@@ -79,32 +81,31 @@ ret
 ;;  Modified: AF, BC, DE, HL
 ;;
 man_deck_getArrayHL::
-    ld  hl, #_deck_array
+    ld  hl, #deck_array
 ret
 
 ;;-----------------------------------------------------------------
 ;;
 ;; man_deck_create_card
 ;;
-;;   gets a random number between 0 and 18
+;;  Create a card from the model pointed by HL
 ;;  Input: HL: puntero al array con los datos de inicializacion
 ;;  Output: a random piece
 ;;  Modified: AF, BC, DE, HL
 ;;
 man_deck_create_card::
 
-    ld  de, (_deck_pend)
-    ld  bc, #CARD_SIZE
+    ld  de, (deck_pend)
+    ld  bc, #sizeof_c
     ldir
 
     ;;PASAMOS A LA SIGUIENTE ENTIDAD
-    ld  a, (_deck_num)    ;;aumentamos el numero de entidades
-    inc a
-    ld  (_deck_num), a
+    ld hl, #deck_num    ;;aumentamos el numero de entidades
+    inc (hl)
 
-    ld   hl, (_deck_pend) ;;pasamos el puntero a la siguiente entidad
-    ld   bc, #CARD_SIZE
+    ld   hl, (deck_pend) ;;pasamos el puntero a la siguiente entidad
+    ld   bc, #sizeof_c
     add  hl, bc
-    ld   (_deck_pend), hl
+    ld   (deck_pend), hl
 ret
 
