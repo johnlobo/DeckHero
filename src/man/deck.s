@@ -89,6 +89,31 @@ ret
 
 ;;-----------------------------------------------------------------
 ;;
+;; man_deck_get_random_card
+;;
+;;   gets a random number between 0 and 18
+;;  Input: 
+;;  Output: a random piece
+;;  Modified: AF, BC, DE, HL
+;;
+man_deck_get_random_card::
+    
+    call cpct_getRandom_mxor_u8_asm
+    ld a, 0b0000001
+    and l
+    ld b, a
+    or a
+    jp z, 
+    ld de, #sizeof_c
+    ld hl, #model_deck
+_loop_sum:
+    add hl, de
+
+    ld  hl, #deck_array
+ret
+
+;;-----------------------------------------------------------------
+;;
 ;; man_deck_update_X_start
 ;;
 ;;   gets a random number between 0 and 18

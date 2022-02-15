@@ -81,6 +81,35 @@ sys_render_update::
 
 ;;-----------------------------------------------------------------
 ;;
+;; sys_render_erase_deck
+;;
+;;  Erase the deck render area
+;;  Input: 
+;;  Output: a random piece
+;;  Modified: AF, BC, DE, HL
+;;
+sys_render_erase_deck::
+    ld de, #CPCT_VMEM_START_ASM     ;; DE = Pointer to start of the screen
+    ld b, #DECK_Y                   ;; B = y coordinate 
+    ld a,(#deck_X_start)            ;; retrieve X start position of the deck
+    ld c, a                         ;; c = x coordinate  
+    call cpct_getScreenPtr_asm      ;; Calculate video memory location and return it in HL
+    push hl                         ;; Save screen address in the stack
+    
+    ld a, (deck_num)                ;; Calculate num cards x width of card
+    ld h, a                         ;;
+    ld e, #S_CARD_WIDTH               ;;
+    call sys_util_h_times_e         ;;
+    ld c, l
+
+    ld b, #S_CARD_HEIGHT
+    ld a,#0                         ;; Patern of solid box
+    pop de                          ;; retrieve screen address in de
+    call cpct_drawSolidBox_asm
+    ret
+
+;;-----------------------------------------------------------------
+;;
 ;; sys_render_card
 ;;
 ;;  Renders a specific card
@@ -130,12 +159,13 @@ sys_render_card:
 ;;  Modified: AF, BC, DE, HL
 ;;
 sys_render_deck::
-    ld ix, #deck_array
-
     ld a,(#deck_num)            ;; retrieve num cards in deck
     or a                        ;; If no cards ret
     ret z                       ;;
 
+    ld ix, #deck_array
+    
+    ld a,(#deck_num)            ;; retrieve num cards in deck
     ld b, a                     ;; store num cards in b
 
     ld a,(#deck_X_start)        ;; retrieve X start position of the deck

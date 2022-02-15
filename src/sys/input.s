@@ -624,7 +624,8 @@ sys_input_init::
 _add_card::
     ld hl, #model_deck_01           ;; load in hl the first card of the model deck
     call man_deck_create_card       ;; create a card in the deck
-
+    
+    call sys_render_erase_deck      ;; erase deck area
     call sys_render_deck
     ret
 
@@ -637,8 +638,12 @@ _add_card::
 ;;  Modified: iy, bc
 ;;
 _remove_card::
+    call sys_render_erase_deck      ;; erase deck area
+    
     ld a, #1
     call man_deck_remove_card
+
+    call sys_render_deck
     ret
 
 ;;-----------------------------------------------------------------

@@ -49,12 +49,12 @@
 man_game_init::
     call man_deck_init              ;; Initialize deck
     
-    ;;ld hl, #model_deck_01           ;; load in hl the first card of the model deck
-    ;;call man_deck_create_card       ;; create a card in the deck
-    ;;ld hl, #model_deck_02           ;; load in hl the first card of the model deck
-    ;;call man_deck_create_card       ;; create a card in the deck
-    ;;ld hl, #model_deck_01           ;; load in hl the first card of the model deck
-    ;;call man_deck_create_card       ;; create a card in the deck
+    ld hl, #model_deck_01           ;; load in hl the first card of the model deck
+    call man_deck_create_card       ;; create a card in the deck
+    ld hl, #model_deck_02           ;; load in hl the first card of the model deck
+    call man_deck_create_card       ;; create a card in the deck
+    ld hl, #model_deck_01           ;; load in hl the first card of the model deck
+    call man_deck_create_card       ;; create a card in the deck
     ;;ld hl, #model_deck_02           ;; load in hl the first card of the model deck
     ;;call man_deck_create_card       ;; create a card in the deck
     ;;ld hl, #model_deck_02           ;; load in hl the first card of the model deck

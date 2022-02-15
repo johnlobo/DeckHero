@@ -24,4 +24,5 @@
 ;;===============================================================================
 .globl sys_render_init
 .globl sys_render_update
+.globl sys_render_erase_deck
 .globl sys_render_deck
