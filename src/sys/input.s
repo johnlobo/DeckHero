@@ -66,8 +66,8 @@
 ;;    .dw 0
 
 sys_input_debug_key_actions::
-    ;;.dw Key_O,      _score_move_left
-    ;;.dw Key_P,      _score_move_right
+    .dw Key_O,      _selected_left
+    .dw Key_P,      _selected_right
     .dw Key_Q,      _add_card
     .dw Key_A,      _remove_card
     ;;.dw Key_Space,  _score_fire
@@ -622,10 +622,10 @@ sys_input_init::
 ;;  Modified: iy, bc
 ;;
 _add_card::
-    ld hl, #model_deck_01           ;; load in hl the first card of the model deck
-    call man_deck_create_card       ;; create a card in the deck
-    
+    call cpct_waitVSYNC_asm
     call sys_render_erase_deck      ;; erase deck area
+    call man_deck_get_random_card   ;; get hl pointing to a random card
+    call man_deck_create_card       ;; create a card in the deck
     call sys_render_deck
     ret
 
@@ -638,12 +638,56 @@ _add_card::
 ;;  Modified: iy, bc
 ;;
 _remove_card::
+    call cpct_waitVSYNC_asm
     call sys_render_erase_deck      ;; erase deck area
-    
-    ld a, #1
+    ld a, (deck_selected)
     call man_deck_remove_card
-
     call sys_render_deck
+    ret
+
+;;-----------------------------------------------------------------
+;;
+;;  _selected_left
+;;
+;;  move selected card to the left
+;;  Output:
+;;  Modified: 
+;;
+_selected_left::
+    ld a, (deck_selected)
+    or a
+    ret z
+
+    call cpct_waitVSYNC_asm
+    call sys_render_erase_deck      ;; erase deck area
+    ld hl, #deck_selected
+    dec (hl)
+    call sys_render_deck
+
+    ret
+
+;;-----------------------------------------------------------------
+;;
+;;  _selected_right
+;;
+;;  move selected card to the right
+;;  Output:
+;;  Modified: 
+;;
+_selected_right::
+    ld a, (deck_num)
+    ld b, a
+    ld a, (deck_selected)
+    inc a
+    cp b
+    ret z
+
+    call cpct_waitVSYNC_asm
+    call sys_render_erase_deck      ;; erase deck area
+    ld hl, #deck_selected
+    inc (hl)
+    call sys_render_deck
+
     ret
 
 ;;-----------------------------------------------------------------

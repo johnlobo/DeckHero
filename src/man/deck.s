@@ -37,6 +37,7 @@
 DefineComponentArrayStructure_Size deck, MAX_CARDS, sizeof_c     
 .db 0   ;;ponemos este aqui como trampita para que siempre haya un tipo invalido al final
 deck_X_start:: .db 40
+deck_selected:: .db 0
 
 ;;
 ;; Definition of model deck
@@ -93,23 +94,22 @@ ret
 ;;
 ;;   gets a random number between 0 and 18
 ;;  Input: 
-;;  Output: a random piece
+;;  Output: hl pointing to the start of the random piece
 ;;  Modified: AF, BC, DE, HL
 ;;
 man_deck_get_random_card::
-    
     call cpct_getRandom_mxor_u8_asm
-    ld a, 0b0000001
+    ld a, #0b00000001                   ;; TODO change this when card model increase
     and l
+    ld hl, #model_deck                  ;; point hl to the start of the model cards
+    or a                                ;; If the random card is the first (0) return 
+    ret z
+
     ld b, a
-    or a
-    jp z, 
     ld de, #sizeof_c
-    ld hl, #model_deck
 _loop_sum:
     add hl, de
-
-    ld  hl, #deck_array
+    djnz _loop_sum	
 ret
 
 ;;-----------------------------------------------------------------
@@ -172,14 +172,12 @@ ret
 ;;
 man_deck_remove_card::
 
-    ;;ld h, a                     ;; position de at the begining of the card to remove
-    ;;ld e, #sizeof_c                    ;;
-    ;;call sys_util_h_times_e     ;;    
-    ;;ld a, l                     ;;
-    ;;ld de,  #deck_array         ;;    
-    ;;add_de_a                    ;;
-
     ld b, a                     ;; copy card to erase to b
+    ld a, (deck_num)            ;; check if we have to erase the last card
+    dec a                       ;;
+    cp b                        ;;
+    jr z, _last_card            ;;  jump if we have to erase the last card
+
     ld hl, #deck_array          ;; mode de at the start of the deck
     ld de, #sizeof_c            ;; copy the size of a card in hl
 _sum_loop:                      ;;
@@ -205,7 +203,13 @@ _sum_loop:                      ;;
     pop de                      ;; restore de
 
     ldir
+    jr _not_last_card
 
+_last_card:
+    ld hl, #deck_selected
+    dec (hl)
+    
+_not_last_card:
     ld   hl, (deck_pend)        ;; move deck end back one card
     ld   bc, #sizeof_c          ;;
     sbc  hl, bc                 ;;

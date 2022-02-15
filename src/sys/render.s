@@ -89,23 +89,40 @@ sys_render_update::
 ;;  Modified: AF, BC, DE, HL
 ;;
 sys_render_erase_deck::
-    ld de, #CPCT_VMEM_START_ASM     ;; DE = Pointer to start of the screen
-    ld b, #DECK_Y                   ;; B = y coordinate 
+    ld b, #0                        ;; move num cards in deck to b (index)
     ld a,(#deck_X_start)            ;; retrieve X start position of the deck
     ld c, a                         ;; c = x coordinate  
-    call cpct_getScreenPtr_asm      ;; Calculate video memory location and return it in HL
-    push hl                         ;; Save screen address in the stack
+_e_d_loop01:    
+    push bc                       
+    ld de, #CPCT_VMEM_START_ASM     ;; DE = Pointer to start of the screen
     
-    ld a, (deck_num)                ;; Calculate num cards x width of card
-    ld h, a                         ;;
-    ld e, #S_CARD_WIDTH               ;;
-    call sys_util_h_times_e         ;;
-    ld c, l
+    ld a, (deck_selected)           ;; compare card selected with current card
+    cp b                            ;;
+    ld b, #DECK_Y                   ;; c = y coordinate by default
+    jr nz, _erase_not_selected      ;; jump if current card not selected
+    ld b, #DECK_Y - 5
 
+_erase_not_selected:
+    call cpct_getScreenPtr_asm      ;; Calculate video memory location and return it in HL
+    
+    ex de, hl                       ;; move screen address to de
+    ld c, #S_CARD_WIDTH
     ld b, #S_CARD_HEIGHT
     ld a,#0                         ;; Patern of solid box
-    pop de                          ;; retrieve screen address in de
     call cpct_drawSolidBox_asm
+
+    pop bc                          ;; retrieve bc index of loop, and x coord
+    
+    ld a, #S_CARD_WIDTH             ;; add CARD WITH to x coord
+    add c                           ;;
+    ld c, a                         ;;
+
+    inc b                           ;; increment current card
+
+    ld a, (deck_num)                ;; compare with num of cards in deck
+    cp b                            ;;
+    jr nz, _e_d_loop01              ;; return to loop if not lasta card reached
+
     ret
 
 ;;-----------------------------------------------------------------
@@ -158,25 +175,76 @@ sys_render_card:
 ;;  Output: a random piece
 ;;  Modified: AF, BC, DE, HL
 ;;
+;;sys_render_deck::
+;;    ld a,(#deck_num)            ;; retrieve num cards in deck
+;;    or a                        ;; If no cards ret
+;;    ret z                       ;;
+;;
+;;    ld ix, #deck_array
+;;    
+;;    ld a,(#deck_num)            ;; retrieve num cards in deck
+;;    ld b, a                     ;; store num cards in b
+;;
+;;    ld a,(#deck_X_start)        ;; retrieve X start position of the deck
+;;    ld c, a                     ;; c = x coordinate 
+;;
+;;s_r_d_loop:
+;;    push bc     
+;;    push ix                     ;; Save b and c values 
+;;
+;;    ld a, (deck_selected)       ;; compare card selected with current card
+;;    cp b                        ;;
+;;
+;;    ld b, #DECK_Y               ;; c = y coordinate by default
+;;    jr nz, _not_selected        ;; jump if current card not selected
+;;    ld b, #DECK_Y + 5
+;;
+;;_not_selected:
+;;    call  sys_render_card
+;;
+;;    pop ix                      ;; Move ix to the next card
+;;    ld de, #sizeof_c            ;;
+;;    add ix, de                  ;;
+;;
+;;    pop bc                      ;; retrive b value for the loop
+;;
+;;    ld a, #S_CARD_WIDTH         ;; Calculate x coord in C
+;;    add c                       ;;
+;;    ld c, a                     ;;
+;;
+;;    djnz s_r_d_loop
+;;    
+;;    ret
+
+;;-----------------------------------------------------------------
+;;
+;; sys_render_deck
+;;
+;;  Updates the render system
+;;  Input: 
+;;  Output: a random piece
+;;  Modified: AF, BC, DE, HL
+;;
 sys_render_deck::
-    ld a,(#deck_num)            ;; retrieve num cards in deck
+    ld a,(deck_num)            ;; retrieve num cards in deck
     or a                        ;; If no cards ret
     ret z                       ;;
 
     ld ix, #deck_array
-    
-    ld a,(#deck_num)            ;; retrieve num cards in deck
-    ld b, a                     ;; store num cards in b
-
     ld a,(#deck_X_start)        ;; retrieve X start position of the deck
     ld c, a                     ;; c = x coordinate 
-
-s_r_d_loop:
+    ld b, #0
+_s_r_d_loop0:
     push bc     
     push ix                     ;; Save b and c values 
 
-    ld b, #DECK_Y               ;; c = y coordinate
+    ld a, (deck_selected)       ;; compare card selected with current card
+    cp b                        ;;
+    ld b, #DECK_Y               ;; c = y coordinate by default
+    jr nz, _render_not_selected        ;; jump if current card not selected
+    ld b, #DECK_Y - 5
 
+_render_not_selected:
     call  sys_render_card
 
     pop ix                      ;; Move ix to the next card
@@ -189,6 +257,10 @@ s_r_d_loop:
     add c                       ;;
     ld c, a                     ;;
 
-    djnz s_r_d_loop
-    
+    inc b                       ;; increment current card
+
+    ld a, (deck_num)            ;; compare with num of cards in deck
+    cp b                        ;;
+    jr nz, _s_r_d_loop0         ;; return to loop if not lasta card reached
+
     ret

@@ -40,21 +40,16 @@
 .globl cpct_drawSprite_asm
 .globl cpct_setVideoMode_asm
 .globl cpct_setPalette_asm
-.globl cpct_setPALColour_asm
-.globl cpct_memset_asm
-.globl cpct_getScreenToSprite_asm
-.globl cpct_scanKeyboard_asm
 .globl cpct_scanKeyboard_if_asm
 .globl cpct_isKeyPressed_asm
 .globl cpct_waitHalts_asm
 .globl cpct_drawSolidBox_asm
-.globl cpct_getRandom_xsp40_u8_asm
 .globl cpct_setSeed_xsp40_u8_asm
 .globl cpct_isAnyKeyPressed_asm
 .globl cpct_setInterruptHandler_asm
 .globl cpct_waitVSYNC_asm
-.globl cpct_drawSpriteBlended_asm
 .globl _cpct_keyboardStatusBuffer
+.globl cpct_getRandom_mxor_u8_asm
 
 ;;===============================================================================
 ;; DEFINED CONSTANTS
