@@ -18,7 +18,10 @@
 
 .module Component
 
+;;===============================================================================
 ;; COMPONENT DEFINITION MACRO
+;;===============================================================================
+
 
 .macro DefineComponentArrayStructure_Size _Tname, _N, _ComponentSize
       _Tname'_num::     .db 0
@@ -26,3 +29,20 @@
       _Tname'_array::
             .ds _N * _ComponentSize
 .endm
+
+
+;;===============================================================================
+;; POINTER TO CARD DEFINITION MACRO
+;;===============================================================================
+.macro DefineP2C _status, _pointer
+    .db _status
+    .dw _pointer
+.endm
+
+;;===============================================================================
+;; CARD SCTRUCTURE CREATION
+;;===============================================================================
+BeginStruct p2c
+Field p2c, status , 1
+Field p2c, pointer , 2
+EndStruct c
