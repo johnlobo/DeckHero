@@ -242,16 +242,16 @@ draw_string_2::
     cp #58                          ;; numbers
     jr c, _numbers
 _rest_of_chars:    
-    sub #49                         ;; chars from ? to Z
+    sub #45                         ;; chars from ? to Z
     jr _draw_char                   
 _exclamation:
     ld a, #0
     jr _draw_char
 _symbols:
-    sub #43
+    sub #39
     jr _draw_char
 _numbers:
-    sub #44
+    sub #40
 _draw_char:
     push de
     ld h, #FONT_WIDTH               ;; copy FONT WIDTH in l

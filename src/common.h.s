@@ -24,6 +24,9 @@
 .globl _s_font_1
 .globl _s_cards_0
 .globl _s_cards_1
+.globl _s_cards_2
+.globl _s_cards_3
+.globl _s_cards_4
 .globl _s_cards_energy_0
 .globl _s_cards_energy_1
 .globl _s_cards_energy_2
@@ -85,11 +88,20 @@ S_CARD_ENERGY_HEIGHT = 8
 
 ;; Deck Position
 DECK_X = 0
-DECK_Y = 150
+DECK_Y = 130
+DESC_X = 1
+DESC_Y_1 = 180
+DESC_Y_2 = 190
 
 ;; Font constants
 FONT_WIDTH = 2
 FONT_HEIGHT = 9
+
+;; DECK CONSTANTS
+CARD_SIZE = 22
+MAX_HAND_CARDS = 10
+MAX_DECK_CARDS = 30
+MAX_MODEL_CARD = 4
 
 ;;===============================================================================
 ;; DEFINED MACROS

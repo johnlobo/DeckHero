@@ -4,7 +4,7 @@
 
 #include <types.h>
 #define S_FONT_0_W 2
-#define S_FONT_0_H 378
-extern const u8 s_font_0[2 * 378];
+#define S_FONT_0_H 414
+extern const u8 s_font_0[2 * 414];
 
 #endif

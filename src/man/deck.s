@@ -34,7 +34,7 @@
 .area _DATA
 
 
-DefineComponentArrayStructure_Size deck, MAX_CARDS, sizeof_c     
+DefineComponentArrayStructure_Size deck, MAX_DECK_CARDS, sizeof_c     
 .db 0   ;;ponemos este aqui como trampita para que siempre haya un tipo invalido al final
 deck_X_start:: .db 40
 deck_selected:: .db 0
@@ -43,11 +43,12 @@ deck_selected:: .db 0
 ;; Definition of model deck
 ;;
 model_deck::
-;;         _status,             _class  _sprite     _name          _rarity _type   _energy _description,       _damage _block, _vulnerable _weak   _strengh    _exhaust    _add_card
-model_deck_01::
-DefineCard e_type_card_in_hand, 1,      _s_cards_0, ^/STRIKE    /, 1,      1,      3,      ^/SINGLE ATTACK       /,   3,      0,      0,          0,      0,          0,          0
-model_deck_02::
-DefineCard e_type_card_in_hand, 2,      _s_cards_1, ^/DEFEND    /, 1,      1,      2,      ^/SIMPLE DEFENCE      /,  0,      3,      0,          0,      0,          0,          0
+;;         _status,        _class  _sprite     _name              _rarity   _type   _energy  _description,                    _damage _block, _vulnerable _weak   _strengh    _exhaust    _add_card
+DefineCard e_type_card_in_hand, 1, _s_cards_0, ^/HIT            /, 1,      1,      1,      ^/SINGLE ATTACK - 6DM           /,  3,      0,      0,          0,      0,          0,          0
+DefineCard e_type_card_in_hand, 2, _s_cards_1, ^/DEFEND         /, 1,      1,      1,      ^/SIMPLE DEFENCE - 5BK          /,  0,      3,      0,          0,      0,          0,          0
+DefineCard e_type_card_in_hand, 2, _s_cards_2, ^/BASH           /, 1,      1,      2,      ^/STRONG HIT - 8DM+2VN          /,  0,      3,      0,          0,      0,          0,          0
+DefineCard e_type_card_in_hand, 2, _s_cards_3, ^/UNBREAKABLE    /, 1,      1,      1,      ^/GREAT DEFENCE - 30BK (E)      /,  0,      3,      0,          0,      0,          0,          0
+DefineCard e_type_card_in_hand, 2, _s_cards_4, ^/IGNORE         /, 1,      1,      1,      ^/GOOD BLOCK - 8BK+1C           /,  0,      3,      0,          0,      0,          0,          0
 
 
 ;;
@@ -99,8 +100,19 @@ ret
 ;;
 man_deck_get_random_card::
     call cpct_getRandom_mxor_u8_asm
-    ld a, #0b00000001                   ;; TODO change this when card model increase
-    and l
+    ;;ld a, #0b00000111                   ;; TODO change this when card model increase
+    ;;and l
+
+    ld a, l                             ;; Calculates a pseudo modulus of MAX_MODEL_CARD
+    ld h,#0                             ;; Load hl with the random number
+    ld bc,#MAX_MODEL_CARD               ;; Load bc with the max value
+mod_loop:
+    or a                                ;; ??
+    sbc hl,bc                           ;; hl = hl - bc
+    jp p, mod_loop                      ;; Jump back if hl > 0
+    add hl,bc                           ;; Adds MAX_MODEL_CARD to hl back to get back to positive values
+    ld a,l                              ;; loads the normalized random number in a
+
     ld hl, #model_deck                  ;; point hl to the start of the model cards
     or a                                ;; If the random card is the first (0) return 
     ret z
@@ -124,9 +136,15 @@ ret
 man_deck_update_X_start:
     ;; Calculate x start coord
     ld a, (deck_num)
-    sla a                       ;; Multiply num cards by 8
+    ;;sla a                       ;; Multiply num cards by 8
+    ;;sla a                       ;;
+    ;;sla a                       ;;
+    ld c, a                     ;; Multiply num cards by 6
     sla a                       ;;
-    sla a                       ;;
+    sla a                       ;; Multyply by 4
+    add c                       ;;
+    add c                       ;; Multiplies by 6
+
     srl a                       ;; Divide (num cards*8) by 2
     ld c,a                      ;; move ((num cards*8)/2) to c
     ld a, #40                   ;; a = 40
@@ -171,6 +189,9 @@ ret
 ;;  Modified: AF, BC, DE, HL
 ;;
 man_deck_remove_card::
+
+    or a                        ;; check if we have to erase the first card
+    jp z, _not_last_card        ;; jump if 0
 
     ld b, a                     ;; copy card to erase to b
     ld a, (deck_num)            ;; check if we have to erase the last card

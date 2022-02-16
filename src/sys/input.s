@@ -622,6 +622,10 @@ sys_input_init::
 ;;  Modified: iy, bc
 ;;
 _add_card::
+    ld a, (deck_num)                ;; Check if we already have 10 cards in the deck
+    cp #10                          ;;
+    ret z                           ;; if 10 return
+
     call cpct_waitVSYNC_asm
     call sys_render_erase_deck      ;; erase deck area
     call man_deck_get_random_card   ;; get hl pointing to a random card
@@ -638,6 +642,10 @@ _add_card::
 ;;  Modified: iy, bc
 ;;
 _remove_card::
+    ld a, (deck_num)                ;; Check if we dont have any card in the deck
+    or a                            ;;
+    ret z                           ;; if 0 return
+
     call cpct_waitVSYNC_asm
     call sys_render_erase_deck      ;; erase deck area
     ld a, (deck_selected)
