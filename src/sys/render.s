@@ -20,11 +20,14 @@
 
 .include "sys/render.h.s"
 .include "man/deck.h.s"
+.include "man/hand.h.s"
 .include "man/card.h.s"
 .include "sys/text.h.s"
 .include "sys/util.h.s"
 .include "cpctelera.h.s"
 .include "common.h.s"
+.include "comp/component.h.s"
+
 
 ;;
 ;; Start of _DATA area 
@@ -88,15 +91,15 @@ sys_render_update::
 ;;  Output: a random piece
 ;;  Modified: AF, BC, DE, HL
 ;;
-sys_render_erase_deck::
+sys_render_erase_hand::
     ld b, #0                        ;; move num cards in deck to b (index)
-    ld a,(#deck_X_start)            ;; retrieve X start position of the deck
+    ld a,(#hand_X_start)            ;; retrieve X start position of the deck
     ld c, a                         ;; c = x coordinate  
 _e_d_loop01:    
     push bc                       
     ld de, #CPCT_VMEM_START_ASM     ;; DE = Pointer to start of the screen
     
-    ld a, (deck_selected)           ;; compare card selected with current card
+    ld a, (hand_selected)           ;; compare card selected with current card
     cp b                            ;;
     ld b, #DECK_Y                   ;; c = y coordinate by default
     jr nz, _erase_not_selected      ;; jump if current card not selected
@@ -119,7 +122,7 @@ _erase_not_selected:
 
     inc b                           ;; increment current card
 
-    ld a, (deck_num)                ;; compare with num of cards in deck
+    ld a, (hand_num)                ;; compare with num of cards in deck
     cp b                            ;;
     jr nz, _e_d_loop01              ;; return to loop if not lasta card reached
 
@@ -171,9 +174,6 @@ sys_render_card:
 
     ret
 
-
-
-
 ;;-----------------------------------------------------------------
 ;;
 ;; sys_render_deck
@@ -202,7 +202,7 @@ _s_r_d_loop0:
     jr nz, _render_not_selected                             ;; jump if current card not selected
     ld b, #DECK_Y - 5
 
-    cpctm_push AF, BC, DE, HL                               ;; Save values              
+    cpctm_push AF, BC, DE, HL , IX                                  ;; Save values              
     ;; Render Card Name
     ld de, #c_name                                              ;; load name address in hl
     ld__hl_ix                                                   ;; load card index in hl
@@ -218,7 +218,7 @@ _s_r_d_loop0:
     ld c, #0                                                    ;; first color
     call sys_text_draw_string                                   ;; draw card name
 
-    cpctm_pop HL, DE, BC, AF                                    ;; Restore values    
+    cpctm_pop IX, HL, DE, BC, AF                                    ;; Restore values    
 
 _render_not_selected:
     call  sys_render_card
@@ -238,5 +238,84 @@ _render_not_selected:
     ld a, (deck_num)            ;; compare with num of cards in deck
     cp b                        ;;
     jr nz, _s_r_d_loop0         ;; return to loop if not lasta card reached
+
+    ret
+
+;;-----------------------------------------------------------------
+;;
+;; sys_render_hand
+;;
+;;  Renders a hand of cards 
+;;  Input: 
+;;  Output: 
+;;  Modified: AF, BC, DE, HL, IX, IY
+;;
+sys_render_hand::
+
+    ld a,(hand_num)             ;; retrieve num cards in deck
+    or a                        ;; If no cards ret
+    ret z                       ;;
+
+    push iy                     ;; save iy in the pile
+    ld ix, #hand_array
+    ld a,(#hand_X_start)        ;; retrieve X start position of the deck
+    ld c, a                     ;; c = x coordinate 
+    ld b, #0
+_s_r_h_loop0:
+    push bc     
+    push ix                                                 ;; Save b and c values 
+
+    ld l, p2c_p(ix)                                         ;; Load card pointer in hl
+    ld h, p2c_p+1(ix)                                       ;;
+
+    ld__iy_hl
+
+    ld a, (hand_selected)                                   ;; compare card selected with current card
+    cp b                                                    ;;
+    ld b, #HAND_Y                                           ;; c = y coordinate by default
+    jr nz, _hand_render_not_selected                             ;; jump if current card not selected
+    ld b, #HAND_Y - 5
+
+    cpctm_push AF, BC, DE, HL                               ;; Save values              
+    ;; Render Card Name
+    ld de, #c_name                                              ;; load name address in hl
+    ld__hl_iy                                                   ;; load card index in hl
+    add hl, de                                                  ;; add name offset to hl
+    cpctm_screenPtr_asm de, CPCT_VMEM_START_ASM, DESC_X, DESC_Y_1    ;; screen address in de
+    ld c, #1                                                    ;; first color
+    call sys_text_draw_string                                   ;; draw card name
+    ;; Render Card Description
+    ld de, #c_description                                       ;; load description address in hl
+    ld__hl_iy                                                   ;; load card index in hl
+    add hl, de                                                  ;; add name offset to hl
+    cpctm_screenPtr_asm de, CPCT_VMEM_START_ASM, DESC_X, DESC_Y_2    ;; screen address in de
+    ld c, #0                                                    ;; first color
+    call sys_text_draw_string                                   ;; draw card name
+
+    cpctm_pop HL, DE, BC, AF                                    ;; Restore values    
+
+_hand_render_not_selected:
+    push iy                                                     ;; move iy to ix for render card
+    pop ix                                                      ;;
+    
+    call  sys_render_card                                       ;; render card
+
+    pop ix                      ;; Move ix to the next card
+    ld de, #sizeof_p2c          ;;
+    add ix, de                  ;;
+
+    pop bc                      ;; retrive b value for the loop
+
+    ld a, #(S_CARD_WIDTH-2)         ;; Calculate x coord in C
+    add c                       ;;
+    ld c, a                     ;;
+
+    inc b                       ;; increment current card
+
+    ld a, (hand_num)            ;; compare with num of cards in deck
+    cp b                        ;;
+    jr nz, _s_r_h_loop0         ;; return to loop if not lasta card reached
+
+    pop iy
 
     ret

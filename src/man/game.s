@@ -18,9 +18,7 @@
 
 .module game_manager
 .include "common.h.s"
-.include "sys/render.h.s"
-.include "man/deck.h.s"
-.include "sys/input.h.s"
+.include "man/fight.h.s"
 
 
 
@@ -47,24 +45,8 @@
 ;;  Modified: AF, BC, DE, HL
 ;;
 man_game_init::
-    call man_deck_init              ;; Initialize deck
-    
-    ;;ld hl, #model_deck_01           ;; load in hl the first card of the model deck
-    ;;call man_deck_create_card       ;; create a card in the deck
-    ;;ld hl, #model_deck_02           ;; load in hl the first card of the model deck
-    ;;call man_deck_create_card       ;; create a card in the deck
-    ;;ld hl, #model_deck_01           ;; load in hl the first card of the model deck
-    ;;call man_deck_create_card       ;; create a card in the deck
-
-    call man_deck_get_random_card   ;; get hl pointing to a random card
-    call man_deck_create_card       ;; create a card in the deck
-    call man_deck_get_random_card   ;; get hl pointing to a random card
-    call man_deck_create_card       ;; create a card in the deck
-    call man_deck_get_random_card   ;; get hl pointing to a random card
-    call man_deck_create_card       ;; create a card in the deck
-
-    call sys_render_deck            ;; render the deck
-
+   
+    call man_fight_init
     ret
 
 ;;-----------------------------------------------------------------
@@ -77,16 +59,5 @@ man_game_init::
 ;;  Modified: AF, BC, DE, HL
 ;;
 man_game_update::
-
-    call sys_input_debug_update
-    ld b, #20
-    call cpct_waitHalts_asm
-;;
-;; Turn structure
-;; 1) Show foes intentions
-;; 2) hero play cards
-;; 3) Foes execute intention
-;; 4) Upate effects
-;; 5) Check end of combat
-;;
+    call man_fight_update
     ret

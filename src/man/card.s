@@ -18,6 +18,8 @@
 
 .module card_manager
 
+.include "man/card.h.s"
+
 
 ;;
 ;; Start of _DATA area 
@@ -31,3 +33,7 @@
 ;; Start of _CODE area
 ;; 
 .area _CODE
+
+default_card:
+;;         _status,        _class  _sprite     _name              _rarity   _type   _energy  _description,                    _damage _block, _vulnerable _weak   _strengh    _exhaust    _add_card
+DefineCard e_type_card_in_hand, 1, _s_cards_0, ^/HIT            /, 1,      1,      1,      ^/SINGLE ATTACK - 6DM           /,  3,      0,      0,          0,      0,          0,          0

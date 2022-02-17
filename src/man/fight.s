@@ -20,6 +20,10 @@
 
 .include "common.h.s"
 .include "man/deck.h.s"
+.include "man/hand.h.s"
+.include "sys/input.h.s"
+.include "sys/render.h.s"
+
 
 ;;
 ;; Start of _DATA area 
@@ -44,6 +48,16 @@
 ;;  Modified: 
 ;;
 man_fight_init::
+    call man_deck_init              ;; Initialize deck
+
+    call man_deck_get_random_card   ;; get hl pointing to a random card
+    call man_hand_create_card       ;; create a card in the deck
+    call man_deck_get_random_card   ;; get hl pointing to a random card
+    call man_hand_create_card       ;; create a card in the deck
+    call man_deck_get_random_card   ;; get hl pointing to a random card
+    call man_hand_create_card       ;; create a card in the deck
+    
+    call sys_render_hand            ;; render the deck
     ret
 
 ;;-----------------------------------------------------------------
@@ -56,4 +70,16 @@ man_fight_init::
 ;;  Modified: 
 ;;
 man_fight_update::
+      
+    call sys_input_debug_update
+    ld b, #20
+    call cpct_waitHalts_asm
+;;
+;; Turn structure
+;; 1) Show foes intentions
+;; 2) hero play cards
+;; 3) Foes execute intention
+;; 4) Upate effects
+;; 5) Check end of combat
+;;
     ret

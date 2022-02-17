@@ -89,6 +89,10 @@ S_CARD_ENERGY_HEIGHT = 8
 ;; Deck Position
 DECK_X = 0
 DECK_Y = 130
+
+HAND_X = 0
+HAND_Y = 130
+
 DESC_X = 1
 DESC_Y_1 = 180
 DESC_Y_2 = 190

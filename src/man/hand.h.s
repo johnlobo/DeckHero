@@ -21,7 +21,7 @@
 ;;===============================================================================
 ;; CARD DEFINITION MACRO
 ;;===============================================================================
-.macro DefineCard _status, _class, _sprite, _name, _rarity, _type, _energy, _description, _damage, _block, _vulnerable, _weak, _strengh, _exhaust, _add_card
+.macro DefineHand _status, _class, _sprite, _name, _rarity, _type, _energy, _description, _damage, _block, _vulnerable, _weak, _strengh, _exhaust, _add_card
     .db _status
     .db _class
     .dw _sprite
@@ -59,3 +59,20 @@ Field c, strengh , 1
 Field c, exhaust , 1
 Field c, add_card , 1
 EndStruct c
+
+;;===============================================================================
+;; PUBLIC VARIABLES
+;;===============================================================================
+.globl hand_num
+.globl hand_pend
+.globl hand_array
+.globl hand_X_start
+.globl hand_selected
+
+
+;;===============================================================================
+;; PUBLIC METHODS
+;;===============================================================================
+.globl man_hand_init
+.globl man_hand_create_card
+.globl man_hand_remove_card

@@ -224,12 +224,11 @@ _char_buffer:: .db 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 sys_text_draw_string::
-    push ix
+    cpctm_push ix, iy
     ld a,c
     ld (_string_color),a            ;; store color in memory
 draw_string_2::
-    push de
-    push hl
+    cpctm_push de, hl 
     ld a, (hl)                      ;; load a with the char to draw
     or a
     jr z, _draw_string_exit         ;; if char == 0 return
@@ -275,8 +274,6 @@ _next_char:
     inc de
     jr draw_string_2
 _draw_string_exit:
-    pop hl
-    pop de
-    pop ix
+    cpctm_pop hl, de, iy, ix
     ret
 _string_color: .db 0

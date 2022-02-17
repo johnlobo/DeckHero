@@ -26,6 +26,7 @@
 .include "sys/render.h.s"
 ;;.include "sys/score.h.s"
 .include "man/deck.h.s"
+.include "man/hand.h.s"
 
 ;;
 ;; Start of _DATA area 
@@ -622,15 +623,15 @@ sys_input_init::
 ;;  Modified: iy, bc
 ;;
 _add_card::
-    ld a, (deck_num)                ;; Check if we already have 10 cards in the deck
+    ld a, (hand_num)                ;; Check if we already have 10 cards in the deck
     cp #10                          ;;
     ret z                           ;; if 10 return
 
     call cpct_waitVSYNC_asm
-    call sys_render_erase_deck      ;; erase deck area
+    call sys_render_erase_hand      ;; erase deck area
     call man_deck_get_random_card   ;; get hl pointing to a random card
-    call man_deck_create_card       ;; create a card in the deck
-    call sys_render_deck
+    call man_hand_create_card       ;; create a card in the deck
+    call sys_render_hand
     ret
 
 ;;-----------------------------------------------------------------
@@ -642,15 +643,15 @@ _add_card::
 ;;  Modified: iy, bc
 ;;
 _remove_card::
-    ld a, (deck_num)                ;; Check if we dont have any card in the deck
+    ld a, (hand_num)                ;; Check if we dont have any card in the deck
     or a                            ;;
     ret z                           ;; if 0 return
 
     call cpct_waitVSYNC_asm
-    call sys_render_erase_deck      ;; erase deck area
+    call sys_render_erase_hand      ;; erase deck area
     ld a, (deck_selected)
-    call man_deck_remove_card
-    call sys_render_deck
+    call man_hand_remove_card
+    call sys_render_hand
     ret
 
 ;;-----------------------------------------------------------------
@@ -662,15 +663,15 @@ _remove_card::
 ;;  Modified: 
 ;;
 _selected_left::
-    ld a, (deck_selected)
+    ld a, (hand_selected)
     or a
     ret z
 
     call cpct_waitVSYNC_asm
-    call sys_render_erase_deck      ;; erase deck area
-    ld hl, #deck_selected
+    call sys_render_erase_hand      ;; erase deck area
+    ld hl, #hand_selected
     dec (hl)
-    call sys_render_deck
+    call sys_render_hand
 
     ret
 
@@ -683,18 +684,18 @@ _selected_left::
 ;;  Modified: 
 ;;
 _selected_right::
-    ld a, (deck_num)
+    ld a, (hand_num)
     ld b, a
-    ld a, (deck_selected)
+    ld a, (hand_selected)
     inc a
     cp b
     ret z
 
     call cpct_waitVSYNC_asm
-    call sys_render_erase_deck      ;; erase deck area
-    ld hl, #deck_selected
+    call sys_render_erase_hand      ;; erase deck area
+    ld hl, #hand_selected
     inc (hl)
-    call sys_render_deck
+    call sys_render_hand
 
     ret
 

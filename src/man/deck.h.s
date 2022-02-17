@@ -42,3 +42,4 @@
 .globl man_deck_create_card
 .globl man_deck_remove_card
 .globl man_deck_get_random_card
+.globl man_deck_model_get_random_card
