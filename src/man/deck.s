@@ -50,7 +50,9 @@ model_defend:
 DefineCard e_type_card_in_hand, 2, _s_cards_1, ^/DEFEND         /, 1,      1,      1,      ^/SIMPLE DEFENCE - 5BK          /,  0,      3,      0,          0,      0,          0,          0
 model_bash:
 DefineCard e_type_card_in_hand, 2, _s_cards_2, ^/BASH           /, 1,      1,      2,      ^/STRONG HIT - 8DM+2VN          /,  0,      3,      0,          0,      0,          0,          0
+model_unbreakeable:
 DefineCard e_type_card_in_hand, 2, _s_cards_3, ^/UNBREAKABLE    /, 1,      1,      1,      ^/GREAT DEFENCE - 30BK (E)      /,  0,      3,      0,          0,      0,          0,          0
+model_ignore:
 DefineCard e_type_card_in_hand, 2, _s_cards_4, ^/IGNORE         /, 1,      1,      1,      ^/GOOD BLOCK - 8BK+1C           /,  0,      3,      0,          0,      0,          0,          0
 
 
@@ -80,9 +82,13 @@ man_deck_init::
     ;; Load default cards in deck
     ld hl, #model_hit
     call man_deck_create_card
-    ;;ld hl, #model_defend
-    ;;call man_deck_create_card
+    ld hl, #model_defend
+    call man_deck_create_card
     ld hl, #model_bash
+    call man_deck_create_card
+    ld hl, #model_unbreakeable
+    call man_deck_create_card
+    ld hl, #model_ignore
     call man_deck_create_card
 ret
 

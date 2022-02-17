@@ -68,7 +68,7 @@ sys_render_init::
     ld de, #16                              ;;
     call cpct_setPalette_asm                ;;
 
-    cpctm_setBorder_asm HW_BRIGHT_WHITE     ;; Set Border
+    cpctm_setBorder_asm HW_BLACK            ;; Set Border
 
     cpctm_clearScreen_asm 0                 ;; Clear screen
 
@@ -105,9 +105,9 @@ _e_d_loop01:
     
     ld a, (hand_selected)           ;; compare card selected with current card
     cp b                            ;;
-    ld b, #DECK_Y                   ;; c = y coordinate by default
+    ld b, #HAND_Y                   ;; c = y coordinate by default
     jr nz, _erase_not_selected      ;; jump if current card not selected
-    ld b, #DECK_Y - 5
+    ld b, #HAND_Y - 5
 
 _erase_not_selected:
     call cpct_getScreenPtr_asm      ;; Calculate video memory location and return it in HL
@@ -337,19 +337,19 @@ sys_render_show_deck::
 
     cpctm_clearScreen_asm 0
 
-    cpctm_screenPtr_asm de, CPCT_VMEM_START_ASM, 10, 10  ;; screen address in de
-    ld b, #60
+    cpctm_screenPtr_asm de, CPCT_VMEM_START_ASM, 5, 10  ;; screen address in de
+    ld b, #70
     ld c, #180
     ld a, #0xff
     call sys_messages_draw_box
 
     ld hl, #_show_deck_string
-    cpctm_screenPtr_asm de, CPCT_VMEM_START_ASM, 15, 15  ;; screen address in de
+    cpctm_screenPtr_asm de, CPCT_VMEM_START_ASM, 27, 14  ;; screen address in de
     ld c, #0
     call sys_text_draw_string
 
    ld ix, #deck_array
-   ld c, #5                     ;; c = x coordinate 
+   ld c, #DECK_X                     ;; c = x coordinate 
    ld b, #0
 _s_r_s_d_loop0:
    push bc     
