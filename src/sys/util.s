@@ -176,31 +176,3 @@ BCD_cp_direct:
   djnz BCD_cp_direct
   or a                    ;; Clear carry
   ret
-
-;;-----------------------------------------------------------------
-;;
-;; sys_util_41_modulo
-;;
-;;  Converts a 0-256 number to 0-41
-;;  Input:  a: Number to convert
-;;  Output: a: Number converted 
-;;  Destroyed: af, bc
-;;
-;;  Original idea by Eto (https://www.cpcwiki.eu/forum/programming/random-number-between-0-and-41)
-;;
-sys_util_41_modulo::
-  ld b, a
-  sra a
-  sra a
-  sra a
-  sra a
-  sra a
-  ld c, a
-  ld a, b
-  and #0b00011111
-  add c
-  ld c,a
-  ld a, r
-  and #0b00000011
-  add c
-  ret

@@ -71,6 +71,7 @@ sys_input_debug_key_actions::
     .dw Key_P,      _selected_right
     .dw Key_Q,      _add_card
     .dw Key_A,      _remove_card
+    .dw Key_D,      _show_deck
     ;;.dw Key_Space,  _score_fire
     ;;.dw Key_Esc,    _score_cancel_entry
     ;;.dw Joy0_Left,  _score_move_left
@@ -613,6 +614,21 @@ sys_input_init::
 ;;    ld e_set(ix), #1
 ;;    call _input_update_moved
 ;;    ret
+
+;;-----------------------------------------------------------------
+;;
+;;  _show_deck
+;;
+;;  Shows deck on scree
+;;  Output:
+;;  Modified: 
+;;
+_show_deck::
+    call sys_render_show_deck
+    call sys_input_wait4anykey
+    cpctm_clearScreen_asm 0
+    call sys_render_hand
+    ret
 
 ;;-----------------------------------------------------------------
 ;;

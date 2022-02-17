@@ -216,8 +216,8 @@ y_coord:
 ;;  draws an empty box
 ;;  Input:  (2B DE) memory	Video memory pointer to the upper left box corner byte
 ;;          (1B A ) colour_pattern	1-byte colour pattern (in screen pixel format) to fill the box with
-;;          (1B C ) HEIGHT	Box width in bytes [1-64] (Beware!  not in pixels!)
-;;          (1B B ) WIDTH	Box height in bytes (>0)
+;;          (1B C ) WIDTH	Box width in bytes [1-64] (Beware!  not in pixels!)
+;;          (1B B ) HEIGHT	Box height in bytes (>0)
 ;;  Output:
 ;;  Modified: af, hl, de, bc
 ;;

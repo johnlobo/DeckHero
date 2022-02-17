@@ -27,3 +27,4 @@
 .globl sys_render_erase_hand
 .globl sys_render_deck
 .globl sys_render_hand
+.globl sys_render_show_deck
