@@ -19,6 +19,7 @@
 .module game_manager
 .include "common.h.s"
 .include "man/fight.h.s"
+.include "man/oponent.h.s"
 
 
 
@@ -29,6 +30,9 @@
 ;;  right after _CODE area contents.
 ;;
 .area _DATA
+
+player::
+DefineOponent 1, ^/PLAYER1        /, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 
 ;;
 ;; Start of _CODE area
