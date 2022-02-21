@@ -22,6 +22,7 @@
 .include "man/deck.h.s"
 .include "man/hand.h.s"
 .include "man/card.h.s"
+.include "man/oponent.h.s"
 .include "sys/text.h.s"
 .include "sys/util.h.s"
 .include "sys/messages.h.s"
@@ -178,72 +179,6 @@ sys_render_card:
 
     ret
 
-;;-----------------------------------------------------------------
-;;
-;; sys_render_deck
-;;
-;;  Updates the render system
-;;  Input: 
-;;  Output: a random piece
-;;  Modified: AF, BC, DE, HL
-;;
-sys_render_deck::
-    ld a,(deck_num)            ;; retrieve num cards in deck
-    or a                        ;; If no cards ret
-    ret z                       ;;
-
-    ld ix, #deck_array
-    ld a,(#deck_X_start)        ;; retrieve X start position of the deck
-    ld c, a                     ;; c = x coordinate 
-    ld b, #0
-_s_r_d_loop0:
-    push bc     
-    push ix                                                 ;; Save b and c values 
-
-    ld a, (deck_selected)                                   ;; compare card selected with current card
-    cp b                                                    ;;
-    ld b, #DECK_Y                                           ;; c = y coordinate by default
-    jr nz, _render_not_selected                             ;; jump if current card not selected
-    ld b, #DECK_Y - 5
-
-    cpctm_push AF, BC, DE, HL , IX                                  ;; Save values              
-    ;; Render Card Name
-    ld de, #c_name                                              ;; load name address in hl
-    ld__hl_ix                                                   ;; load card index in hl
-    add hl, de                                                  ;; add name offset to hl
-    cpctm_screenPtr_asm de, CPCT_VMEM_START_ASM, DESC_X, DESC_Y_1    ;; screen address in de
-    ld c, #1                                                    ;; first color
-    call sys_text_draw_string                                   ;; draw card name
-    ;; Render Card Description
-    ld de, #c_description                                       ;; load description address in hl
-    ld__hl_ix                                                   ;; load card index in hl
-    add hl, de                                                  ;; add name offset to hl
-    cpctm_screenPtr_asm de, CPCT_VMEM_START_ASM, DESC_X, DESC_Y_2    ;; screen address in de
-    ld c, #0                                                    ;; first color
-    call sys_text_draw_string                                   ;; draw card name
-
-    cpctm_pop IX, HL, DE, BC, AF                                    ;; Restore values    
-
-_render_not_selected:
-    call  sys_render_card
-
-    pop ix                      ;; Move ix to the next card
-    ld de, #sizeof_c            ;;
-    add ix, de                  ;;
-
-    pop bc                      ;; retrive b value for the loop
-
-    ld a, #(S_CARD_WIDTH-2)         ;; Calculate x coord in C
-    add c                       ;;
-    ld c, a                     ;;
-
-    inc b                       ;; increment current card
-
-    ld a, (deck_num)            ;; compare with num of cards in deck
-    cp b                        ;;
-    jr nz, _s_r_d_loop0         ;; return to loop if not lasta card reached
-
-    ret
 
 ;;-----------------------------------------------------------------
 ;;
@@ -326,7 +261,7 @@ _hand_render_not_selected:
 
 ;;-----------------------------------------------------------------
 ;;
-;; sys_show_deck
+;; sys_render_show_deck
 ;;
 ;;  Shows the current deck on screen
 ;;  Input: 
@@ -348,54 +283,161 @@ sys_render_show_deck::
     ld c, #0
     call sys_text_draw_string
 
-   ld ix, #deck_array
-   ld c, #DECK_X                     ;; c = x coordinate 
-   ld b, #0
+    ld ix, #deck_array
+    ld c, #DECK_X                     ;; c = x coordinate 
+    ld b, #0
 _s_r_s_d_loop0:
-   push bc     
-   push ix                                                 ;; Save b and c values 
+    push bc     
+    push ix                                                 ;; Save b and c values 
 
-   ld a, (deck_selected)                                   ;; compare card selected with current card
-   cp b                                                    ;;
-   ld b, #DECK_Y                                           ;; c = y coordinate by default
-   jr nz, _render_not_selected_show                             ;; jump if current card not selected
-   ld b, #DECK_Y - 5
+    ld a, (deck_selected)                                   ;; compare card selected with current card
+    cp b                                                    ;;
+    ld b, #DECK_Y                                           ;; c = y coordinate by default
+    jr nz, _render_not_selected_show                             ;; jump if current card not selected
+    ld b, #DECK_Y - 5
 
-   cpctm_push AF, BC, DE, HL , IX                                  ;; Save values              
-   ;; Render Card Name
-   ld de, #c_name                                              ;; load name address in hl
-   ld__hl_ix                                                   ;; load card index in hl
-   add hl, de                                                  ;; add name offset to hl
-   cpctm_screenPtr_asm de, CPCT_VMEM_START_ASM, DESC_SHOW_X, DESC_SHOW_Y_1    ;; screen address in de
-   ld c, #1                                                    ;; first color
-   call sys_text_draw_string                                   ;; draw card name
-   ;; Render Card Description
-   ld de, #c_description                                       ;; load description address in hl
-   ld__hl_ix                                                   ;; load card index in hl
-   add hl, de                                                  ;; add name offset to hl
-   cpctm_screenPtr_asm de, CPCT_VMEM_START_ASM, DESC_SHOW_X, DESC_SHOW_Y_2    ;; screen address in de
-   ld c, #0                                                    ;; first color
-   call sys_text_draw_string                                   ;; draw card name
+    cpctm_push AF, BC, DE, HL , IX                                  ;; Save values              
+    ;; Render Card Name
+    ld de, #c_name                                              ;; load name address in hl
+    ld__hl_ix                                                   ;; load card index in hl
+    add hl, de                                                  ;; add name offset to hl
+    cpctm_screenPtr_asm de, CPCT_VMEM_START_ASM, DESC_SHOW_X, DESC_SHOW_Y_1    ;; screen address in de
+    ld c, #1                                                    ;; first color
+    call sys_text_draw_string                                   ;; draw card name
+    ;; Render Card Description
+    ld de, #c_description                                       ;; load description address in hl
+    ld__hl_ix                                                   ;; load card index in hl
+    add hl, de                                                  ;; add name offset to hl
+    cpctm_screenPtr_asm de, CPCT_VMEM_START_ASM, DESC_SHOW_X, DESC_SHOW_Y_2    ;; screen address in de
+    ld c, #0                                                    ;; first color
+    call sys_text_draw_string                                   ;; draw card name
 
-   cpctm_pop IX, HL, DE, BC, AF                                    ;; Restore values    
+    cpctm_pop IX, HL, DE, BC, AF                                    ;; Restore values    
 
 _render_not_selected_show:
-   call  sys_render_card
+    call  sys_render_card
 
-   pop ix                      ;; Move ix to the next card
-   ld de, #sizeof_c            ;;
-   add ix, de                  ;;
+    pop ix                      ;; Move ix to the next card
+    ld de, #sizeof_c            ;;
+    add ix, de                  ;;
 
-   pop bc                      ;; retrive b value for the loop
+    pop bc                      ;; retrive b value for the loop
 
-   ld a, #(S_CARD_WIDTH)         ;; Calculate x coord in C
-   add c                       ;;
-   ld c, a                     ;;
+    ld a, #(S_CARD_WIDTH)         ;; Calculate x coord in C
+    add c                       ;;
+    ld c, a                     ;;
 
-   inc b                       ;; increment current card
+    inc b                       ;; increment current card
 
-   ld a, (deck_num)            ;; compare with num of cards in deck
-   cp b                        ;;
-   jr nz, _s_r_s_d_loop0         ;; return to loop if not lasta card reached
+    ld a, (deck_num)            ;; compare with num of cards in deck
+    cp b                        ;;
+    jr nz, _s_r_s_d_loop0         ;; return to loop if not lasta card reached
+
+    ret
+
+;;-----------------------------------------------------------------
+;;
+;; sys_render_player
+;;
+;;  Shows the the entire fight screen
+;;  Input: 
+;;  Output: 
+;;  Modified: AF, BC, DE, HL
+;;
+sys_render_player::
+    ld ix, #player
+    ;; draw player sprite
+    cpctm_screenPtr_asm de, CPCT_VMEM_START_ASM, PLAYER_SPRITE_X, PLAYER_SPRITE_Y  ;; screen address in de
+    ld l, o_sprite(ix)
+    ld h, o_sprite+1(ix)
+    ld c, #PLAYER_SPRITE_WIDTH
+    ld b, #PLAYER_SPRITE_HEIGHT
+    call cpct_drawSprite_asm
+
+
+    call sys_text_draw_string
+    ret
+
+
+;;-----------------------------------------------------------------
+;;
+;; sys_render_topbar
+;;
+;;  Shows the the entire fight screen
+;;  Input: 
+;;  Output: 
+;;  Modified: AF, BC, DE, HL
+;;
+sys_render_topbar::
+    ;; draw life
+    cpctm_screenPtr_asm de, CPCT_VMEM_START_ASM, 0, 0  ;; screen address in de
+    ld hl, #_s_heart_small
+    ld c, #S_HEART_SMALL_WIDTH
+    ld b, #S_HEART_SMALL_HEIGHT
+    call cpct_drawSprite_asm
+
+    call sys_text_reset_aux_txt
+
+
+    ld ix, #player
+    ld h, #0
+    ld l, o_life(ix)
+    ld de, #aux_txt
+    call sys_text_num2str8
+
+    ex de, hl
+    
+    ld (hl), #'/'
+    inc hl
+    ld (hl), #'1'
+    inc hl
+    ld (hl), #'0'
+    inc hl
+    ld (hl), #'0'
+    ld hl, #aux_txt
+    cpctm_screenPtr_asm de, CPCT_VMEM_START_ASM, 5, 1  ;; screen address in de
+    ld c, #0
+    call sys_text_draw_string
+
+    ;;draw money
+    cpctm_screenPtr_asm de, CPCT_VMEM_START_ASM, 20, 0  ;; screen address in de
+    ld hl, #_s_coin
+    ld c, #S_COIN_WIDTH
+    ld b, #S_COIN_HEIGHT
+    call cpct_drawSprite_asm
+
+    call sys_text_reset_aux_txt
+
+    ld h, #0
+    ld l, o_money(ix)
+    ld de, #aux_txt
+    call sys_text_num2str8
+
+    ld hl, #aux_txt
+    cpctm_screenPtr_asm de, CPCT_VMEM_START_ASM, 25, 1  ;; screen address in de
+    ld c, #0
+    call sys_text_draw_string
+
+    ld h, #0
+    ld l, o_force(ix)
+    cpctm_screenPtr_asm de, CPCT_VMEM_START_ASM, 45, 1  ;; screen address in de
+    call sys_text_draw_small_number
+
+    ret
+
+;;-----------------------------------------------------------------
+;;
+;; sys_render_fight_screen
+;;
+;;  Shows the the entire fight screen
+;;  Input: 
+;;  Output: 
+;;  Modified: AF, BC, DE, HL
+;;
+sys_render_fight_screen::
+    
+    call sys_render_topbar
+    call sys_render_player
+    call sys_render_hand
 
     ret

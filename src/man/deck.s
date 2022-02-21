@@ -79,16 +79,18 @@ man_deck_init::
 
     ld  (hl), #e_type_invalid   ;;ponemos el primer elemento del array con tipo invalido
     
-    ;; Load default cards in deck
+    ;; Load default cards in deck 4 hits + 2 defends
+    ld b, #4
+_d_i_hit_loop:
+    push bc
     ld hl, #model_hit
     call man_deck_create_card
+    pop bc
+    djnz _d_i_hit_loop
+
     ld hl, #model_defend
     call man_deck_create_card
-    ld hl, #model_bash
-    call man_deck_create_card
-    ld hl, #model_unbreakeable
-    call man_deck_create_card
-    ld hl, #model_ignore
+    ld hl, #model_defend
     call man_deck_create_card
 ret
 

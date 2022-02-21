@@ -21,6 +21,7 @@
 ;;===============================================================================
 ;; CARD DEFINITION MACRO
 ;;===============================================================================
+.mdelete DefineHand
 .macro DefineHand _status, _class, _sprite, _name, _rarity, _type, _energy, _description, _damage, _block, _vulnerable, _weak, _strengh, _exhaust, _add_card
     .db _status
     .db _class

@@ -18,9 +18,11 @@
 
 .module fight_manager
 
+.include "man/player.h.s"
 .include "common.h.s"
 .include "man/deck.h.s"
 .include "man/hand.h.s"
+.include "man/oponent.h.s"
 .include "sys/input.h.s"
 .include "sys/render.h.s"
 
@@ -32,6 +34,14 @@
 ;;  right after _CODE area contents.
 ;;
 .area _DATA
+
+;; Character templates
+player_template::
+;;_status, _name, _sprite, _life, _money, _shield, _force, _dexterity, _buffer, _blessing, _thorns, _regen, _draw_card, _confuse, _poison
+DefineOponent 1, ^/PLAYER1        /, _s_player_0, 123, 1, 5, 1, 0, 0, 0, 0, 0, 0, 0, 0
+;; Characters
+player::
+DefineOponent 1, ^/PLAYER1        /, _s_player_0, 100, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 
 ;;
 ;; Start of _CODE area
@@ -47,42 +57,12 @@
 ;;  Output: a random piece
 ;;  Modified: 
 ;;
-man_fight_init::
-    call man_deck_init              ;; Initialize deck
-    ld b, #5
-_initial_set_of_cards:
-    push bc
-    call man_deck_get_random_card   ;; get hl pointing to a random card
-    call man_hand_create_card       ;; create a card in the deck
-    pop bc
-    djnz _initial_set_of_cards
-    
-    call sys_render_fight_screen    ;; renders the fight screen
+man_player_init::
+    ;; Initialization of the player
+    ld de, #player
+    ld hl, #player_template
+    ld bc, #sizeof_o
+    ldir
     ret
 
 
-
-
-;;-----------------------------------------------------------------
-;;
-;; man_fight_update
-;;
-;;  Updates the state of a fight
-;;  Input: 
-;;  Output: 
-;;  Modified: 
-;;
-man_fight_update::
-      
-    call sys_input_debug_update
-    ld b, #20
-    call cpct_waitHalts_asm
-;;
-;; Turn structure
-;; 1) Show foes intentions
-;; 2) hero play cards
-;; 3) Foes execute intention
-;; 4) Upate effects
-;; 5) Check end of combat
-;;
-    ret

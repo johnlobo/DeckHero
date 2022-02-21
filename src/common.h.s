@@ -18,6 +18,10 @@
 
 .module main
 
+
+;;===============================================================================
+;; SPRITES
+;;===============================================================================
 .globl _g_palette0
 .globl _g_palette1
 .globl _s_font_0
@@ -33,6 +37,27 @@
 .globl _s_cards_energy_3
 .globl _s_cards_energy_4
 .globl _s_cards_energy_5
+.globl _s_player_0
+.globl _s_player_1
+.globl _s_blob_0
+.globl _s_blob_1
+.globl _s_heart_small
+.globl _s_coin
+.globl _s_small_numbers_00
+.globl _s_small_numbers_01
+.globl _s_small_numbers_02
+.globl _s_small_numbers_03
+.globl _s_small_numbers_04
+.globl _s_small_numbers_05
+.globl _s_small_numbers_06
+.globl _s_small_numbers_07
+.globl _s_small_numbers_08
+.globl _s_small_numbers_09
+
+;;===============================================================================
+;; PUBLIC VARIBLES
+;;===============================================================================
+.globl player
 
 
 ;;===============================================================================
@@ -85,21 +110,17 @@ S_CARD_WIDTH = 8
 S_CARD_HEIGHT = 41
 S_CARD_ENERGY_WIDTH = 3
 S_CARD_ENERGY_HEIGHT = 8
+S_PLAYER_WIDTH = 8
+S_PLAYER_HEIGHT = 40
+S_BLOB_WIDTH = 8
+S_BLOB_HEIGHT = 25
+S_HEART_SMALL_WIDTH = 4
+S_HEART_SMALL_HEIGHT = 10
+S_COIN_WIDTH = 4
+S_COIN_HEIGHT = 10
+S_SMALL_NUMBERS_WIDTH = 2
+S_SMALL_NUMBERS_HEIGHT = 5
 
-;; Deck Position
-DECK_X = 7
-DECK_Y = 25
-DESC_SHOW_X = 7
-DESC_SHOW_Y_1 = 160
-DESC_SHOW_Y_2 = 170
-
-
-HAND_X = 0
-HAND_Y = 130
-
-DESC_X = 1
-DESC_Y_1 = 180
-DESC_Y_2 = 190
 
 ;; Font constants
 FONT_WIDTH = 2
@@ -110,6 +131,27 @@ CARD_SIZE = 22
 MAX_HAND_CARDS = 10
 MAX_DECK_CARDS = 30
 MAX_MODEL_CARD = 4
+
+;; MAIN SCREEN
+PLAYER_SPRITE_X = 20
+PLAYER_SPRITE_Y = 70
+PLAYER_SPRITE_WIDTH = 8
+PLAYER_SPRITE_HEIGHT = 40
+
+;; Deck Position
+DECK_X = 7
+DECK_Y = 25
+DESC_SHOW_X = 7
+DESC_SHOW_Y_1 = 160
+DESC_SHOW_Y_2 = 170
+
+HAND_X = 0
+HAND_Y = 130
+
+DESC_X = 1
+DESC_Y_1 = 180
+DESC_Y_2 = 190
+
 
 ;;===============================================================================
 ;; DEFINED MACROS

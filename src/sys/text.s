@@ -20,7 +20,7 @@
 
 ;; Include all CPCtelera constant definitions, macros and variables
 .include "cpctelera.h.s"
-.include "../common.h.s"
+.include "common.h.s"
 .include "sys/util.h.s"
 
 
@@ -32,11 +32,31 @@
 ;;
 .area _DATA
 
+aux_txt:: .ds 20
+
 
 ;;
 ;; Start of _CODE area
 ;; 
 .area _CODE
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; sys_text_reset_aux_txt
+;;  Resets the aux string buffer
+;; Input:
+;; Returns: 
+;; Destroys:
+;;  bc, hl
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+sys_text_reset_aux_txt::
+    ld b, #20
+    ld hl, #aux_txt
+_tr_loop:
+    ld (hl), #0
+    inc hl
+    djnz _tr_loop
+    ret
+
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -236,21 +256,16 @@ draw_string_2::
     jr z, _next_char                
     cp #33                          ;; exclamation sign
     jr z, _exclamation         
-    cp #47                          ;; ,-.
-    jr c, _symbols
     cp #58                          ;; numbers
     jr c, _numbers
 _rest_of_chars:    
-    sub #45                         ;; chars from ? to Z
+    sub #44                         ;; chars from ? to Z
     jr _draw_char                   
 _exclamation:
     ld a, #0
     jr _draw_char
-_symbols:
-    sub #39
-    jr _draw_char
 _numbers:
-    sub #40
+    sub #39
 _draw_char:
     push de
     ld h, #FONT_WIDTH               ;; copy FONT WIDTH in l
@@ -277,3 +292,98 @@ _draw_string_exit:
     cpctm_pop hl, de, iy, ix
     ret
 _string_color: .db 0
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; sys_text_num2str8
+;;  Converts an 8 bit number to a string
+;; Input:
+;;  hl : number to convert
+;;  de : string address
+;;  
+;; Returns: 
+;;  Nothing
+;; Destroys:
+;;  af, bc, hl, de
+;;      
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+sys_text_num2str8::
+    ld	bc,#-100
+	call _ns8_Num1
+	ld	c,#-10
+	call _ns8_Num1
+	ld	c,b
+_ns8_Num1:	
+    ld	a,#('0'-1)
+_ns8_Num2:
+    inc	a
+	add	hl,bc
+	jr	c,_ns8_Num2
+	sbc	hl,bc
+
+	ld	(de),a
+	inc	de
+	ret
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; sys_text_draw_small_char_number
+;;  draws a two digit number with small characters
+;; Input:
+;;  a : number to draw
+;;  de : screen address
+;;  
+;; Returns: 
+;;  Nothing
+;; Destroys:
+;;  af, bc, hl, de
+;;      
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+sys_text_draw_small_char_number::
+    push de                             ;; save de for later
+    ld h, #10                           ;; calculate the offset from the first char
+    ld e, a                             ;;
+    call sys_util_h_times_e             ;; l = 20 * number
+    ld b, #0                            ;;
+    ld c, l                             ;;
+    ld hl, #_s_small_numbers_00         ;; point hl to the start of the numbers
+    add hl, bc                          ;; address of the number to show
+    pop de                              ;; retreive de
+    ld c, #S_SMALL_NUMBERS_WIDTH
+    ld b, #S_SMALL_NUMBERS_HEIGHT
+    call cpct_drawSprite_asm            ;; draw the number
+    ret
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; sys_text_draw_small_number
+;;  draws a two digit number with small characters
+;; Input:
+;;  hl : number to convert
+;;  de : screen address
+;;  
+;; Returns: 
+;;  Nothing
+;; Destroys:
+;;  af, bc, hl, de
+;;      
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+sys_text_draw_small_number::
+    ld bc, #-10
+	call _dsn_Num1
+	ld	c,b
+_dsn_Num1:	
+    ld a, #-1                           
+_dsn_Num2:
+    inc	a
+	add	hl,bc
+	jr	c,_dsn_Num2
+	sbc	hl,bc
+
+    cpctm_push de, hl, bc
+    call sys_text_draw_small_char_number
+    cpctm_pop bc, hl, de
+
+    inc de                      ;; go to the next screen address
+    inc de                      ;;
+    
+    ret

@@ -19,6 +19,7 @@
 .module game_manager
 .include "common.h.s"
 .include "man/fight.h.s"
+.include "man/player.h.s"
 .include "man/oponent.h.s"
 
 
@@ -31,8 +32,12 @@
 ;;
 .area _DATA
 
-player::
-DefineOponent 1, ^/PLAYER1        /, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+
+blob_template::
+DefineOponent 1, ^/BLOB           /, _s_blob_0, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+
+foe::
+DefineOponent 1, ^/FOE   1        /, _s_blob_0, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 
 ;;
 ;; Start of _CODE area
@@ -49,8 +54,8 @@ DefineOponent 1, ^/PLAYER1        /, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 ;;  Modified: AF, BC, DE, HL
 ;;
 man_game_init::
-   
-    call man_fight_init
+    call man_player_init    ;; Initialize player
+    call man_fight_init     ;; Initialize fight
     ret
 
 ;;-----------------------------------------------------------------

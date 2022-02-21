@@ -16,19 +16,10 @@
 ;;  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;-------------------------------------------------------------------------------
 
-;;===============================================================================
-;; PUBLIC VARIABLES
-;;===============================================================================
-.globl aux_txt
+.module player_manager
+
 
 ;;===============================================================================
 ;; PUBLIC METHODS
 ;;===============================================================================
-.globl sys_text_str_length
-.globl sys_text_str_copy
-.globl sys_text_str_cmp
-.globl sys_text_draw_char
-.globl sys_text_draw_string
-.globl sys_text_num2str8
-.globl sys_text_reset_aux_txt
-.globl sys_text_draw_small_number
+.globl man_player_init

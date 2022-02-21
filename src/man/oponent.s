@@ -18,8 +18,6 @@
 
 .module oponent_manager
 
-.include "man/oponent.h.s"
-.include "common.h.s"
 
 ;;
 ;; Start of _DATA area 

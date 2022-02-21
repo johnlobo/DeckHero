@@ -17,16 +17,20 @@
 ;;-------------------------------------------------------------------------------
 
 .module oponent_manager
-.include "comp/component.h.s"
+
+.include "common.h.s"
 
 ;;===============================================================================
 ;; OPONENT DEFINITION MACRO
 ;;===============================================================================
-.macro DefineOponent _status, _name, _life, _shield, _force, _dexterity, _buffer, _blessing, _thorns, _regen, _draw_card, _confuse, _poison
+.mdelete DefineOponent
+.macro DefineOponent _status, _name, _sprite, _life, _money, _shield, _force, _dexterity, _buffer, _blessing, _thorns, _regen, _draw_card, _confuse, _poison
     .db _status
     .asciz "_name"
-    .dw _life
+    .dw _sprite
+    .db _life
     .db _shield
+    .db _money
     .db _force
     .db _dexterity
     .db _buffer
@@ -44,8 +48,10 @@
 BeginStruct o
 Field o, status , 1
 Field o, name , 16    
+Field o, sprite , 2
 Field o, life , 1
 Field o, shield , 1
+Field o, money , 1
 Field o, force , 1
 Field o, dexterity , 1
 Field o, buffer , 1
