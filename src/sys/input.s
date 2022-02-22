@@ -20,13 +20,14 @@
 
 .include "cpctelera.h.s"
 .include "../common.h.s"
-;;.include "man/entity.h.s"
 .include "man/game.h.s"
 .include "sys/util.h.s"
 .include "sys/render.h.s"
-;;.include "sys/score.h.s"
+.include "man/fight.h.s"
 .include "man/deck.h.s"
 .include "man/hand.h.s"
+.include "man/array.h.s"
+.include "comp/component.h.s"
 
 ;;
 ;; Start of _DATA area 
@@ -654,20 +655,28 @@ _add_card::
 ;;
 ;;  _remove_card
 ;;
-;;  Add card to deck
+;;  Remove card from deck
 ;;  Output:
 ;;  Modified: iy, bc
 ;;
 _remove_card::
-    ld a, (hand_num)                ;; Check if we dont have any card in the deck
+    ld ix, #hand
+    ;;ld a, (hand_num)                ;; Check if we dont have any card in the deck
+    ld a, a_count(ix)                ;; Check if we dont have any card in the deck
     or a                            ;;
     ret z                           ;; if 0 return
 
     call cpct_waitVSYNC_asm
     call sys_render_erase_hand      ;; erase deck area
-    ld a, (deck_selected)
-    call man_hand_remove_card
-    call sys_render_hand
+    ;;ld a, (hand_selected)
+    ld a, a_selected(ix)
+    push af                         ;; save a (card to move)
+    call man_array_get_element      ;; obtain content of a
+    ld ix, #cemetery                ;; operate on cemetery
+    call man_array_create_card      ;; create card in cemetery
+    pop af                          ;; retrieve card to erase
+    call man_hand_remove_card       ;; erase hand
+    call sys_render_hand            ;; update hand
     ret
 
 ;;-----------------------------------------------------------------
@@ -676,17 +685,19 @@ _remove_card::
 ;;
 ;;  move selected card to the left
 ;;  Output:
-;;  Modified: 
+;;  Modified: AF, HL, IX
 ;;
 _selected_left::
-    ld a, (hand_selected)
+    ld ix, #hand
+    ;;ld a, (hand_selected)
+    ld a, a_selected(ix)
     or a
     ret z
 
     call cpct_waitVSYNC_asm
     call sys_render_erase_hand      ;; erase deck area
-    ld hl, #hand_selected
-    dec (hl)
+    ;;ld hl, #hand_selected
+    dec (ix+(a_count)))
     call sys_render_hand
 
     ret

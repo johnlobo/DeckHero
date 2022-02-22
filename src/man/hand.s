@@ -33,12 +33,6 @@
 .area _DATA
 
 
-DefineComponentArrayStructure_Size hand, MAX_HAND_CARDS, sizeof_p2c     
-.db 0   ;;ponemos este aqui como trampita para que siempre haya un tipo invalido al final
-hand_X_start:: .db 40
-hand_selected:: .db 0
-
-
 ;;
 ;; Start of _CODE area
 ;; 

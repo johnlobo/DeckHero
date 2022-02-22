@@ -19,49 +19,6 @@
 .include "common.h.s"
 
 ;;===============================================================================
-;; CARD DEFINITION MACRO
-;;===============================================================================
-.mdelete DefineHand
-.macro DefineHand _status, _class, _sprite, _name, _rarity, _type, _energy, _description, _damage, _block, _vulnerable, _weak, _strengh, _exhaust, _add_card
-    .db _status
-    .db _class
-    .dw _sprite
-    .asciz "_name"
-    .db _rarity
-    .db _type
-    .db _energy
-    .asciz "_description"
-    .db _damage
-    .db _block
-    .db _vulnerable
-    .db _weak
-    .db _strengh
-    .db _exhaust
-    .db _add_card
-.endm
-
-;;===============================================================================
-;; CARD SCTRUCTURE CREATION
-;;===============================================================================
-BeginStruct c
-Field c, status , 1
-Field c, class , 1
-Field c, sprite , 2
-Field c, name , 16
-Field c, rarity , 1
-Field c, type , 1
-Field c, energy , 1
-Field c, description , 31
-Field c, damage , 1
-Field c, block , 1
-Field c, vulnerable , 1
-Field c, weak , 1
-Field c, strengh , 1
-Field c, exhaust , 1
-Field c, add_card , 1
-EndStruct c
-
-;;===============================================================================
 ;; PUBLIC VARIABLES
 ;;===============================================================================
 .globl hand_num

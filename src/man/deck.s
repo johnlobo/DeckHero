@@ -36,8 +36,6 @@
 
 DefineComponentArrayStructure_Size deck, MAX_DECK_CARDS, sizeof_c     
 .db 0   ;;ponemos este aqui como trampita para que siempre haya un tipo invalido al final
-deck_X_start:: .db 40
-deck_selected:: .db 0
 
 ;;
 ;; Definition of model deck

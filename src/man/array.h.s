@@ -15,19 +15,20 @@
 ;;  You should have received a copy of the GNU Lesser General Public License
 ;;  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;-------------------------------------------------------------------------------
+.module array_manager
 
-.module fight_manager
-
+.include "common.h.s"
 
 ;;===============================================================================
 ;; PUBLIC VARIABLES
 ;;===============================================================================
-.globl hand
-.globl cemetery
-.globl sacrifice
+
 
 ;;===============================================================================
 ;; PUBLIC METHODS
 ;;===============================================================================
-.globl man_fight_init
-.globl man_fight_update
+.globl man_array_init
+.globl man_array_create_card
+.globl man_array_remove_card
+.globl man_array_get_element
+.globl man_array_load_array_from_deck

@@ -21,6 +21,7 @@
 .include "man/fight.h.s"
 .include "man/player.h.s"
 .include "man/oponent.h.s"
+.include "man/deck.h.s"
 
 
 
@@ -55,6 +56,7 @@ DefineOponent 1, ^/FOE   1        /, _s_blob_0, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
 ;;
 man_game_init::
     call man_player_init    ;; Initialize player
+    call man_deck_init      ;; Initialize deck
     call man_fight_init     ;; Initialize fight
     ret
 

@@ -29,10 +29,22 @@
 .macro DefineComponentArrayStructure_Size _Tname, _N, _ComponentSize
       _Tname'_num::     .db 0
       _Tname'_pend::    .dw _Tname'_array 
+      _Tname'_selected::.db 0
+      _Tname'_X_start:: .db 40
       _Tname'_array::
             .ds _N * _ComponentSize
 .endm
 
+;;===============================================================================
+;; DATA ARRAY SCTRUCTURE CREATION
+;;===============================================================================
+BeginStruct a
+Field a, count , 1
+Field a, pend , 2
+Field a, selected , 1
+Field a, X_start , 1
+Field a, array , 1
+EndStruct a
 
 ;;===============================================================================
 ;; POINTER TO CARD DEFINITION MACRO
@@ -43,7 +55,7 @@
 .endm
 
 ;;===============================================================================
-;; CARD SCTRUCTURE CREATION
+;; POINTER TO CARD SCTRUCTURE CREATION
 ;;===============================================================================
 BeginStruct p2c
 Field p2c, status , 1

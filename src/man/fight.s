@@ -21,8 +21,10 @@
 .include "common.h.s"
 .include "man/deck.h.s"
 .include "man/hand.h.s"
+.include "man/array.h.s"
 .include "sys/input.h.s"
 .include "sys/render.h.s"
+.include "comp/component.h.s"
 
 
 ;;
@@ -32,6 +34,22 @@
 ;;  right after _CODE area contents.
 ;;
 .area _DATA
+
+fight_deck::
+DefineComponentArrayStructure_Size fight_deck, MAX_DECK_CARDS, sizeof_p2c     
+.db 0   ;;ponemos este aqui como trampita para que siempre haya un tipo invalido al final
+
+hand::
+DefineComponentArrayStructure_Size hand, MAX_HAND_CARDS, sizeof_p2c     
+.db 0   ;;ponemos este aqui como trampita para que siempre haya un tipo invalido al final
+
+cemetery::
+DefineComponentArrayStructure_Size cemetery, MAX_DECK_CARDS, sizeof_p2c     
+.db 0   ;;ponemos este aqui como trampita para que siempre haya un tipo invalido al final
+
+sacrifice::
+DefineComponentArrayStructure_Size sacrifice, MAX_DECK_CARDS, sizeof_p2c     
+.db 0   ;;ponemos este aqui como trampita para que siempre haya un tipo invalido al final
 
 ;;
 ;; Start of _CODE area
@@ -48,7 +66,21 @@
 ;;  Modified: 
 ;;
 man_fight_init::
-    call man_deck_init              ;; Initialize deck
+    
+    ld ix, #fight_deck                  ;; initialize fight_deck
+    call man_array_init                 ;;
+
+    call man_array_load_array_from_deck ;; loads all the cards in deck in the pointer array
+
+    ld ix, #hand                        ;; initialize hand
+    call man_array_init                 ;;
+
+    ld ix, #cemetery                    ;; initialize cemetery
+    call man_array_init                 ;;
+
+    ld ix, #sacrifice                   ;; initialize scrifice
+    call man_array_init                 ;;
+
     ld b, #5
 _initial_set_of_cards:
     push bc
@@ -56,7 +88,7 @@ _initial_set_of_cards:
     call man_hand_create_card       ;; create a card in the deck
     pop bc
     djnz _initial_set_of_cards
-    
+
     call sys_render_fight_screen    ;; renders the fight screen
     ret
 
