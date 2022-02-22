@@ -53,6 +53,12 @@
 .globl _s_small_numbers_07
 .globl _s_small_numbers_08
 .globl _s_small_numbers_09
+.globl _s_icons_0
+.globl _s_icons_1
+.globl _s_icons_2
+.globl _s_icons_3
+.globl _s_status_0
+.globl _s_status_1
 
 ;;===============================================================================
 ;; PUBLIC VARIBLES
@@ -78,6 +84,7 @@
 .globl cpct_waitVSYNC_asm
 .globl _cpct_keyboardStatusBuffer
 .globl cpct_getRandom_mxor_u8_asm
+.globl cpct_drawSpriteBlended_asm
 
 ;;===============================================================================
 ;; DEFINED CONSTANTS
@@ -120,6 +127,11 @@ S_COIN_WIDTH = 4
 S_COIN_HEIGHT = 10
 S_SMALL_NUMBERS_WIDTH = 2
 S_SMALL_NUMBERS_HEIGHT = 5
+S_ICONS_WIDTH = 6
+S_ICONS_HEIGHT = 17
+S_STATUS_WIDTH = 5
+S_STATUS_HEIGHT = 12
+
 
 
 ;; Font constants
@@ -134,9 +146,12 @@ MAX_MODEL_CARD = 4
 
 ;; MAIN SCREEN
 PLAYER_SPRITE_X = 20
-PLAYER_SPRITE_Y = 70
+PLAYER_SPRITE_Y = 60
 PLAYER_SPRITE_WIDTH = 8
 PLAYER_SPRITE_HEIGHT = 40
+PLAYER_STATUS_X = 21
+PLAYER_STATUS_Y = 102
+PLAYER_STATUS_NUMBER_Y = 104
 
 ;; Deck Position
 DECK_X = 7

@@ -349,9 +349,9 @@ sys_text_draw_small_char_number::
     ld hl, #_s_small_numbers_00         ;; point hl to the start of the numbers
     add hl, bc                          ;; address of the number to show
     pop de                              ;; retreive de
-    ld c, #S_SMALL_NUMBERS_WIDTH
-    ld b, #S_SMALL_NUMBERS_HEIGHT
-    call cpct_drawSprite_asm            ;; draw the number
+    ld b, #S_SMALL_NUMBERS_WIDTH
+    ld c, #S_SMALL_NUMBERS_HEIGHT
+    call cpct_drawSpriteBlended_asm            ;; draw the number
     ret
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

@@ -354,8 +354,18 @@ sys_render_player::
     ld b, #PLAYER_SPRITE_HEIGHT
     call cpct_drawSprite_asm
 
+    ;; draw player shield
+    cpctm_screenPtr_asm de, CPCT_VMEM_START_ASM, PLAYER_STATUS_X, PLAYER_STATUS_Y  ;; screen address in de
+    ld hl, #_s_status_0
+    ld c, #S_STATUS_WIDTH
+    ld b, #S_STATUS_HEIGHT
+    call cpct_drawSprite_asm
+    ;; shield number
+    ld hl, #3
+    cpctm_screenPtr_asm de, CPCT_VMEM_START_ASM, PLAYER_STATUS_X, PLAYER_STATUS_NUMBER_Y  ;; screen address in de
+    call sys_text_draw_small_number
 
-    call sys_text_draw_string
+
     ret
 
 
@@ -427,6 +437,61 @@ sys_render_topbar::
 
 ;;-----------------------------------------------------------------
 ;;
+;; sys_render_icons
+;;
+;;  Draws the game icons
+;;  Input: 
+;;  Output: 
+;;  Modified: AF, BC, DE, HL
+;;
+sys_render_icons::
+    ;; energy icon
+    cpctm_screenPtr_asm de, CPCT_VMEM_START_ASM, 0, 118  ;; screen address in de
+    ld hl, #_s_icons_2
+    ld c, #S_ICONS_WIDTH
+    ld b, #S_ICONS_HEIGHT
+    call cpct_drawSprite_asm
+    ;; energy number
+    ld hl, #3
+    cpctm_screenPtr_asm de, CPCT_VMEM_START_ASM, 1, 136  ;; screen address in de
+    call sys_text_draw_small_number
+
+    ;; sacrifice
+    cpctm_screenPtr_asm de, CPCT_VMEM_START_ASM, 74, 118  ;; screen address in de
+    ld hl, #_s_icons_0
+    ld c, #S_ICONS_WIDTH
+    ld b, #S_ICONS_HEIGHT
+    call cpct_drawSprite_asm
+    ;; sacrifice number
+    ld hl, #10
+    cpctm_screenPtr_asm de, CPCT_VMEM_START_ASM, 75, 136  ;; screen address in de
+    call sys_text_draw_small_number
+
+    ;; deck
+    cpctm_screenPtr_asm de, CPCT_VMEM_START_ASM, 0, 148  ;; screen address in de
+    ld hl, #_s_icons_3
+    ld c, #S_ICONS_WIDTH
+    ld b, #S_ICONS_HEIGHT
+    call cpct_drawSprite_asm
+    ;; deck number
+    ld hl, #10
+    cpctm_screenPtr_asm de, CPCT_VMEM_START_ASM, 1, 166  ;; screen address in de
+    call sys_text_draw_small_number
+
+    ;; cemetery
+    cpctm_screenPtr_asm de, CPCT_VMEM_START_ASM, 74, 148  ;; screen address in de
+    ld hl, #_s_icons_1
+    ld c, #S_ICONS_WIDTH
+    ld b, #S_ICONS_HEIGHT
+    call cpct_drawSprite_asm
+    ;; cemetery number
+    ld hl, #10
+    cpctm_screenPtr_asm de, CPCT_VMEM_START_ASM, 75, 166  ;; screen address in de
+    call sys_text_draw_small_number
+
+    ret
+;;-----------------------------------------------------------------
+;;
 ;; sys_render_fight_screen
 ;;
 ;;  Shows the the entire fight screen
@@ -437,6 +502,7 @@ sys_render_topbar::
 sys_render_fight_screen::
     
     call sys_render_topbar
+    call sys_render_icons
     call sys_render_player
     call sys_render_hand
 
