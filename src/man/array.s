@@ -23,7 +23,7 @@
 .include "man/card.h.s"
 .include "comp/component.h.s"
 .include "man/deck.h.s"
-
+.include "sys/util.h.s"
 
 ;;
 ;; Start of _DATA area 
@@ -68,7 +68,7 @@ man_array_init::
 
 ;;-----------------------------------------------------------------
 ;;
-;; man_hand_create_card
+;; man_hand_create_element
 ;;
 ;;  Create a card from the model pointed by HL
 ;;  Input:  ix: pointer to the array 
@@ -76,7 +76,7 @@ man_array_init::
 ;;  Output:
 ;;  Modified: AF, BC, DE, HL
 ;;
-man_array_create_card::
+man_array_create_element::
 
     ex de, hl                           ;; save the pointer to the card in de
 
@@ -93,55 +93,85 @@ man_array_create_card::
     ;;ld   hl, (hand_pend)              ;; update the pointer to the next card
     ld   l, a_pend(ix)                  ;; update the pointer to the next card
     ld   h, a_pend+1(ix)                ;; update the pointer to the next card
-    ld   bc, #sizeof_p2c                ;; load the size of the pointer to card
+    ld   bc, #sizeof_e                  ;; load the size of the pointer to card
     add  hl, bc                         ;; move hl the the next card
     ld   a_pend(ix), l                  ;; store the new pointer to the next card
-    ld   a_pend+1(ix), h                 ;;
+    ld   a_pend+1(ix), h                ;;
+
+    call man_array_update_X_start        ;; Update X coord for teh deck
+
 ret
 
 
 ;;-----------------------------------------------------------------
 ;;
-;; man_array_remove_card
+;; man_array_update_X_start
+;;
+;;  Updates the starting x coord for rendering the array
+;;  Input: 
+;;  Output: 
+;;  Modified: AF, C
+;;
+man_array_update_X_start:
+    ;; Calculate x start coord
+    ld a, a_count(ix)
+    ld c, a                     ;; Multiply num cards by 6
+    sla a                       ;;
+    sla a                       ;; Multyply by 4
+    add c                       ;;
+    add c                       ;; Multiplies by 6
+
+    srl a                       ;; Divide (num cards*8) by 2
+    ld c,a                      ;; move ((num cards*8)/2) to c
+    ld a, #40                   ;; a = 40
+    sub c                       ;; a = 40 - ((num cards*8)/2)
+    ld a_X_start(ix), a         ;; store the new x start coord
+    ret
+
+;;-----------------------------------------------------------------
+;;
+;; man_array_remove_element
 ;;
 ;;  Remove a card pointed by a from the hand
 ;;  Input: a: number of card to remove
 ;;  Output: a random piece
 ;;  Modified: AF, BC, DE, HL
 ;;
-man_array_remove_card::
-
-    or a                        ;; check if we have to erase the first card
-    jp z, _not_last_card        ;; jump if 0
+man_array_remove_element::
 
     ld b, a                     ;; copy card to erase to b
-    ;;ld a, (hand_num)          ;; check if we have to erase the last card
     ld a, a_count(ix)           ;; check if we have to erase the last card
     dec a                       ;;
     cp b                        ;;
-    jr z, _not_last_card            ;;  jump if we have to erase the last card
+    jr z, _last_card            ;;  jump if we have to erase the last card
 
-    ;;ld hl, #hand_array          ;; mode de at the start of the deck
-    ld l, a_array(ix)          ;; mode de at the start of the deck
-    ld h, a_array+1(ix)          ;; mode de at the start of the deck
-    ld de, #sizeof_p2c          ;; copy the size of a card in hl
-_sum_loop:                      ;;
+    push ix                     ;; hl to the start of the array    
+    pop hl                      ;;
+    ld de, #a_array             ;;
     add hl, de                  ;;
-    djnz _sum_loop              ;;
 
-    ld d, h                     ;; copy hl in de
+    ld a, b                     ;; restore a value from b
+    or a                        ;; if we have to erase the first card we are don with hl
+    jp z, _calc_end_of_card     ;; 
+
+    ld de, #sizeof_e            ;; copy the size of a card in de
+_start_loop:                    ;;
+    add hl, de                  ;; hl advance a card
+    djnz _start_loop            ;; hl points to the start of the card to remove
+
+_calc_end_of_card:
+    ld d, h                     ;; copy hl in de-> de=start of the card to remove
     ld e, l                     ;;
 
-    ld bc, #sizeof_p2c          ;; add size of card to hl
-    add hl,bc                   ;;
+    ld bc, #sizeof_e            ;; add size of card to hl
+    add hl,bc                   ;; hl= end of the card to remove
 
     push de                     ;; save de
     push hl                     ;; save hl
     ex de, hl                   ;; we have in de the end of the card to remove
 
-    ;;ld hl, (hand_pend)          ;; calculate the amount of data to move
-    ld l, a_pend(ix)           ;; calculate the amount of data to move
-    ld h, a_pend+1(ix)           ;; calculate the amount of data to move
+    ld l, a_pend(ix)            ;; calculate the amount of data to move
+    ld h, a_pend+1(ix)          ;; 
     sbc hl, de                  ;;
     ld b, h                     ;; move hl to bc
     ld c, l                     ;; bc = size of data to move
@@ -150,20 +180,22 @@ _sum_loop:                      ;;
     pop de                      ;; restore de
 
     ldir
-   
-_not_last_card:
-    ;;ld   hl, (hand_pend)      ;; move deck end back one card
-    ld   l, a_pend(ix)          ;; move deck end back one card
-    ld   h, a_pend+1(ix)        ;; move deck end back one card
-    ld   bc, #sizeof_p2c        ;;
-    sbc  hl, bc                 ;;
-    ;;ld   (hand_pend), hl      ;;
-    ld   a_pend(ix), l         ;;
-    ld   a_pend+1(ix), h         ;;
+    jr _move_pend
 
-    ;;ld hl, #hand_num          ;; Decrment the number of cards
-    ;;dec (hl)
-    dec(ix)
+_last_card:
+    dec a_selected(ix)
+    
+_move_pend:
+    ld l, a_pend(ix)            ;; calculate the amount of data to move
+    ld h, a_pend+1(ix)          ;; 
+    ld   bc, #sizeof_e          ;;
+    sbc  hl, bc                 ;;
+    ld a_pend(ix), l            ;; store hl in pend
+    ld a_pend+1(ix), h          ;; 
+
+    dec a_count(ix) 
+
+    call man_array_update_X_start        ;; Update X coord for teh deck
 
 ret
 
@@ -180,14 +212,15 @@ ret
 man_array_get_element::
     push ix                     ;; load in hl the beginning of the array
     pop hl                      ;;
+    ld (_e_output), a              ;; store the random number in the output variable
     ld de, #a_array
     add hl, de
 
-    or a                        ;; check if we have to erase the first card
+    or a                        ;; check if we have to retrieve the first card
     jp z, _g_e_read_card        ;; jump if we wnat to get the first card
 
     ld b, a
-    ld de, #sizeof_p2c          ;; copy the size of a card in de
+    ld de, #sizeof_e            ;; copy the size of a card in de
 _g_e_sum_loop:                      ;;
     add hl, de                  ;;  add de to hl until we reach the card
     djnz _g_e_sum_loop          ;;
@@ -199,8 +232,52 @@ _g_e_read_card:
     ld d, (hl)                  ;;
 
     ex de, hl                   ;; move de to hl
-
+_e_output = .+1
+    ld a, #00
     ret
+
+
+;;-----------------------------------------------------------------
+;;
+;; man_array_get_random_element
+;;
+;;  Retrieves in hl the element in a random position and in a the position
+;;  Input:  ix: array structure
+;;  Output: hl: element
+;;          a : number of element.
+;;  Modified: AF, BC, DE, HL
+;;
+man_array_get_random_element::
+    push ix                         ;; load in hl the beginning of the array
+    pop hl                          ;;
+    ld de, #a_array 
+    add hl, de                      ;; move hl to the beginning of the array
+    push hl                         ;; save hl (array address)
+
+    ld a, a_count(ix)
+    call sys_util_get_random_number
+    ld (_r_e_output), a             ;; store the random number in the output variable
+    pop hl                          ;; restore hl (array address)
+    or a                            ;; check if we have to retrieve the first card
+    jp z, _g_r_e_read_card          ;; jump if we wnat to get the first card
+
+    ld b, a
+    ld de, #sizeof_e                ;; copy the size of a card in de
+_g_r_e_sum_loop:                    ;;
+    add hl, de                      ;;  add de to hl until we reach the card
+    djnz _g_r_e_sum_loop            ;;
+
+_g_r_e_read_card:   
+    inc hl                          ;; dicard the status byte
+    ld e, (hl)                      ;; read the content of (hl) in de
+    inc hl                          ;;
+    ld d, (hl)                      ;;
+
+    ex de, hl                       ;; move de to hl
+_r_e_output = .+1   
+    ld a, #00
+    ret
+
 
 ;;-----------------------------------------------------------------
 ;;
@@ -212,16 +289,52 @@ _g_e_read_card:
 ;;  Modified: AF, BC, DE, HL
 ;;
 man_array_load_array_from_deck::
-    ld hl, #deck_array
-    ld a, (#deck_num)
-    ld b, a
+    ld hl, #deck_array                  ;; hl points to the array of cards
+    ld a, (#deck_num)                   ;; a holds the number of cards to copy
+    ld b, a                             ;; b = number of cards to copy
 _l_a_loop:
-    cpctm_push bc, hl
-    call man_array_create_card
-    ld de, #sizeof_c
-    pop hl
-    add hl, de
-    pop bc
-    djnz _l_a_loop
+    cpctm_push bc, hl                   ;; save bc and hl
+    call man_array_create_element       ;; create a new element from hl
     
+    ld de, #sizeof_c                    ;; de hold the size of a card
+    pop hl                              ;; restore hl
+    add hl, de                          ;; hl points to the next card of deck
+    pop bc                              ;; restore bc (index)
+    djnz _l_a_loop                      ;; jump if b != 0
+    
+    ret
+
+;;-----------------------------------------------------------------
+;;
+;; man_array_move_all_elements
+;;
+;;  moves all the elements form one array to the other
+;;  Input:  hl: array from
+;;          de: array to
+;;  Output: 
+;;  Modified: AF, BC, DE, HL
+;;
+man_array_move_all_elements::
+    ld (FIRST_ARRAY), hl
+    ld (THIRD_ARRAY), hl
+    ex de, hl
+    ld (SECOND_ARRAY), hl
+_move_loop:
+FIRST_ARRAY = .+2
+    ld ix, #0000
+    xor a
+    call man_array_get_element
+
+SECOND_ARRAY = .+2
+    ld ix, #0000
+    call man_array_create_element
+
+THIRD_ARRAY = .+2    
+    ld ix, #0000
+    xor a
+    call man_array_remove_element
+    
+    ld a, a_count(ix)
+    or a
+    jr nz, _move_loop
     ret

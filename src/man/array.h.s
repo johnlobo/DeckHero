@@ -28,7 +28,9 @@
 ;; PUBLIC METHODS
 ;;===============================================================================
 .globl man_array_init
-.globl man_array_create_card
-.globl man_array_remove_card
+.globl man_array_create_element
+.globl man_array_remove_element
 .globl man_array_get_element
 .globl man_array_load_array_from_deck
+.globl man_array_get_random_element
+.globl man_array_move_all_elements

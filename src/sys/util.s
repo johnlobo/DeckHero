@@ -176,3 +176,28 @@ BCD_cp_direct:
   djnz BCD_cp_direct
   or a                    ;; Clear carry
   ret
+
+;;-----------------------------------------------------------------
+;;
+;; sys_util_get_random_number
+;;
+;;  Returns a random number between 0 and <end>
+;;  Input:  a: <end>
+;;  Output: a: random number
+;;  Destroyed: af, bc,de, hl
+
+sys_util_get_random_number::
+  ld (#random_max_number), a
+  call cpct_getRandom_mxor_u8_asm
+  ld a, l                             ;; Calculates a pseudo modulus of max number
+  ld h,#0                             ;; Load hl with the random number
+random_max_number = .+1
+  ld c, #0                            ;; Load c with the max number
+  ld b, #0
+_random_mod_loop:
+  or a                                ;; ??
+  sbc hl,bc                           ;; hl = hl - bc
+  jp p, _random_mod_loop              ;; Jump back if hl > 0
+  add hl,bc                           ;; Adds MAX_MODEL_CARD to hl back to get back to positive values
+  ld a,l                              ;; loads the normalized random number in a
+ret

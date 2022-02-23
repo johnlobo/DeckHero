@@ -219,42 +219,6 @@ man_deck_create_card::
     call man_deck_update_X_start    ;; update the X coord of the deck
 ret
 
-
-;;-----------------------------------------------------------------
-;;
-;; man_deck_create_card
-;;
-;;  Create a card from the model pointed by HL
-;;  Input: HL: pointer to the card to add to the hand
-;;  Output:
-;;  Modified: AF, BC, DE, HL
-;;
-;;man_deck_create_card::
-;;
-;;    ex de, hl                           ;; save the pointer to the card in de
-;;
-;;    ld  hl, (deck_pend)                 ;; load in hl the address of the next card
-;;    ld (hl), #e_type_card_in_hand       ;; stores in the firs byt the status of the card
-;;    inc hl                              ;; move to the next position
-;;    ld (hl), e                          ;; store in the following 2 bytes the address to the card to add
-;;    inc hl                              ;; move to the next position
-;;    ld (hl), d                          ;;
-;;    
-;;    ld hl, #deck_num                    ;; increase the number of cards in hand
-;;    inc (hl)                            ;; 
-;;
-;;    ld   hl, (deck_pend)                ;; update the pointer to the next card
-;;    ld   bc, #sizeof_p2c                ;; load the size of the pointer to card
-;;    add  hl, bc                         ;; move hl the the next card
-;;    ld   (deck_pend), hl                ;; store the new pointer to the next card
-;;
-;;    ;;call man_hand_update_X_start        ;; update the X coord of the deck
-;;ret
-
-
-
-
-
 ;;-----------------------------------------------------------------
 ;;
 ;; man_deck_remove_card

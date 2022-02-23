@@ -36,20 +36,22 @@
 .area _DATA
 
 fight_deck::
-DefineComponentArrayStructure_Size fight_deck, MAX_DECK_CARDS, sizeof_p2c     
+DefineComponentArrayStructure_Size fight_deck, MAX_DECK_CARDS, sizeof_e     
 .db 0   ;;ponemos este aqui como trampita para que siempre haya un tipo invalido al final
 
 hand::
-DefineComponentArrayStructure_Size hand, MAX_HAND_CARDS, sizeof_p2c     
+DefineComponentArrayStructure_Size hand, MAX_HAND_CARDS, sizeof_e     
 .db 0   ;;ponemos este aqui como trampita para que siempre haya un tipo invalido al final
 
 cemetery::
-DefineComponentArrayStructure_Size cemetery, MAX_DECK_CARDS, sizeof_p2c     
+DefineComponentArrayStructure_Size cemetery, MAX_DECK_CARDS, sizeof_e     
 .db 0   ;;ponemos este aqui como trampita para que siempre haya un tipo invalido al final
 
 sacrifice::
-DefineComponentArrayStructure_Size sacrifice, MAX_DECK_CARDS, sizeof_p2c     
+DefineComponentArrayStructure_Size sacrifice, MAX_DECK_CARDS, sizeof_e     
 .db 0   ;;ponemos este aqui como trampita para que siempre haya un tipo invalido al final
+
+player_energy:: .db 0
 
 ;;
 ;; Start of _CODE area
@@ -83,11 +85,21 @@ man_fight_init::
 
     ld b, #5
 _initial_set_of_cards:
-    push bc
-    call man_deck_get_random_card   ;; get hl pointing to a random card
-    call man_hand_create_card       ;; create a card in the deck
-    pop bc
+    push bc                             ;; store loop index
+    ld ix, #fight_deck                  ;; working with fight_deck
+    call man_array_get_random_element   ;; gen a random element form fight_deck
+    ld (ELEMENT_TO_ERASE),a             ;; store the element to be erased later
+    ld ix, #hand                        ;; working with hand
+    call man_array_create_element       ;; create the element in hand
+    ld ix, #fight_deck                  ;; working with fight_deck
+ELEMENT_TO_ERASE = . +1                 
+    ld a, #00                           ;; set the element to be erased
+    call man_array_remove_element       ;; Remove element from fight_deck
+    pop bc                              ;; restore loop index
     djnz _initial_set_of_cards
+
+    ld hl, #player_energy
+    ld (hl), #3
 
     call sys_render_fight_screen    ;; renders the fight screen
     ret

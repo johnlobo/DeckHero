@@ -168,8 +168,10 @@ sys_text_draw_char::
     push bc
     push hl
     ;; color
+    ld l, a
     sla a
-    sla a       ;; multiply color by 4 to get correct color index
+    sla a       ;; multiply color by 5 to get correct color index
+    add a, l
     ld hl, #_swapColors
     add_hl_a    ;; add a to hl (swapcolors)
     push hl 
@@ -192,6 +194,8 @@ _loop:
     jr z, _third_byte
     cp #0xff
     jr z, _forth_byte
+    cp #0xaa
+    jr z, _fifth_byte
     jr _continue
 _first_byte:
     ld a, 0(ix)
@@ -204,6 +208,9 @@ _third_byte:
     jr _modified_byte
 _forth_byte:
     ld a, 3(ix)
+    jr _modified_byte
+_fifth_byte:
+    ld a, 4(ix)
 _modified_byte:
 
 _continue:
@@ -221,12 +228,12 @@ _continue:
     ret
 _color_ptr: .dw 0x0000
 _swapColors: 
-    .db 0x55, 0xee, 0xdd, 0xff   ;; Bright White 
-    .db 0x14, 0x6c, 0x9c, 0x3c   ;; Bright Yellow
-    .db 0x50, 0xe4, 0xd8, 0xf0   ;; Orange
-    .db 0x11, 0x66, 0x99, 0x33   ;; Blue
-    .db 0x10, 0x35, 0x3a, 0x30   ;; Bright Red
-    .db 0x45, 0xce, 0xcd, 0xcf   ;; Mauve
+    .db 0x55, 0xee, 0xdd, 0xff, 0xaa   ;; Bright White 
+    .db 0x14, 0x6c, 0x9c, 0x3c, 0x28   ;; Bright Yellow
+    .db 0x50, 0xe4, 0xd8, 0xf0, 0xa0   ;; Orange
+    .db 0x11, 0x66, 0x99, 0x33, 0x22   ;; Blue
+    .db 0x10, 0x35, 0x3a, 0x30, 0x20   ;; Bright Red
+    .db 0x45, 0xce, 0xcd, 0xcf, 0x84   ;; Mauve
 _char_buffer:: .db 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -349,9 +356,9 @@ sys_text_draw_small_char_number::
     ld hl, #_s_small_numbers_00         ;; point hl to the start of the numbers
     add hl, bc                          ;; address of the number to show
     pop de                              ;; retreive de
-    ld b, #S_SMALL_NUMBERS_WIDTH
-    ld c, #S_SMALL_NUMBERS_HEIGHT
-    call cpct_drawSpriteBlended_asm            ;; draw the number
+    ld c, #S_SMALL_NUMBERS_WIDTH
+    ld b, #S_SMALL_NUMBERS_HEIGHT
+    call cpct_drawSprite_asm            ;; draw the number
     ret
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

@@ -25,3 +25,4 @@
 .globl sys_util_BCD_GetEnd
 .globl sys_util_BCD_Add
 .globl sys_util_BCD_Compare
+.globl sys_util_get_random_number

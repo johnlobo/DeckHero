@@ -106,7 +106,7 @@ man_hand_create_card::
     inc (hl)                            ;; 
 
     ld   hl, (hand_pend)                ;; update the pointer to the next card
-    ld   bc, #sizeof_p2c                ;; load the size of the pointer to card
+    ld   bc, #sizeof_e                ;; load the size of the pointer to card
     add  hl, bc                         ;; move hl the the next card
     ld   (hand_pend), hl                ;; store the new pointer to the next card
 
@@ -135,7 +135,7 @@ man_hand_remove_card::
     jr z, _last_card            ;;  jump if we have to erase the last card
 
     ld hl, #hand_array          ;; mode de at the start of the deck
-    ld de, #sizeof_p2c            ;; copy the size of a card in hl
+    ld de, #sizeof_e            ;; copy the size of a card in hl
 _sum_loop:                      ;;
     add hl, de                  ;;
     djnz _sum_loop              ;;
@@ -143,7 +143,7 @@ _sum_loop:                      ;;
     ld d, h                     ;; copy hl in de
     ld e, l                     ;;
 
-    ld bc, #sizeof_p2c          ;; add size of card to hl
+    ld bc, #sizeof_e          ;; add size of card to hl
     add hl,bc                   ;;
 
     push de                     ;; save de
@@ -167,7 +167,7 @@ _last_card:
     
 _not_last_card:
     ld   hl, (hand_pend)        ;; move deck end back one card
-    ld   bc, #sizeof_p2c        ;;
+    ld   bc, #sizeof_e        ;;
     sbc  hl, bc                 ;;
     ld   (hand_pend), hl        ;;
 

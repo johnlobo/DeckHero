@@ -46,18 +46,11 @@ Field a, X_start , 1
 Field a, array , 1
 EndStruct a
 
-;;===============================================================================
-;; POINTER TO CARD DEFINITION MACRO
-;;===============================================================================
-.macro DefineP2C _status, _pointer
-    .db _status
-    .dw _pointer
-.endm
 
 ;;===============================================================================
 ;; POINTER TO CARD SCTRUCTURE CREATION
 ;;===============================================================================
-BeginStruct p2c
-Field p2c, status , 1
-Field p2c, p , 2
-EndStruct p2c
+BeginStruct e
+Field e, status , 1
+Field e, p , 2
+EndStruct e
