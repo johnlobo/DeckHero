@@ -16,15 +16,18 @@
 ;;  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;-------------------------------------------------------------------------------
 
-.module player_manager
+.module foe_manager
 
-.include "man/player.h.s"
+.include "man/foe.h.s"
 .include "common.h.s"
 .include "man/deck.h.s"
 .include "man/hand.h.s"
 .include "man/oponent.h.s"
 .include "sys/input.h.s"
 .include "sys/render.h.s"
+.include "comp/component.h.s"
+.include "cpctelera.h.s"
+
 
 
 ;;
@@ -36,12 +39,13 @@
 .area _DATA
 
 ;; Character templates
-player_template::
+foe_blob::
 ;;_status, _name, _sprite, _life, _money, _shield, _force, _dexterity, _buffer, _blessing, _thorns, _regen, _draw_card, _confuse, _poison
-DefineOponent 1, ^/PLAYER1        /, _s_player_0, 123, 1, 5, 1, 0, 0, 0, 0, 0, 0, 0, 0
+DefineOponent 1, ^/BLOB           /, _s_blob_0, 40, 1, 5, 1, 0, 0, 0, 0, 0, 0, 0, 0
 ;; Characters
-player::
-DefineOponent 1, ^/PLAYER1        /, _s_player_0, 100, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+foes::
+DefineComponentArrayStructure_Size foes, MAX_FOES, sizeof_o     
+.db 0   ;;ponemos este aqui como trampita para que siempre haya un tipo invalido al final
 
 ;;
 ;; Start of _CODE area
@@ -50,19 +54,52 @@ DefineOponent 1, ^/PLAYER1        /, _s_player_0, 100, 100, 0, 0, 0, 0, 0, 0, 0,
 
 ;;-----------------------------------------------------------------
 ;;
-;; man_fight_init
+;; man_foe_init
 ;;
 ;;  Initializes a fight
 ;;  Input: 
 ;;  Output: a random piece
 ;;  Modified: 
 ;;
-man_player_init::
-    ;; Initialization of the player
-    ld de, #player
-    ld hl, #player_template
-    ld bc, #sizeof_o
-    ldir
+man_foe_init::
+    ld ix, #foes
+    xor a
+    ld a_count(ix), a
+
+    ld__hl_ix                  ;; point hl to the start of the array 
+    ld a, #a_array
+    add_hl_a
+    ;;ld  (hand_pend), hl
+    ld a_pend(ix), l
+    ld a_pend+1(ix), h
+
+    ld  (hl), #e_type_invalid   ;;ponemos el primer elemento del array con tipo invalido
+    ret
+
+;;-----------------------------------------------------------------
+;;
+;; man_foe_create
+;;
+;;  Initializes a fight
+;;  Input: 
+;;  Output: a random piece
+;;  Modified: 
+;;
+man_foe_create::
+    ld hl, #blob
+    call man_array_create_element
+    ret
+
+;;-----------------------------------------------------------------
+;;
+;; man_foe_remove
+;;
+;;  Initializes a fight
+;;  Input: 
+;;  Output: a random piece
+;;  Modified: 
+;;
+man_foe_remove::
     ret
 
 

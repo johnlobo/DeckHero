@@ -662,6 +662,7 @@ _add_card::
     call man_array_remove_element       ;; erase card form hand
     
     call sys_render_deck                ;; Update number in deck
+    
     call sys_render_hand                ;; update hand
 
     ld ix, #fight_deck
