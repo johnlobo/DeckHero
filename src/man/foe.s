@@ -23,6 +23,7 @@
 .include "man/deck.h.s"
 .include "man/hand.h.s"
 .include "man/oponent.h.s"
+.include "man/array.h.s"
 .include "sys/input.h.s"
 .include "sys/render.h.s"
 .include "comp/component.h.s"
@@ -86,7 +87,7 @@ man_foe_init::
 ;;  Modified: 
 ;;
 man_foe_create::
-    ld hl, #blob
+    ld hl, #foe_blob
     call man_array_create_element
     ret
 
