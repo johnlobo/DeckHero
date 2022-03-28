@@ -41,8 +41,8 @@
 
 ;; Character templates
 foe_blob::
-;;_status, _name, _sprite, _life, _money, _shield, _force, _dexterity, _buffer, _blessing, _thorns, _regen, _draw_card, _confuse, _poison
-DefineOponent 1, ^/BLOB           /, _s_blob_0, 40, 1, 5, 1, 0, 0, 0, 0, 0, 0, 0, 0
+;;_status, _name, _sprite, _sprite_x, _sprite_y, _sprite_w, _sprite_h, _life, _money, _shield, _force, _dexterity, _buffer, _blessing, _thorns, _regen, _draw_card, _confuse, _poison
+DefineOponent 1, ^/BLOB           /, _s_blob_0,60, 60, S_BLOB_WIDTH, S_BLOB_HEIGHT, 40, 1, 5, 1, 0, 0, 0, 0, 0, 0, 0, 0
 ;; Characters
 foes::
 DefineComponentArrayStructure_Size foes, MAX_FOES, sizeof_o     

@@ -38,10 +38,10 @@
 ;; Character templates
 player_template::
 ;;_status, _name, _sprite, _life, _money, _shield, _force, _dexterity, _buffer, _blessing, _thorns, _regen, _draw_card, _confuse, _poison
-DefineOponent 1, ^/PLAYER1        /, _s_player_0, 123, 1, 5, 1, 0, 0, 0, 0, 0, 0, 0, 0
+DefineOponent 1, ^/PLAYER1        /, _s_player_0, 60, 60, S_PLAYER_WIDTH, S_PLAYER_HEIGHT,123, 1, 5, 1, 0, 0, 0, 0, 0, 0, 0, 0
 ;; Characters
 player::
-DefineOponent 1, ^/PLAYER1        /, _s_player_0, 100, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+DefineOponent 1, ^/PLAYER1        /, _s_player_0, 60, 60, S_PLAYER_WIDTH, S_PLAYER_HEIGHT,100, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 
 ;;
 ;; Start of _CODE area

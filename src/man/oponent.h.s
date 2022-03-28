@@ -24,10 +24,14 @@
 ;; OPONENT DEFINITION MACRO
 ;;===============================================================================
 .mdelete DefineOponent
-.macro DefineOponent _status, _name, _sprite, _life, _money, _shield, _force, _dexterity, _buffer, _blessing, _thorns, _regen, _draw_card, _confuse, _poison
+.macro DefineOponent _status, _name, _sprite, _sprite_x, _sprite_y, _sprite_w, _sprite_h, _life, _money, _shield, _force, _dexterity, _buffer, _blessing, _thorns, _regen, _draw_card, _confuse, _poison
     .db _status
     .asciz "_name"
     .dw _sprite
+    .dw _sprite_x
+    .dw _sprite_y
+    .dw _sprite_w
+    .dw _sprite_h
     .db _life
     .db _shield
     .db _money
@@ -49,6 +53,10 @@ BeginStruct o
 Field o, status , 1
 Field o, name , 16    
 Field o, sprite , 2
+Field o, sprite_x , 1
+Field o, sprite_y , 1
+Field o, sprite_w , 1
+Field o, sprite_h , 1
 Field o, life , 1
 Field o, shield , 1
 Field o, money , 1

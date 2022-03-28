@@ -15,17 +15,19 @@
 ;;  You should have received a copy of the GNU Lesser General Public License
 ;;  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;-------------------------------------------------------------------------------
+.module array_of_e_manager
 
-.module foe_manager
+.include "common.h.s"
 
 ;;===============================================================================
 ;; PUBLIC VARIABLES
 ;;===============================================================================
-.globl foes
+
 
 ;;===============================================================================
 ;; PUBLIC METHODS
 ;;===============================================================================
-.globl man_foe_init
-.globl man_foe_create
-.globl man_foe_remove
+.globl man_array_init
+.globl man_array_create_element
+.globl man_array_remove_element
+.globl man_array_get_element

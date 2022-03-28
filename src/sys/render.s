@@ -23,6 +23,7 @@
 .include "man/hand.h.s"
 .include "man/card.h.s"
 .include "man/oponent.h.s"
+.include "man/foe.h.s"
 .include "man/fight.h.s"
 .include "sys/text.h.s"
 .include "sys/util.h.s"
@@ -469,6 +470,42 @@ sys_render_player::
     cpctm_screenPtr_asm de, CPCT_VMEM_START_ASM, PLAYER_STATUS_X, PLAYER_STATUS_NUMBER_Y  ;; screen address in de
     call sys_text_draw_small_number
 
+    ret
+
+;;-----------------------------------------------------------------
+;;
+;; sys_render_foe
+;;
+;;  Shows the the entire fight screen
+;;  Input: 
+;;  Output: 
+;;  Modified: AF, BC, DE, HL
+;;
+sys_render_foe::
+    ld ix, #foes
+    
+    ;; Get screen address of the foe
+    ld de, #CPCT_VMEM_START_ASM     ;; DE = Pointer to start of the screen
+    ld c, o_sprite_x(ix)
+    ld b, o_sprite_y(ix)
+    call cpct_getScreenPtr_asm      ;; Calculate video memory location and return it in HL
+
+    ld l, o_sprite(ix)
+    ld h, o_sprite+1(ix)
+    ld c, o_sprite_w(ix)
+    ld b, o_sprite_h(ix)
+    call cpct_drawSprite_asm
+
+    ;; ;; draw player shield
+    ;; cpctm_screenPtr_asm de, CPCT_VMEM_START_ASM, PLAYER_STATUS_X, PLAYER_STATUS_Y  ;; screen address in de
+    ;; ld hl, #_s_status_0
+    ;; ld c, #S_STATUS_WIDTH
+    ;; ld b, #S_STATUS_HEIGHT
+    ;; call cpct_drawSprite_asm
+    ;; ;; shield number
+    ;; ld hl, #3
+    ;; cpctm_screenPtr_asm de, CPCT_VMEM_START_ASM, PLAYER_STATUS_X, PLAYER_STATUS_NUMBER_Y  ;; screen address in de
+    ;; call sys_text_draw_small_number
 
     ret
 
@@ -668,6 +705,8 @@ sys_render_fight_screen::
     call sys_render_cemetery    ;; Cemetery number
 
     call sys_render_player
+
+    call sys_render_foe
     
     call sys_render_hand
 

@@ -103,6 +103,9 @@ ELEMENT_TO_ERASE = . +1
     ld hl, #player_energy
     ld (hl), #3
 
+    call man_foe_init
+    call man_foe_create
+
     call sys_render_fight_screen    ;; renders the fight screen
     ret
 
