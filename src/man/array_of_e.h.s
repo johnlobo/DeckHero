@@ -27,7 +27,7 @@
 ;;===============================================================================
 ;; PUBLIC METHODS
 ;;===============================================================================
-.globl man_array_init
-.globl man_array_create_element
-.globl man_array_remove_element
-.globl man_array_get_element
+.globl man_array_of_e_init
+.globl man_array_of_e_create_element
+.globl man_array_of_e_remove_element
+.globl man_array_of_e_get_element

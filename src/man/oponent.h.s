@@ -21,6 +21,15 @@
 .include "common.h.s"
 
 ;;===============================================================================
+;; DEFINED CONSTANTS
+;;===============================================================================
+
+;;tipos de cartas
+o_type_invalid              = 0x00
+o_type_alive                = 0x01
+o_type_dead                 = 0x02
+
+;;===============================================================================
 ;; OPONENT DEFINITION MACRO
 ;;===============================================================================
 .mdelete DefineOponent
@@ -28,10 +37,10 @@
     .db _status
     .asciz "_name"
     .dw _sprite
-    .dw _sprite_x
-    .dw _sprite_y
-    .dw _sprite_w
-    .dw _sprite_h
+    .db _sprite_x
+    .db _sprite_y
+    .db _sprite_w
+    .db _sprite_h
     .db _life
     .db _shield
     .db _money

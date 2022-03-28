@@ -71,7 +71,8 @@ sys_render_init::
     ld de, #16                              ;;
     call cpct_setPalette_asm                ;;
 
-    cpctm_setBorder_asm HW_BLACK            ;; Set Border
+    ;;cpctm_setBorder_asm HW_BLACK            ;; Set Border
+    cpctm_setBorder_asm HW_WHITE            ;; Set Border
 
     cpctm_clearScreen_asm 0                 ;; Clear screen
 
@@ -459,6 +460,17 @@ sys_render_player::
     ld b, #PLAYER_SPRITE_HEIGHT
     call cpct_drawSprite_asm
 
+
+    ;; draw player life
+    cpctm_screenPtr_asm de, CPCT_VMEM_START_ASM, PLAYER_STATUS_X, PLAYER_STATUS_Y  ;; screen address in de
+    ld hl, #_s_status_1
+    ld c, #S_STATUS_WIDTH
+    ld b, #S_STATUS_HEIGHT
+    call cpct_drawSprite_asm
+    ;; shield number
+    ld hl, #3
+    cpctm_screenPtr_asm de, CPCT_VMEM_START_ASM, PLAYER_STATUS_X+4, PLAYER_STATUS_NUMBER_Y  ;; screen address in de
+    call sys_text_draw_small_number
     ;; draw player shield
     cpctm_screenPtr_asm de, CPCT_VMEM_START_ASM, PLAYER_STATUS_X, PLAYER_STATUS_Y  ;; screen address in de
     ld hl, #_s_status_0
@@ -482,7 +494,7 @@ sys_render_player::
 ;;  Modified: AF, BC, DE, HL
 ;;
 sys_render_foe::
-    ld ix, #foes
+    ld ix, #foes + #a_array
     
     ;; Get screen address of the foe
     ld de, #CPCT_VMEM_START_ASM     ;; DE = Pointer to start of the screen
@@ -490,22 +502,15 @@ sys_render_foe::
     ld b, o_sprite_y(ix)
     call cpct_getScreenPtr_asm      ;; Calculate video memory location and return it in HL
 
+    ex de, hl
+
     ld l, o_sprite(ix)
     ld h, o_sprite+1(ix)
     ld c, o_sprite_w(ix)
     ld b, o_sprite_h(ix)
     call cpct_drawSprite_asm
 
-    ;; ;; draw player shield
-    ;; cpctm_screenPtr_asm de, CPCT_VMEM_START_ASM, PLAYER_STATUS_X, PLAYER_STATUS_Y  ;; screen address in de
-    ;; ld hl, #_s_status_0
-    ;; ld c, #S_STATUS_WIDTH
-    ;; ld b, #S_STATUS_HEIGHT
-    ;; call cpct_drawSprite_asm
-    ;; ;; shield number
-    ;; ld hl, #3
-    ;; cpctm_screenPtr_asm de, CPCT_VMEM_START_ASM, PLAYER_STATUS_X, PLAYER_STATUS_NUMBER_Y  ;; screen address in de
-    ;; call sys_text_draw_small_number
+    
 
     ret
 

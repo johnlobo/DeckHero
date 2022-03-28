@@ -24,6 +24,7 @@
 .include "man/hand.h.s"
 .include "man/oponent.h.s"
 .include "man/array.h.s"
+.include "man/array_of_e.h.s"
 .include "sys/input.h.s"
 .include "sys/render.h.s"
 .include "comp/component.h.s"
@@ -42,7 +43,7 @@
 ;; Character templates
 foe_blob::
 ;;_status, _name, _sprite, _sprite_x, _sprite_y, _sprite_w, _sprite_h, _life, _money, _shield, _force, _dexterity, _buffer, _blessing, _thorns, _regen, _draw_card, _confuse, _poison
-DefineOponent 1, ^/BLOB           /, _s_blob_0,60, 60, S_BLOB_WIDTH, S_BLOB_HEIGHT, 40, 1, 5, 1, 0, 0, 0, 0, 0, 0, 0, 0
+DefineOponent 1, ^/BLOB           /, _s_blob_0,50, 75, S_BLOB_WIDTH, S_BLOB_HEIGHT, 40, 1, 5, 1, 0, 0, 0, 0, 0, 0, 0, 0
 ;; Characters
 foes::
 DefineComponentArrayStructure_Size foes, MAX_FOES, sizeof_o     
@@ -74,7 +75,7 @@ man_foe_init::
     ld a_pend(ix), l
     ld a_pend+1(ix), h
 
-    ld  (hl), #e_type_invalid   ;;ponemos el primer elemento del array con tipo invalido
+    ld  (hl), #o_type_invalid   ;;ponemos el primer elemento del array con tipo invalido
     ret
 
 ;;-----------------------------------------------------------------
@@ -83,12 +84,15 @@ man_foe_init::
 ;;
 ;;  Initializes a fight
 ;;  Input: 
-;;  Output: a random piece
+;;  Output: 
 ;;  Modified: 
 ;;
 man_foe_create::
     ld hl, #foe_blob
-    call man_array_create_element
+    ld ix, #foes
+    ld c, #sizeof_o
+    ld a, #o_type_alive
+    call man_array_of_e_create_element
     ret
 
 ;;-----------------------------------------------------------------
