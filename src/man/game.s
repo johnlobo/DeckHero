@@ -35,10 +35,10 @@
 
 
 blob_template::
-DefineOponent 1, ^/BLOB           /, _s_blob_0, 60, 60, S_BLOB_WIDTH, S_BLOB_HEIGHT, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+DefineOponent 1, ^/BLOB           /, _s_blob_0, 60, 60, S_BLOB_WIDTH, S_BLOB_HEIGHT, 20, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 
 foe::
-DefineOponent 1, ^/FOE   1        /, _s_blob_0, 60, 60, S_BLOB_WIDTH, S_BLOB_HEIGHT, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+DefineOponent 1, ^/FOE   1        /, _s_blob_0, 60, 60, S_BLOB_WIDTH, S_BLOB_HEIGHT, 100, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 
 ;;
 ;; Start of _CODE area

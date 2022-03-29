@@ -29,11 +29,14 @@ o_type_invalid              = 0x00
 o_type_alive                = 0x01
 o_type_dead                 = 0x02
 
+;; Constants
+NUM_EFFECTS = 9
+
 ;;===============================================================================
 ;; OPONENT DEFINITION MACRO
 ;;===============================================================================
 .mdelete DefineOponent
-.macro DefineOponent _status, _name, _sprite, _sprite_x, _sprite_y, _sprite_w, _sprite_h, _life, _money, _shield, _force, _dexterity, _buffer, _blessing, _thorns, _regen, _draw_card, _confuse, _poison
+.macro DefineOponent _status, _name, _sprite, _sprite_x, _sprite_y, _sprite_w, _sprite_h, _life, _max_life, _money, _effects_count,_shield, _force, _dexterity, _buffer, _blessing, _thorns, _regen, _confuse, _poison, _draw_card
     .db _status
     .asciz "_name"
     .dw _sprite
@@ -42,17 +45,19 @@ o_type_dead                 = 0x02
     .db _sprite_w
     .db _sprite_h
     .db _life
-    .db _shield
+    .db _max_life
     .db _money
+    .db _effects_count
+    .db _shield
     .db _force
     .db _dexterity
     .db _buffer
     .db _blessing
     .db _thorns
     .db _regen
-    .db _draw_card
     .db _confuse
     .db _poison
+    .db _draw_card
 .endm
 
 ;;===============================================================================
@@ -67,17 +72,19 @@ Field o, sprite_y , 1
 Field o, sprite_w , 1
 Field o, sprite_h , 1
 Field o, life , 1
-Field o, shield , 1
+Field o, max_life , 1
 Field o, money , 1
+Field o, effects_count , 1
+Field o, shield , 1
 Field o, force , 1
 Field o, dexterity , 1
 Field o, buffer , 1
 Field o, blessing , 1
 Field o, thorns , 1
 Field o, regen , 1
-Field o, draw_card , 1
 Field o, confuse , 1
 Field o, poison , 1
+Field o, draw_card , 1
 EndStruct o
 
 

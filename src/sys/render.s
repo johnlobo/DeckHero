@@ -443,60 +443,152 @@ ARRAY_COUNT = .+1
 
 ;;-----------------------------------------------------------------
 ;;
-;; sys_render_player
+;; sys_render_effects
 ;;
 ;;  Shows the the entire fight screen
-;;  Input: 
+;;  Input: IX: player structure
 ;;  Output: 
 ;;  Modified: AF, BC, DE, HL
 ;;
-sys_render_player::
-    ld ix, #player
-    ;; draw player sprite
-    cpctm_screenPtr_asm de, CPCT_VMEM_START_ASM, PLAYER_SPRITE_X, PLAYER_SPRITE_Y  ;; screen address in de
-    ld l, o_sprite(ix)
-    ld h, o_sprite+1(ix)
-    ld c, #PLAYER_SPRITE_WIDTH
-    ld b, #PLAYER_SPRITE_HEIGHT
+sys_render_effects::
+    ld a, o_effects_count(ix)   ;; Check if effects count > 0
+    or a                        ;;
+    ret z                       ;;
+
+    ld__hl_ix                   ;; charge hl with ix
+
+    ld a, #o_shield             ;; position hl at the first effect
+    add_hl_a                    ;;            
+
+    ld b, #0                     ;;
+_effects_loop:
+    push hl                     ;; Keep the pointer to the effect in the stack
+    push bc                     ;; keep index loop in the stack
+
+    ld a, (hl)
+    or a 
+    jr z, _next_effect
+
+    ;; Calc the screen address to draw the effect
+    ;; xcoord
+    ld a, o_sprite_w(ix)        ;; a=sprite width 
+    sra a                       ;; a = sprite_width/2
+    ld c, a                     ;; keep a in c
+
+    ld a, o_effects_count(ix)   ;; a = num effects
+    sla a                       ;; a = num_effects * 2
+    ld l, a                     ;; keep a in l
+
+    ld a, b                     ;; a = current_effect
+    sla a                       ;; a = current_effect * 2
+    sla a                       ;; a = current_effect * 4
+
+    add a, o_sprite_x(ix)       ;; a = sprite_x + (current effect * 4)
+    add c                       ;; a = spritex + (sprite_width/2) + (current effect * 4)
+    sub l                       ;; a = spritex + (sprite_width/2) - (num_effects * 2) + (current effect * 4)
+
+    ld c, a                     ;; store a in c for later use
+    ld (_X_COORD_EFFECT), a     ;; store in a memory spot for later use
+
+    ;; ycoord
+    ld a, o_sprite_y(ix)
+    add a, o_sprite_h(ix)
+    add a, #7                   ;; offset to the sprite pos
+
+    ld b, a
+    ld (_Y_COORD_EFFECT), a     ;; store in a memory spot for later use
+
+    ;; Get screen address of the oponent
+    ld de, #CPCT_VMEM_START_ASM     ;; DE = Pointer to start of the screen
+    call cpct_getScreenPtr_asm      ;; Calculate video memory location and return it in HL
+    ex de, hl
+    
+    pop bc
+    push bc
+    ld hl, #0
+_add_effect_loop:
+    ld a, #S_SMALL_ICONS_SIZE
+    add_hl_a
+    dec b
+    jp p, _add_effect_loop      ;; jump back to the loop if b > 0
+
+    ld bc, #_s_small_icons_00
+    add hl, bc
+    
+    ld c, #S_SMALL_ICONS_WIDTH
+    ld b, #S_SMALL_ICONS_HEIGHT
     call cpct_drawSprite_asm
 
+    ;; Draw effect amount
 
-    ;; draw player life
-    cpctm_screenPtr_asm de, CPCT_VMEM_START_ASM, PLAYER_STATUS_X, PLAYER_STATUS_Y  ;; screen address in de
-    ld hl, #_s_status_1
-    ld c, #S_STATUS_WIDTH
-    ld b, #S_STATUS_HEIGHT
-    call cpct_drawSprite_asm
-    ;; shield number
-    ld hl, #3
-    cpctm_screenPtr_asm de, CPCT_VMEM_START_ASM, PLAYER_STATUS_X+4, PLAYER_STATUS_NUMBER_Y  ;; screen address in de
+    ;; Get screen address of the oponent
+_X_COORD_EFFECT = .+1
+    ld c, #0
+    ld a, #10
+_Y_COORD_EFFECT = .+1
+    add a, #0
+    ld b, a
+    ld de, #CPCT_VMEM_START_ASM     ;; DE = Pointer to start of the screen
+    call cpct_getScreenPtr_asm      ;; Calculate video memory location and return it in HL
+    
+    ex de, hl
+
+    pop bc
+    pop hl
+    push hl
+    push bc
+    ld a, (hl)
+    ld h, #0
+    ld l, a
+    
     call sys_text_draw_small_number
-    ;; draw player shield
-    cpctm_screenPtr_asm de, CPCT_VMEM_START_ASM, PLAYER_STATUS_X, PLAYER_STATUS_Y  ;; screen address in de
-    ld hl, #_s_status_0
-    ld c, #S_STATUS_WIDTH
-    ld b, #S_STATUS_HEIGHT
-    call cpct_drawSprite_asm
-    ;; shield number
-    ld hl, #3
-    cpctm_screenPtr_asm de, CPCT_VMEM_START_ASM, PLAYER_STATUS_X, PLAYER_STATUS_NUMBER_Y  ;; screen address in de
-    call sys_text_draw_small_number
 
+
+_next_effect:
+    pop bc                      ;; retrieve index loop form the stack
+    pop hl                      ;; retrieve index effect from the stack
+    inc hl
+    inc b
+    ld a, #NUM_EFFECTS
+    cp b
+    jr nz, _effects_loop
     ret
+
+    ;;;; draw player life
+    ;;cpctm_screenPtr_asm de, CPCT_VMEM_START_ASM, PLAYER_STATUS_X, PLAYER_STATUS_Y  ;; screen address in de
+    ;;ld hl, #_s_status_1
+    ;;ld c, #S_STATUS_WIDTH
+    ;;ld b, #S_STATUS_HEIGHT
+    ;;call cpct_drawSprite_asm
+    ;;;; shield number
+    ;;ld hl, #3
+    ;;cpctm_screenPtr_asm de, CPCT_VMEM_START_ASM, PLAYER_STATUS_X+4, PLAYER_STATUS_NUMBER_Y  ;; screen address in de
+    ;;call sys_text_draw_small_number
+    ;;;; draw player shield
+    ;;cpctm_screenPtr_asm de, CPCT_VMEM_START_ASM, PLAYER_STATUS_X, PLAYER_STATUS_Y  ;; screen address in de
+    ;;ld hl, #_s_status_0
+    ;;ld c, #S_STATUS_WIDTH
+    ;;ld b, #S_STATUS_HEIGHT
+    ;;call cpct_drawSprite_asm
+    ;;;; shield number
+    ;;ld hl, #3
+    ;;cpctm_screenPtr_asm de, CPCT_VMEM_START_ASM, PLAYER_STATUS_X, PLAYER_STATUS_NUMBER_Y  ;; screen address in de
+    ;;call sys_text_draw_small_number
+    ret
+
 
 ;;-----------------------------------------------------------------
 ;;
-;; sys_render_foe
+;; sys_render_oponent
 ;;
 ;;  Shows the the entire fight screen
 ;;  Input: 
 ;;  Output: 
 ;;  Modified: AF, BC, DE, HL
 ;;
-sys_render_foe::
-    ld ix, #foes + #a_array
+sys_render_oponent::
     
-    ;; Get screen address of the foe
+    ;; Get screen address of the oponent
     ld de, #CPCT_VMEM_START_ASM     ;; DE = Pointer to start of the screen
     ld c, o_sprite_x(ix)
     ld b, o_sprite_y(ix)
@@ -510,8 +602,8 @@ sys_render_foe::
     ld b, o_sprite_h(ix)
     call cpct_drawSprite_asm
 
+    call sys_render_effects
     
-
     ret
 
 
@@ -527,9 +619,9 @@ sys_render_foe::
 sys_render_topbar::
     ;; draw life
     cpctm_screenPtr_asm de, CPCT_VMEM_START_ASM, 0, 0  ;; screen address in de
-    ld hl, #_s_heart_small
-    ld c, #S_HEART_SMALL_WIDTH
-    ld b, #S_HEART_SMALL_HEIGHT
+    ld hl, #_s_small_icons_00
+    ld c, #S_SMALL_ICONS_WIDTH
+    ld b, #S_SMALL_ICONS_HEIGHT
     call cpct_drawSprite_asm
 
     call sys_text_reset_aux_txt
@@ -708,10 +800,12 @@ sys_render_fight_screen::
     call sys_render_sacrifice   ;; Sacrifice number
     call sys_render_deck        ;; Deck number
     call sys_render_cemetery    ;; Cemetery number
-
-    call sys_render_player
-
-    call sys_render_foe
+    ;; render player
+    ld ix, #player
+    call sys_render_oponent
+    ;; render oponent
+    ld ix, #foes+a_array
+    call sys_render_oponent
     
     call sys_render_hand
 

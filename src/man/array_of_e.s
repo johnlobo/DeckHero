@@ -53,7 +53,6 @@ man_array_of_e_init::
     ld a_count(ix), a
 
     ld__hl_ix                  ;; point hl to the start of the array 
-    ;; TODO No entiendo esto... 
     ld a, #a_array
     add_hl_a
     ;;ld  (hand_pend), hl
