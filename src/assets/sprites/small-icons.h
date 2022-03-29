@@ -33,5 +33,8 @@ extern const u8 s_small_icons_08[4 * 10];
 #define S_SMALL_ICONS_09_W 4
 #define S_SMALL_ICONS_09_H 10
 extern const u8 s_small_icons_09[4 * 10];
+#define S_SMALL_ICONS_10_W 4
+#define S_SMALL_ICONS_10_H 10
+extern const u8 s_small_icons_10[4 * 10];
 
 #endif
