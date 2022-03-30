@@ -234,7 +234,7 @@ _swapColors:
     .db 0x11, 0x66, 0x99, 0x33, 0x22   ;; Blue
     .db 0x10, 0x35, 0x3a, 0x30, 0x20   ;; Bright Red
     .db 0x45, 0xce, 0xcd, 0xcf, 0x84   ;; Mauve
-_char_buffer:: .db 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+_char_buffer: .db 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; draw_string
@@ -254,7 +254,7 @@ sys_text_draw_string::
     cpctm_push ix, iy
     ld a,c
     ld (_string_color),a            ;; store color in memory
-draw_string_2::
+draw_string_2:
     cpctm_push de, hl 
     ld a, (hl)                      ;; load a with the char to draw
     or a
@@ -363,7 +363,7 @@ sys_text_draw_small_char_number::
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; sys_text_draw_small_number
-;;  draws a two digit number with small characters
+;;  draws a three digit number with small characters
 ;; Input:
 ;;  hl : number to convert
 ;;  de : screen address
@@ -372,11 +372,20 @@ sys_text_draw_small_char_number::
 ;;  Nothing
 ;; Destroys:
 ;;  af, bc, hl, de
-;;      
+;;
+;;  Routine adapted from WikiTI (https://wikiti.brandonw.net/index.php?title=Z80_Routines:Other:DispHL)
+;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 sys_text_draw_small_number::
+    ld a, l
+    ld (_original_number), a
+    ld	bc, #-100
+    cp #100                      ;; check if number is lower than 100
+    call nc,	_dsn_Num1
     ld bc, #-10
-	call _dsn_Num1
+    ld a, (_original_number)
+    cp #10                      ;; check if number is lower than 10
+	call nc, _dsn_Num1           ;; if number is upper 9 then call
 	ld	c,b
 _dsn_Num1:	
     ld a, #-1                           
@@ -394,3 +403,5 @@ _dsn_Num2:
     inc de                      ;;
     
     ret
+
+_original_number: .db #0    

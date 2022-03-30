@@ -90,6 +90,77 @@ sys_render_init::
 sys_render_update::
     ret
 
+
+;;-----------------------------------------------------------------
+;;
+;; sys_render_hor_line
+;;
+;;  Draws an horizaontal line on the screen
+;;  Input:  bc: y, x screen coords
+;;          a: length of the line
+;;          d: color
+;;  Output: 
+;;  Modified: AF, BC, DE, HL
+;;
+;;sys_render_hor_line::
+;;    push bc
+;;    ld (_HOR_LINE_LENGTH), a         ;; store the length of the line in the comparison.
+;;    ;; calculate color for pixels
+;;    ld h, d
+;;    ld l, d
+;;    call cpct_px2byteM0_asm
+;;    ld (_HOR_LINE_COLOR), a         ;; store the color of the pixel in the loop asignment
+;;
+;;    ;; Get screen address to start the line
+;;    pop bc                          ;; c is xcoord ,  is ycoord
+;;    ld de, #CPCT_VMEM_START_ASM     ;; DE = Pointer to start of the screen
+;;    call cpct_getScreenPtr_asm      ;; Calculate video memory location and return it in HL
+;;    
+;;    ;; draw loop
+;;_HOR_LINE_LENGTH = .+1
+;;    ld b, #0
+;;_HOR_LINE_COLOR = .+1    
+;;    ld a, #0
+;;_hor_line_loop:
+;;    ld (hl), a
+;;    inc hl
+;;    djnz _hor_line_loop
+;;    ret
+
+;;-----------------------------------------------------------------
+;;
+;; sys_render_hor_line
+;;
+;;  Draws an horizaontal line on the screen
+;;  Input:  hl: screen address
+;;          a: length of the line
+;;          d: color
+;;  Output: 
+;;  Modified: AF, BC, DE, HL
+;;
+sys_render_hor_line::
+    push hl
+    ld (_HOR_LINE_LENGTH), a         ;; store the length of the line in the comparison.
+    
+    ;; calculate color for pixels
+    ld h, d
+    ld l, d
+    call cpct_px2byteM0_asm
+
+    pop hl
+
+    ;; draw loop
+_HOR_LINE_LENGTH = .+1
+    ld b, #0
+
+_hor_line_loop:
+    ld (hl), a
+    inc hl
+    djnz _hor_line_loop
+    ret
+
+
+
 ;;-----------------------------------------------------------------
 ;;
 ;; sys_render_erase_deck
@@ -109,7 +180,7 @@ _e_d_loop01:
     
     ld a, (hand_selected)           ;; compare card selected with current card
     cp b                            ;;
-    ld b, #HAND_Y                   ;; c = y coordinate by default
+    ld b, #HAND_Y                   ;; b = y coordinate by default
     jr nz, _erase_not_selected      ;; jump if current card not selected
     ld b, #HAND_Y - 5
 
@@ -451,6 +522,65 @@ ARRAY_COUNT = .+1
 ;;  Modified: AF, BC, DE, HL
 ;;
 sys_render_effects::
+
+    ;; Calc the screen address to draw the effect
+
+    ;; xcoord base
+    ld a, o_sprite_w(ix)        ;; a=sprite width 
+    sra a                       ;; a = sprite_width/2
+    add a, o_sprite_x(ix)       ;; a = sprite_x + (sprite_width/2)
+
+    ld b, o_effects_count(ix)   ;; b = num effects
+    inc b                       ;; b = (num effects + 1)
+    sla b                       ;; b = (num effects + 1) * 2
+    sub b                       ;; a = sprite_x + (sprite_width/2) - ((num effects + 1) * 2)
+    
+    ld (_x_coord_base), a
+    ld c, a
+    ld (_X_COORD_HEART_EFFECT), a         ;; store in a memory spot for later use
+
+
+    ;; ycoord base
+    ld a, o_sprite_y(ix)
+    add a, o_sprite_h(ix)
+    add a, #2                   ;; offset to the sprite pos
+    ld (_y_coord_base), a
+    ld b, a
+    ld (_Y_COORD_HEART_EFFECT), a     ;; store in a memory spot for later use
+
+
+    ;; Get screen address of the oponent
+    ld de, #CPCT_VMEM_START_ASM     ;; DE = Pointer to start of the screen
+    call cpct_getScreenPtr_asm      ;; Calculate video memory location and return it in HL
+    ex de, hl
+    ;; Draw heart sprite
+    ld hl, #_s_small_icons_00
+    ld c, #S_SMALL_ICONS_WIDTH
+    ld b, #S_SMALL_ICONS_HEIGHT
+    call cpct_drawSprite_asm
+
+ ;; Draw effect amount
+
+    ;; Get screen address of the text
+_X_COORD_HEART_EFFECT = .+1
+    ld c, #0
+    ld a, #10
+_Y_COORD_HEART_EFFECT = .+1
+    add a, #0
+    ld b, a
+    ld de, #CPCT_VMEM_START_ASM     ;; DE = Pointer to start of the screen
+    call cpct_getScreenPtr_asm      ;; Calculate video memory location and return it in HL
+    
+    ex de, hl
+
+    ld h, #0
+    ld l, o_life(ix)
+    
+    call sys_text_draw_small_number
+
+
+
+    ;; Check if effects > 0
     ld a, o_effects_count(ix)   ;; Check if effects count > 0
     or a                        ;;
     ret z                       ;;
@@ -471,30 +601,41 @@ _effects_loop:
 
     ;; Calc the screen address to draw the effect
     ;; xcoord
-    ld a, o_sprite_w(ix)        ;; a=sprite width 
-    sra a                       ;; a = sprite_width/2
-    ld c, a                     ;; keep a in c
+    ;;ld a, o_sprite_w(ix)        ;; a=sprite width 
+    ;;sra a                       ;; a = sprite_width/2
+    ;;ld c, a                     ;; keep a in c
+;;
+    ;;ld a, o_effects_count(ix)   ;; a = num effects
+    ;;sla a                       ;; a = num_effects * 2
+    ;;ld l, a                     ;; keep a in l
+;;
+    ;;ld a, b                     ;; a = current_effect
+    ;;sla a                       ;; a = current_effect * 2
+    ;;sla a                       ;; a = current_effect * 4
+;;
+    ;;add a, o_sprite_x(ix)       ;; a = sprite_x + (current effect * 4)
+    ;;add c                       ;; a = spritex + (sprite_width/2) + (current effect * 4)
+    ;;sub l                       ;; a = spritex + (sprite_width/2) - (num_effects * 2) + (current effect * 4)
+;;
+    ;;ld c, a                     ;; store a in c for later use
 
-    ld a, o_effects_count(ix)   ;; a = num effects
-    sla a                       ;; a = num_effects * 2
-    ld l, a                     ;; keep a in l
 
-    ld a, b                     ;; a = current_effect
-    sla a                       ;; a = current_effect * 2
-    sla a                       ;; a = current_effect * 4
-
-    add a, o_sprite_x(ix)       ;; a = sprite_x + (current effect * 4)
-    add c                       ;; a = spritex + (sprite_width/2) + (current effect * 4)
-    sub l                       ;; a = spritex + (sprite_width/2) - (num_effects * 2) + (current effect * 4)
-
-    ld c, a                     ;; store a in c for later use
-    ld (_X_COORD_EFFECT), a     ;; store in a memory spot for later use
+    ld a, (_x_coord_base)
+    ld c, b                         ;; c = current effect
+    inc c                           ;; c = current effect + 1
+    sla c                           ;; c = (current effect + 1) * 2
+    sla c                           ;; c = (current effect + 1) * 4
+    add c                           ;; a = _x_coord_base + ((current effect + 1) * 4)
+    ld c,a
+    ld (_X_COORD_EFFECT), a         ;; store in a memory spot for later use
 
     ;; ycoord
-    ld a, o_sprite_y(ix)
-    add a, o_sprite_h(ix)
-    add a, #7                   ;; offset to the sprite pos
+    
+    ;;ld a, o_sprite_y(ix)
+    ;;add a, o_sprite_h(ix)
+    ;;add a, #8                   ;; offset to the sprite pos
 
+    ld a, (_y_coord_base)
     ld b, a
     ld (_Y_COORD_EFFECT), a     ;; store in a memory spot for later use
 
@@ -521,7 +662,7 @@ _add_effect_loop:
 
     ;; Draw effect amount
 
-    ;; Get screen address of the oponent
+    ;; Get screen address of the text
 _X_COORD_EFFECT = .+1
     ld c, #0
     ld a, #10
@@ -538,9 +679,12 @@ _Y_COORD_EFFECT = .+1
     push hl
     push bc
     ld a, (hl)
+    cp #10
+    jr nc, _draw_effect_number
+    inc de
+_draw_effect_number:
     ld h, #0
-    ld l, a
-    
+    ld l, a    
     call sys_text_draw_small_number
 
 
@@ -553,29 +697,53 @@ _next_effect:
     cp b
     jr nz, _effects_loop
     ret
+_x_coord_base: .db #0
+_y_coord_base: .db #0
 
-    ;;;; draw player life
-    ;;cpctm_screenPtr_asm de, CPCT_VMEM_START_ASM, PLAYER_STATUS_X, PLAYER_STATUS_Y  ;; screen address in de
-    ;;ld hl, #_s_status_1
-    ;;ld c, #S_STATUS_WIDTH
-    ;;ld b, #S_STATUS_HEIGHT
-    ;;call cpct_drawSprite_asm
-    ;;;; shield number
-    ;;ld hl, #3
-    ;;cpctm_screenPtr_asm de, CPCT_VMEM_START_ASM, PLAYER_STATUS_X+4, PLAYER_STATUS_NUMBER_Y  ;; screen address in de
-    ;;call sys_text_draw_small_number
-    ;;;; draw player shield
-    ;;cpctm_screenPtr_asm de, CPCT_VMEM_START_ASM, PLAYER_STATUS_X, PLAYER_STATUS_Y  ;; screen address in de
-    ;;ld hl, #_s_status_0
-    ;;ld c, #S_STATUS_WIDTH
-    ;;ld b, #S_STATUS_HEIGHT
-    ;;call cpct_drawSprite_asm
-    ;;;; shield number
-    ;;ld hl, #3
-    ;;cpctm_screenPtr_asm de, CPCT_VMEM_START_ASM, PLAYER_STATUS_X, PLAYER_STATUS_NUMBER_Y  ;; screen address in de
-    ;;call sys_text_draw_small_number
+;;-----------------------------------------------------------------
+;;
+;; sys_render_life_line
+;;
+;;  Shows the the entire fight screen
+;;  Input: ix : oponent struct
+;;  Output: 
+;;  Modified: AF, BC, DE, HL
+;;
+sys_render_life_line::
+    ;; Get screen address for the life line
+    ld c, o_sprite_x(ix)            ;; c = sprite_x
+    ld a, o_sprite_w(ix)            ;;
+    sra a                           ;; a = sprite_w / 2
+
+    ld b, o_sprite_y(ix)            ;; b = sprite_y + sprite_h + 2
+    ld a, o_sprite_h(ix)            ;;
+    add b                           ;;
+    ld b, a                         ;;
+    inc b                           ;;
+    inc b                           ;;
+
+    ld de, #CPCT_VMEM_START_ASM     ;; DE = Pointer to start of the screen
+    call cpct_getScreenPtr_asm      ;; Calculate video memory location and return it in HL
+
+    push hl
+
+    ex de, hl
+
+    ld h, #0
+    ld l, o_life(ix)
+    call sys_text_draw_small_number
+
+    pop hl
+    inc hl
+    inc hl
+    inc hl
+    inc hl
+
+    ld a, #8                        ;; a = length
+    ld d, #8                        ;; d = color
+    call sys_render_hor_line        ;; render line
+
     ret
-
 
 ;;-----------------------------------------------------------------
 ;;
@@ -602,9 +770,12 @@ sys_render_oponent::
     ld b, o_sprite_h(ix)
     call cpct_drawSprite_asm
 
+    ;;call sys_render_life_line
+      
     call sys_render_effects
     
     ret
+_mid_sprite: .db #0
 
 
 ;;-----------------------------------------------------------------

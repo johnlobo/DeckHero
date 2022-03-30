@@ -162,7 +162,7 @@ _kp_endLoop:
     ld (_key_released), a
     ret
 
-_key_released::
+_key_released:
     .db #0
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -624,7 +624,7 @@ sys_input_init::
 ;;  Output:
 ;;  Modified: 
 ;;
-_show_deck::
+_show_deck:
     ld ix, #fight_deck
     call sys_render_show_array
 
