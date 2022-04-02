@@ -109,7 +109,18 @@ ELEMENT_TO_ERASE = . +1
     call sys_render_fight_screen    ;; renders the fight screen
     ret
 
-
+;;-----------------------------------------------------------------
+;;
+;; man_fight_excute_card
+;;
+;;  Executes the selected card
+;;  Input: 
+;;  Output: 
+;;  Modified: 
+;;
+man_fight_execute_card::
+    ld ix, #hand
+    ld a, a_selected(ix)
 
 
 ;;-----------------------------------------------------------------

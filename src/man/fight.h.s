@@ -33,3 +33,4 @@
 ;;===============================================================================
 .globl man_fight_init
 .globl man_fight_update
+.globl man_fight_execute_card

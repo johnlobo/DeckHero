@@ -194,9 +194,7 @@ man_array_of_e_get_element::
     push ix                     ;; load in hl the beginning of the array
     pop hl                      ;;
     ld (_e_output), a           ;; store the random number in the output variable
-    ld de, #a_array          ;;
-    ;;ld e, a_array(ix)
-    ;;ld d, a_array+1(ix)
+    ld de, #a_array             ;;
     add hl, de
 
     or a                        ;; check if we have to retrieve the first card

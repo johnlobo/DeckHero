@@ -36,7 +36,7 @@
 .endm
 
 ;;===============================================================================
-;; DATA ARRAY SCTRUCTURE CREATION
+;; DATA ARRAY STRUCTURE CREATION
 ;;===============================================================================
 BeginStruct a
 Field a, count , 1
@@ -48,7 +48,7 @@ EndStruct a
 
 
 ;;===============================================================================
-;; POINTER TO CARD SCTRUCTURE CREATION
+;; POINTER TO CARD STRUCTURE CREATION
 ;;===============================================================================
 BeginStruct e
 Field e, status , 1

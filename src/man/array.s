@@ -212,7 +212,7 @@ ret
 man_array_get_element::
     push ix                     ;; load in hl the beginning of the array
     pop hl                      ;;
-    ld (_e_output), a              ;; store the random number in the output variable
+    ld (_e_output), a           ;; store the card number to be retrieved in the output variable
     ld de, #a_array
     add hl, de
 
@@ -221,7 +221,7 @@ man_array_get_element::
 
     ld b, a
     ld de, #sizeof_e            ;; copy the size of a card in de
-_g_e_sum_loop:                      ;;
+_g_e_sum_loop:                  ;;
     add hl, de                  ;;  add de to hl until we reach the card
     djnz _g_e_sum_loop          ;;
 
