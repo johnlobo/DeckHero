@@ -25,7 +25,6 @@
 .include "sys/render.h.s"
 .include "man/fight.h.s"
 .include "man/deck.h.s"
-.include "man/hand.h.s"
 .include "man/array.h.s"
 .include "comp/component.h.s"
 
@@ -266,7 +265,6 @@ sys_input_add_card::
 ;;
 sys_input_remove_card::
     ld ix, #hand
-    ;;ld a, (hand_num)                ;; Check if we dont have any card in the deck
     ld a, a_count(ix)                ;; Check if we dont have any card in the deck
     or a                            ;;
     ret z                           ;; if 0 return
@@ -278,7 +276,7 @@ sys_input_remove_card::
     push af                         ;; save a (card to move)
     call man_array_get_element      ;; obtain content of a
     ld ix, #cemetery                ;; operate on cemetery
-    call man_array_create_element      ;; create card in cemetery
+    call man_array_create_element   ;; create card in cemetery
     pop af                          ;; retrieve card to erase
     ld ix, #hand
     call man_array_remove_element   ;; erase card from hand

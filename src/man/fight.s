@@ -20,7 +20,6 @@
 
 .include "common.h.s"
 .include "man/deck.h.s"
-.include "man/hand.h.s"
 .include "man/array.h.s"
 .include "man/player.h.s"
 .include "man/foe.h.s"
@@ -119,8 +118,9 @@ ELEMENT_TO_ERASE = . +1
 ;;  Modified: 
 ;;
 man_fight_execute_card::
-    ld ix, #hand
-    ld a, a_selected(ix)
+    ;;ld ix, #hand
+    ;;ld a, a_selected(ix)
+    ret
 
 
 ;;-----------------------------------------------------------------

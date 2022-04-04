@@ -23,7 +23,13 @@
 ;; PUBLIC VARIABLES
 ;;===============================================================================
 .globl fight_deck
+
 .globl hand
+.globl hand_num
+.globl hand_pend
+.globl hand_array
+.globl hand_selected
+
 .globl cemetery
 .globl sacrifice
 .globl player_energy

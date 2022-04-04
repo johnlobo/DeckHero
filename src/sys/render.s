@@ -20,7 +20,6 @@
 
 .include "sys/render.h.s"
 .include "man/deck.h.s"
-.include "man/hand.h.s"
 .include "man/card.h.s"
 .include "man/oponent.h.s"
 .include "man/foe.h.s"
@@ -163,6 +162,30 @@ _hor_line_loop:
 
 ;;-----------------------------------------------------------------
 ;;
+;; sys_render_get_X_start
+;;
+;;  Updates the starting x coord for rendering the array
+;;  Input: ix: array of cards
+;;  Output: a: x cord to start rendering the array of cards
+;;  Modified: AF, C
+;;
+sys_render_get_X_start:
+    ;; Calculate x start coord
+    ld a, a_count(ix)
+    ld c, a                     ;; Multiply num cards by 6
+    sla a                       ;;
+    sla a                       ;; Multyply by 4
+    add c                       ;;
+    add c                       ;; Multiplies by 6
+
+    srl a                       ;; Divide (num cards*8) by 2
+    ld c,a                      ;; move ((num cards*8)/2) to c
+    ld a, #40                   ;; a = 40
+    sub c                       ;; a = 40 - ((num cards*8)/2)
+    ret
+
+;;-----------------------------------------------------------------
+;;
 ;; sys_render_erase_deck
 ;;
 ;;  Erase the deck render area
@@ -171,14 +194,15 @@ _hor_line_loop:
 ;;  Modified: AF, BC, DE, HL
 ;;
 sys_render_erase_hand::
-    ld b, #0                        ;; move num cards in deck to b (index)
-    ld a,(#hand_X_start)            ;; retrieve X start position of the deck
+    ld ix, #hand
+    call sys_render_get_X_start     ;; get x coord to start rendering the deck
     ld c, a                         ;; c = x coordinate  
+    ld b, #0                        ;; move num cards in deck to b (index)
 _e_d_loop01:    
     push bc                       
     ld de, #CPCT_VMEM_START_ASM     ;; DE = Pointer to start of the screen
     
-    ld a, (hand_selected)           ;; compare card selected with current card
+    ld a, a_selected(ix)            ;; compare card selected with current card
     cp b                            ;;
     ld b, #HAND_Y                   ;; b = y coordinate by default
     jr nz, _erase_not_selected      ;; jump if current card not selected
@@ -201,7 +225,7 @@ _erase_not_selected:
 
     inc b                           ;; increment current card
 
-    ld a, (hand_num)                ;; compare with num of cards in deck
+    ld a, a_count(ix)                ;; compare with num of cards in deck
     cp b                            ;;
     jr nz, _e_d_loop01              ;; return to loop if not lasta card reached
 
@@ -341,14 +365,14 @@ _render_not_selected_show:
 ;;  Modified: AF, BC, DE, HL, IX, IY
 ;;
 sys_render_hand::
-
+    ld ix, #hand
     ld a,(hand_num)             ;; retrieve num cards in deck
     or a                        ;; If no cards ret
     ret z                       ;;
 
     push iy                     ;; save iy in the pile
     ld ix, #hand_array
-    ld a,(#hand_X_start)        ;; retrieve X start position of the deck
+    call sys_render_get_X_start ;; retrieve X start position of the deck in a
     ld c, a                     ;; c = x coordinate 
     ld b, #0
 _s_r_h_loop0:

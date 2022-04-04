@@ -20,17 +20,16 @@
 
 .include "common.h.s"
 
-
 ;;===============================================================================
 ;; COMPONENT DEFINITION MACRO
 ;;===============================================================================
 
 
 .macro DefineComponentArrayStructure_Size _Tname, _N, _ComponentSize
-      _Tname'_num::     .db 0
-      _Tname'_pend::    .dw _Tname'_array 
-      _Tname'_selected::.db 0
-      _Tname'_X_start:: .db 40
+      _Tname'_num::           .db 0
+      _Tname'_component_size::   .db _ComponentSize
+      _Tname'_pend::          .dw _Tname'_array 
+      _Tname'_selected::      .db 0
       _Tname'_array::
             .ds _N * _ComponentSize
 .endm
@@ -40,9 +39,9 @@
 ;;===============================================================================
 BeginStruct a
 Field a, count , 1
+Field a, component_size , 1
 Field a, pend , 2
 Field a, selected , 1
-Field a, X_start , 1
 Field a, array , 1
 EndStruct a
 

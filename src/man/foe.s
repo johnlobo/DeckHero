@@ -21,10 +21,8 @@
 .include "man/foe.h.s"
 .include "common.h.s"
 .include "man/deck.h.s"
-.include "man/hand.h.s"
 .include "man/oponent.h.s"
 .include "man/array.h.s"
-.include "man/array_of_e.h.s"
 .include "sys/input.h.s"
 .include "sys/render.h.s"
 .include "comp/component.h.s"
@@ -90,9 +88,9 @@ man_foe_init::
 man_foe_create::
     ld hl, #foe_blob
     ld ix, #foes
-    ld c, #sizeof_o
-    ld a, #o_type_alive
-    call man_array_of_e_create_element
+    call man_array_create_element
+    ld a, #o_type_alive             ;; Update the status of the new foe
+    ld (hl), a                      ;;
     ret
 
 ;;-----------------------------------------------------------------

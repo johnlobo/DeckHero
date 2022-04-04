@@ -44,22 +44,20 @@
 ;;
 ;; man_array_init
 ;;
-;;  Initilizes a hand of cards
+;;  Initilizes an array
 ;;  Input: ix points to the array
 ;;  Output: 
 ;;  Modified: AF, HL
 ;;
 man_array_init::
     xor a
-    ld a_count(ix), a
+    ld a_count(ix), a           ;; Initialize the number of elements in the array
 
-    ;;ld  hl, #hand_array      ;;ponemos el puntero de la ultima entidad a la primera posicion del array
-    ;;ld hl #(a_array(ix))
-    ld__hl_ix                  ;; point hl to the start of the array 
+    ld__hl_ix                   ;; point hl to the start of the array 
     ld a, #a_array
     add_hl_a
-    ;;ld  (hand_pend), hl
-    ld a_pend(ix), l
+    
+    ld a_pend(ix), l            ;; load pointer to the end in hl
     ld a_pend+1(ix), h
 
     ld  (hl), #e_type_invalid   ;;ponemos el primer elemento del array con tipo invalido
@@ -68,65 +66,43 @@ man_array_init::
 
 ;;-----------------------------------------------------------------
 ;;
-;; man_hand_create_element
+;; man_array_create_element
 ;;
 ;;  Create a card from the model pointed by HL
 ;;  Input:  ix: pointer to the array 
-;;          hl: pointer to the card to add to the hand
-;;  Output:
+;;          hl: pointer to the entity to add to the hand
+;;  Output: hl: points to the new created entity
 ;;  Modified: AF, BC, DE, HL
 ;;
 man_array_create_element::
-
-    ex de, hl                           ;; save the pointer to the card in de
-
-    ld  l, a_pend(ix)                  ;; load in hl the address of the next card
-    ld  h, a_pend+1(ix)                  ;; 
-    ld (hl), #e_type_card_in_hand       ;; stores in the firs byt the status of the card
-    inc hl                              ;; move to the next position
-    ld (hl), e                          ;; store in the following 2 bytes the address to the card to add
-    inc hl                              ;; move to the next position
-    ld (hl), d                          ;;
+    ld b, #0                        ;; bc = component size
+    ld a, a_component_size(ix)      ;;
+    ld c, a                         ;;    
+    ld (_create_size), a            ;; self modifying code to move the size of the entity to bc
+    xor a                           ;; ld a, #0
+    ld (_create_size+1), a          ;;
     
-    inc (ix)                            ;; increase the number of cards in hand
+    ld e, a_pend(ix)                ;; Load the address of the next element in de
+    ld d, a_pend+1(ix)              ;;
+    push de                         ;; Store the address of the next element to return it at the end
+    ldir                            ;; de=pend, bc=component_size, hl=pointer to the entity to be added
 
-    ;;ld   hl, (hand_pend)              ;; update the pointer to the next card
-    ld   l, a_pend(ix)                  ;; update the pointer to the next card
-    ld   h, a_pend+1(ix)                ;; update the pointer to the next card
-    ld   bc, #sizeof_e                  ;; load the size of the pointer to card
-    add  hl, bc                         ;; move hl the the next card
-    ld   a_pend(ix), l                  ;; store the new pointer to the next card
-    ld   a_pend+1(ix), h                ;;
+    inc a_count(ix)                 ;; increase the number of entities
 
-    call man_array_update_X_start        ;; Update X coord for teh deck
+    ld l, a_pend(ix)                ;; load in hl the pointer to the next entity
+    ld h, a_pend+1(ix)
+_create_size = .+1
+    ld   bc, #00
+    add  hl, bc
 
+    ld   a_pend(ix), l              ;; update the pointer to the next entity
+    ld   a_pend+1(ix), h            ;;
+
+    pop hl                          ;; restore the new element address in hl
 ret
 
 
-;;-----------------------------------------------------------------
-;;
-;; man_array_update_X_start
-;;
-;;  Updates the starting x coord for rendering the array
-;;  Input: 
-;;  Output: 
-;;  Modified: AF, C
-;;
-man_array_update_X_start:
-    ;; Calculate x start coord
-    ld a, a_count(ix)
-    ld c, a                     ;; Multiply num cards by 6
-    sla a                       ;;
-    sla a                       ;; Multyply by 4
-    add c                       ;;
-    add c                       ;; Multiplies by 6
 
-    srl a                       ;; Divide (num cards*8) by 2
-    ld c,a                      ;; move ((num cards*8)/2) to c
-    ld a, #40                   ;; a = 40
-    sub c                       ;; a = 40 - ((num cards*8)/2)
-    ld a_X_start(ix), a         ;; store the new x start coord
-    ret
 
 ;;-----------------------------------------------------------------
 ;;
@@ -195,8 +171,6 @@ _move_pend:
 
     dec a_count(ix) 
 
-    call man_array_update_X_start        ;; Update X coord for teh deck
-
 ret
 
 ;;-----------------------------------------------------------------
@@ -204,36 +178,27 @@ ret
 ;; man_array_get_element
 ;;
 ;;  Retrieves in hl the element in position a
-;;  Input: a: number of card to remove
+;;  Input:  a: number of element to return
 ;;          ix: array structure
-;;  Output: hl: element
+;;  Output: hl: pointer to the element
 ;;  Modified: AF, BC, DE, HL
 ;;
 man_array_get_element::
     push ix                     ;; load in hl the beginning of the array
     pop hl                      ;;
-    ld (_e_output), a           ;; store the card number to be retrieved in the output variable
     ld de, #a_array
     add hl, de
 
     or a                        ;; check if we have to retrieve the first card
-    jp z, _g_e_read_card        ;; jump if we wnat to get the first card
+    ret z                       ;; retrurn if we want to get the first card
 
     ld b, a
-    ld de, #sizeof_e            ;; copy the size of a card in de
+    ld d, #0                    ;; copy the size of an entity in de
+    ld e, a_component_size(ix)  ;; 
 _g_e_sum_loop:                  ;;
     add hl, de                  ;;  add de to hl until we reach the card
     djnz _g_e_sum_loop          ;;
 
-_g_e_read_card:
-    inc hl                      ;; dicard the status byte
-    ld e, (hl)                  ;; read the content of (hl) in de
-    inc hl                      ;;
-    ld d, (hl)                  ;;
-
-    ex de, hl                   ;; move de to hl
-_e_output = .+1
-    ld a, #00
     ret
 
 
@@ -259,7 +224,7 @@ man_array_get_random_element::
     ld (_r_e_output), a             ;; store the random number in the output variable
     pop hl                          ;; restore hl (array address)
     or a                            ;; check if we have to retrieve the first card
-    jp z, _g_r_e_read_card          ;; jump if we wnat to get the first card
+    jp z, _g_r_e_return             ;; jump if we wnat to get the first card
 
     ld b, a
     ld de, #sizeof_e                ;; copy the size of a card in de
@@ -267,13 +232,7 @@ _g_r_e_sum_loop:                    ;;
     add hl, de                      ;;  add de to hl until we reach the card
     djnz _g_r_e_sum_loop            ;;
 
-_g_r_e_read_card:   
-    inc hl                          ;; dicard the status byte
-    ld e, (hl)                      ;; read the content of (hl) in de
-    inc hl                          ;;
-    ld d, (hl)                      ;;
-
-    ex de, hl                       ;; move de to hl
+_g_r_e_return:
 _r_e_output = .+1   
     ld a, #00
     ret
@@ -289,14 +248,18 @@ _r_e_output = .+1
 ;;  Modified: AF, BC, DE, HL
 ;;
 man_array_load_array_from_deck::
-    ld hl, #deck_array                  ;; hl points to the array of cards
-    ld a, (#deck_num)                   ;; a holds the number of cards to copy
+    ld hl, #deck                        ;; hl points to the array of cards
+    ld a, #a_array                      ;;
+    add_hl_a                            ;;
+
+    ld a, (hl)                          ;; a holds the number of cards to copy
     ld b, a                             ;; b = number of cards to copy
 _l_a_loop:
     cpctm_push bc, hl                   ;; save bc and hl
     call man_array_create_element       ;; create a new element from hl
     
-    ld de, #sizeof_c                    ;; de hold the size of a card
+    ld d, #0                            ;; de hold the size of a card
+    ld e, a_component_size(ix)          ;; 
     pop hl                              ;; restore hl
     add hl, de                          ;; hl points to the next card of deck
     pop bc                              ;; restore bc (index)

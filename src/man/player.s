@@ -21,7 +21,6 @@
 .include "man/player.h.s"
 .include "common.h.s"
 .include "man/deck.h.s"
-.include "man/hand.h.s"
 .include "man/oponent.h.s"
 .include "sys/input.h.s"
 .include "sys/render.h.s"

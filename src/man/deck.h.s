@@ -27,19 +27,16 @@
 ;;===============================================================================
 ;; PUBLIC VARIABLES
 ;;===============================================================================
+.globl model_deck
+
+.globl deck
 .globl deck_num
 .globl deck_pend
 .globl deck_array
-.globl deck_X_start
 .globl deck_selected
 
-.globl model_deck
 
 ;;===============================================================================
 ;; PUBLIC METHODS
 ;;===============================================================================
 .globl man_deck_init
-.globl man_deck_create_card
-.globl man_deck_remove_card
-.globl man_deck_get_random_card
-.globl man_deck_model_get_random_card
