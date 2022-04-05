@@ -20,7 +20,6 @@
 
 .include "sys/render.h.s"
 .include "man/deck.h.s"
-.include "man/card.h.s"
 .include "man/oponent.h.s"
 .include "man/foe.h.s"
 .include "man/fight.h.s"
@@ -171,7 +170,7 @@ _hor_line_loop:
 ;;
 sys_render_get_X_start::
     ;; Calculate x start coord
-    ld a, #hand_num
+    ld a, (hand_num)
     ld c, a                     ;; Multiply num cards by 6
     sla a                       ;;
     sla a                       ;; Multyply by 4
