@@ -31,12 +31,15 @@
 
 .globl deck
 .globl deck_num
+.globl deck_component_size
 .globl deck_pend
-.globl deck_array
 .globl deck_selected
+.globl deck_array
+
 
 
 ;;===============================================================================
 ;; PUBLIC METHODS
 ;;===============================================================================
 .globl man_deck_init
+.globl man_deck_load_array_from_deck

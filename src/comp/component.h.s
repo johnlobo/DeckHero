@@ -26,10 +26,10 @@
 
 
 .macro DefineComponentArrayStructure_Size _Tname, _N, _ComponentSize
-      _Tname'_num::           .db 0
-      _Tname'_component_size::   .db _ComponentSize
-      _Tname'_pend::          .dw _Tname'_array 
-      _Tname'_selected::      .db 0
+      _Tname'_num::                 .db 0
+      _Tname'_component_size::      .db _ComponentSize
+      _Tname'_pend::                .dw _Tname'_array 
+      _Tname'_selected::            .db 0
       _Tname'_array::
             .ds _N * _ComponentSize
 .endm

@@ -73,7 +73,7 @@ man_fight_init::
     ld ix, #fight_deck                  ;; initialize fight_deck
     call man_array_init                 ;;
 
-    call man_array_load_array_from_deck ;; loads all the cards in deck in the pointer array
+    call man_deck_load_array_from_deck ;; loads all the cards in deck in the pointer array
 
     ld ix, #hand                        ;; initialize hand
     call man_array_init                 ;;

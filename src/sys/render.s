@@ -169,9 +169,9 @@ _hor_line_loop:
 ;;  Output: a: x cord to start rendering the array of cards
 ;;  Modified: AF, C
 ;;
-sys_render_get_X_start:
+sys_render_get_X_start::
     ;; Calculate x start coord
-    ld a, a_count(ix)
+    ld a, #hand_num
     ld c, a                     ;; Multiply num cards by 6
     sla a                       ;;
     sla a                       ;; Multyply by 4
@@ -366,21 +366,21 @@ _render_not_selected_show:
 ;;
 sys_render_hand::
     ld ix, #hand
-    ld a,(hand_num)             ;; retrieve num cards in deck
-    or a                        ;; If no cards ret
-    ret z                       ;;
+    ld a,(hand_num)                         ;; retrieve num cards in deck
+    or a                                    ;; If no cards ret
+    ret z                                   ;;
 
-    push iy                     ;; save iy in the pile
-    ld ix, #hand_array
-    call sys_render_get_X_start ;; retrieve X start position of the deck in a
-    ld c, a                     ;; c = x coordinate 
+    push iy                                 ;; save iy in the pile
+    ld ix, #hand_array          
+    call sys_render_get_X_start             ;; retrieve X start position of the deck in a
+    ld c, a                                 ;; c = x coordinate 
     ld b, #0
 _s_r_h_loop0:
-    push bc     
-    push ix                                               ;; Save b and c values 
+    push bc                                 ;; Save b 
+    push ix                                 
 
-    ld l, e_p(ix)                                         ;; Load card pointer in hl
-    ld h, e_p+1(ix)                                       ;;
+    ld l, e_p(ix)                           ;; Load card pointer in hl
+    ld h, e_p+1(ix)                         ;;
 
     ld__iy_hl
 
@@ -623,27 +623,6 @@ _effects_loop:
     or a 
     jr z, _next_effect
 
-    ;; Calc the screen address to draw the effect
-    ;; xcoord
-    ;;ld a, o_sprite_w(ix)        ;; a=sprite width 
-    ;;sra a                       ;; a = sprite_width/2
-    ;;ld c, a                     ;; keep a in c
-;;
-    ;;ld a, o_effects_count(ix)   ;; a = num effects
-    ;;sla a                       ;; a = num_effects * 2
-    ;;ld l, a                     ;; keep a in l
-;;
-    ;;ld a, b                     ;; a = current_effect
-    ;;sla a                       ;; a = current_effect * 2
-    ;;sla a                       ;; a = current_effect * 4
-;;
-    ;;add a, o_sprite_x(ix)       ;; a = sprite_x + (current effect * 4)
-    ;;add c                       ;; a = spritex + (sprite_width/2) + (current effect * 4)
-    ;;sub l                       ;; a = spritex + (sprite_width/2) - (num_effects * 2) + (current effect * 4)
-;;
-    ;;ld c, a                     ;; store a in c for later use
-
-
     ld a, (_x_coord_base)
     ld c, b                         ;; c = current effect
     inc c                           ;; c = current effect + 1
@@ -655,10 +634,6 @@ _effects_loop:
 
     ;; ycoord
     
-    ;;ld a, o_sprite_y(ix)
-    ;;add a, o_sprite_h(ix)
-    ;;add a, #8                   ;; offset to the sprite pos
-
     ld a, (_y_coord_base)
     ld b, a
     ld (_Y_COORD_EFFECT), a     ;; store in a memory spot for later use

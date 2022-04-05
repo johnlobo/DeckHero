@@ -70,7 +70,7 @@ man_array_init::
 ;;
 ;;  Create a card from the model pointed by HL
 ;;  Input:  ix: pointer to the array 
-;;          hl: pointer to the entity to add to the hand
+;;          hl: pointer to the entity to add to the array
 ;;  Output: hl: points to the new created entity
 ;;  Modified: AF, BC, DE, HL
 ;;
@@ -238,34 +238,7 @@ _r_e_output = .+1
     ret
 
 
-;;-----------------------------------------------------------------
-;;
-;; man_array_load_array_from_deck
-;;
-;;  Loads the array with all the cards in deck
-;;  Input: ix: array structure
-;;  Output: 
-;;  Modified: AF, BC, DE, HL
-;;
-man_array_load_array_from_deck::
-    ld hl, #deck                        ;; hl points to the array of cards
-    ld a, #a_array                      ;;
-    add_hl_a                            ;;
 
-    ld a, (hl)                          ;; a holds the number of cards to copy
-    ld b, a                             ;; b = number of cards to copy
-_l_a_loop:
-    cpctm_push bc, hl                   ;; save bc and hl
-    call man_array_create_element       ;; create a new element from hl
-    
-    ld d, #0                            ;; de hold the size of a card
-    ld e, a_component_size(ix)          ;; 
-    pop hl                              ;; restore hl
-    add hl, de                          ;; hl points to the next card of deck
-    pop bc                              ;; restore bc (index)
-    djnz _l_a_loop                      ;; jump if b != 0
-    
-    ret
 
 ;;-----------------------------------------------------------------
 ;;

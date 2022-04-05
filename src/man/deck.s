@@ -35,7 +35,7 @@
 ;;
 .area _DATA
 
-
+deck::
 DefineComponentArrayStructure_Size deck, MAX_DECK_CARDS, sizeof_c     
 .db 0   ;;ponemos este aqui como trampita para que siempre haya un tipo invalido al final
 
@@ -98,4 +98,38 @@ _d_i_hit_loop:
     ld hl, #model_defend
     call man_array_create_element
 ret
+
+;;-----------------------------------------------------------------
+;;
+;; man_deck_load_array_from_deck
+;;
+;;  Loads the array with all the cards in deck
+;;  Input: ix: array structure
+;;  Output: 
+;;  Modified: AF, BC, DE, HL
+;;
+man_deck_load_array_from_deck::
+    ld hl, #deck_array                  ;; hl points to the array of cards
+    ld a, (#deck_num)                   ;; a holds the number of cards to copy
+    ld b, a                             ;; b = number of cards to copy
+_l_a_loop:
+    cpctm_push bc, hl                   ;; save bc and hl
+    ld (pe_pointer), hl
+    ld hl, #pe_struct
+    call man_array_create_element       ;; create a new element from hl
+    
+    ld a, (deck_component_size)         ;;
+    ld e, a                             ;; de hold the size of a card
+    ld d, #0                            ;;
+
+    pop hl                              ;; restore hl
+    add hl, de                          ;; hl points to the next card of deck
+    pop bc                              ;; restore bc (index)
+    djnz _l_a_loop                      ;; jump if b != 0
+    
+    ret
+
+pe_struct:
+    pe_status: .db #e_type_invalid
+    pe_pointer: .dw #0
 
