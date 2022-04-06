@@ -24,7 +24,7 @@
 ;;===============================================================================
 ;; CARD DEFINITION MACRO
 ;;===============================================================================
-.macro DefineCard _status, _class, _sprite, _name, _rarity, _type, _energy, _description, _damage, _block, _vulnerable, _weak, _strengh, _exhaust, _add_card
+.macro DefineCard _status, _class, _sprite, _name, _rarity, _type, _energy, _description, _damage, _block, _vulnerable, _weak, _strengh, _exhaust, _add_card, _execute_routine
     .db _status
     .db _class
     .dw _sprite
@@ -40,6 +40,7 @@
     .db _strengh
     .db _exhaust
     .db _add_card
+    .dw _execute_routine
 .endm
 
 ;;===============================================================================
@@ -61,6 +62,7 @@ Field c, weak , 1
 Field c, strengh , 1
 Field c, exhaust , 1
 Field c, add_card , 1
+Field c, execute_routine, 2
 EndStruct c
 
 ;;===============================================================================
@@ -87,3 +89,4 @@ EndStruct c
 ;;===============================================================================
 .globl man_deck_init
 .globl man_deck_load_array_from_deck
+.globl man_deck_remove_card_from_hand

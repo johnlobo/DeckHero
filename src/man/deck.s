@@ -22,7 +22,10 @@
 .include "common.h.s"
 .include "comp/component.h.s"
 .include "sys/util.h.s"
+.include "sys/render.h.s"
 .include "man/array.h.s"
+.include "man/fight.h.s"
+.include "man/foe.h.s"
 
 
 
@@ -42,23 +45,73 @@ DefineComponentArrayStructure_Size deck, MAX_DECK_CARDS, sizeof_c
 ;; Definition of model deck
 ;;
 model_deck::
-;;         _status,        _class  _sprite     _name              _rarity   _type   _energy  _description,                    _damage _block, _vulnerable _weak   _strengh    _exhaust    _add_card
+;;         _status,        _class  _sprite     _name              _rarity   _type   _energy  _description,                    _damage _block, _vulnerable _weak   _strengh    _exhaust    _add_card _execute_routine
 model_hit:
-DefineCard e_type_card_in_hand, 1, _s_cards_0, ^/HIT            /, 1,      1,      1,      ^/SINGLE ATTACK - 6DM           /,  3,      0,      0,          0,      0,          0,          0
+DefineCard e_type_card_in_hand, 1, _s_cards_0, ^/HIT            /, 1,      1,      1,      ^/SINGLE ATTACK - 6DM           /,  6,      0,      0,          0,      0,          0,          0,       #man_deck_execute_hit
 model_defend:
-DefineCard e_type_card_in_hand, 2, _s_cards_1, ^/DEFEND         /, 1,      1,      1,      ^/SIMPLE DEFENCE - 5BK          /,  0,      3,      0,          0,      0,          0,          0
+DefineCard e_type_card_in_hand, 2, _s_cards_1, ^/DEFEND         /, 1,      1,      1,      ^/SIMPLE DEFENCE - 5BK          /,  0,      5,      0,          0,      0,          0,          0,       #man_deck_dummy_routine
 model_bash:
-DefineCard e_type_card_in_hand, 2, _s_cards_2, ^/BASH           /, 1,      1,      2,      ^/STRONG HIT - 8DM+2VN          /,  0,      3,      0,          0,      0,          0,          0
+DefineCard e_type_card_in_hand, 2, _s_cards_2, ^/BASH           /, 1,      1,      2,      ^/STRONG HIT - 8DM+2VN          /,  0,      3,      0,          0,      0,          0,          0,       #man_deck_dummy_routine
 model_unbreakeable:
-DefineCard e_type_card_in_hand, 2, _s_cards_3, ^/UNBREAKABLE    /, 1,      1,      1,      ^/GREAT DEFENCE - 30BK (E)      /,  0,      3,      0,          0,      0,          0,          0
+DefineCard e_type_card_in_hand, 2, _s_cards_3, ^/UNBREAKABLE    /, 1,      1,      1,      ^/GREAT DEFENCE - 30BK (E)      /,  0,      3,      0,          0,      0,          0,          0,       #man_deck_dummy_routine
 model_ignore:
-DefineCard e_type_card_in_hand, 2, _s_cards_4, ^/IGNORE         /, 1,      1,      1,      ^/GOOD BLOCK - 8BK+1C           /,  0,      3,      0,          0,      0,          0,          0
+DefineCard e_type_card_in_hand, 2, _s_cards_4, ^/IGNORE         /, 1,      1,      1,      ^/GOOD BLOCK - 8BK+1C           /,  0,      3,      0,          0,      0,          0,          0,       #man_deck_dummy_routine
 
 
 ;;
 ;; Start of _CODE area
 ;; 
 .area _CODE
+
+;;-----------------------------------------------------------------
+;;
+;; man_deck_dummy_routine
+;;
+;;  Dummy execute routine to initialize a ard
+man_deck_dummy_routine::
+    ret
+
+;;-----------------------------------------------------------------
+;;
+;; man_deck_init
+;;
+;;  Initializaes a deck of cards
+;;  Input: 
+;;  Output:
+;;  Modified: AF, HL
+;;
+man_deck_remove_card_from_hand::
+    push ix
+    ld ix, #hand
+    call cpct_waitVSYNC_asm
+    call sys_render_erase_hand      ;; erase deck area
+    ld a, a_selected(ix)
+    push af                         ;; save a (card to move)
+    call man_array_get_element      ;; obtain content of a
+    ld ix, #cemetery                ;; operate on cemetery
+    call man_array_create_element   ;; create card in cemetery
+    pop af                          ;; retrieve card to erase
+    ld ix, #hand
+    call man_array_remove_element   ;; erase card from hand
+    call sys_render_deck
+    call sys_render_cemetery
+    call sys_render_hand            ;; update hand
+    pop ix
+    ret
+
+;;-----------------------------------------------------------------
+;;
+;; man_deck_execute_hit
+;;
+;;  Dummy execute routine to initialize a ard
+man_deck_execute_hit::
+    ld a, c_damage(ix)                      ;; make samage
+    call man_foe_one_damage                 ;;
+
+    ret
+
+
+
 
 ;;-----------------------------------------------------------------
 ;;
@@ -74,9 +127,11 @@ man_deck_init::
     xor a
     ld  a_count(ix), a
 
-    ld  hl, #deck               ;; Load in hl the first position of the array
-    ld a, #a_array               ;;
-    add_hl_a                    ;;
+    ;;ld  hl, #deck               ;; Load in hl the first position of the array
+    ;;ld a, #a_array               ;;
+    ;;add_hl_a                    ;;
+
+    ld hl, #deck_array
     
     ld a_pend(ix), l            ;; Update pointer to the next entity
     ld a_pend+1(ix), h          ;;

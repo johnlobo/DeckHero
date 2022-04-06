@@ -33,3 +33,4 @@
 .globl sys_render_sacrifice
 .globl sys_render_deck
 .globl sys_render_cemetery
+.globl sys_render_effects

@@ -188,7 +188,6 @@ sys_input_init::
 ;;
 sys_input_action:
     call man_fight_execute_card
-    call sys_input_remove_card
     ret
 
 ;;-----------------------------------------------------------------
@@ -231,7 +230,7 @@ sys_input_add_card::
     call man_array_get_random_element   ;; get hl pointing to a random card, and a to the element in the array
     push af
     ld ix, #hand
-    call man_array_create_element           ;; create a card in the deck
+    call man_array_create_element        ;; create a card in the deck
     pop af
     ld ix, #fight_deck
     call man_array_remove_element       ;; erase card form hand
@@ -265,7 +264,7 @@ sys_input_add_card::
 ;;
 sys_input_remove_card::
     ld ix, #hand
-    ld a, a_count(ix)                ;; Check if we dont have any card in the deck
+    ld a, a_count(ix)               ;; Check if we dont have any card in the deck
     or a                            ;;
     ret z                           ;; if 0 return
 

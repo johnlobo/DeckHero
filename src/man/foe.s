@@ -105,4 +105,44 @@ man_foe_create::
 man_foe_remove::
     ret
 
+;;-----------------------------------------------------------------
+;;
+;; man_foe_one_damage
+;;
+;;  damages a foe
+;;  Input: a: damage to apply 
+;;  Output: 
+;;  Modified: 
+;;
+;; TODO: implment foe selector
+;;
+man_foe_one_damage::
+    ld (m_f_o_d_damage), a
+
+    push ix
+    ld hl, #foes
+    ld a, #a_array
+    add_hl_a
+    ld__ix_hl
+
+m_f_o_d_damage = .+1    ;; Substract the damage done to the life
+    ld b, #0            ;;
+    ld a, o_life(ix)    ;;
+    sub b               ;;
+    ld o_life(ix), a    ;;
+    pop ix
+    ret
+
+;;-----------------------------------------------------------------
+;;
+;; man_foe_all_damage
+;;
+;;  damages a foe
+;;  Input: 
+;;  Output: a random piece
+;;  Modified: 
+;;
+man_foe_all_damage::
+    ret
+
 

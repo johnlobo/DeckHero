@@ -22,6 +22,11 @@
 ;; PUBLIC VARIABLES
 ;;===============================================================================
 .globl foes
+.globl foes_num
+.globl foes_component_size
+.globl foes_pend
+.globl foes_selected
+.globl foes_array
 
 ;;===============================================================================
 ;; PUBLIC METHODS
@@ -29,3 +34,5 @@
 .globl man_foe_init
 .globl man_foe_create
 .globl man_foe_remove
+.globl man_foe_one_damage
+.globl man_foe_all_damage
