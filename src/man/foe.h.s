@@ -34,5 +34,4 @@
 .globl man_foe_init
 .globl man_foe_create
 .globl man_foe_remove
-.globl man_foe_one_damage
-.globl man_foe_all_damage
+

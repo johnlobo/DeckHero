@@ -25,7 +25,7 @@
 .include "sys/render.h.s"
 .include "man/array.h.s"
 .include "man/fight.h.s"
-.include "man/foe.h.s"
+.include "man/oponent.h.s"
 
 
 
@@ -49,7 +49,7 @@ model_deck::
 model_hit:
 DefineCard e_type_card_in_hand, 1, _s_cards_0, ^/HIT            /, 1,      1,      1,      ^/SINGLE ATTACK - 6DM           /,  6,      0,      0,          0,      0,          0,          0,       #man_deck_execute_hit
 model_defend:
-DefineCard e_type_card_in_hand, 2, _s_cards_1, ^/DEFEND         /, 1,      1,      1,      ^/SIMPLE DEFENCE - 5BK          /,  0,      5,      0,          0,      0,          0,          0,       #man_deck_dummy_routine
+DefineCard e_type_card_in_hand, 2, _s_cards_1, ^/DEFEND         /, 1,      1,      1,      ^/SIMPLE DEFENCE - 5BK          /,  0,      5,      0,          0,      0,          0,          0,       #man_deck_execute_defend
 model_bash:
 DefineCard e_type_card_in_hand, 2, _s_cards_2, ^/BASH           /, 1,      1,      2,      ^/STRONG HIT - 8DM+2VN          /,  0,      3,      0,          0,      0,          0,          0,       #man_deck_dummy_routine
 model_unbreakeable:
@@ -73,7 +73,7 @@ man_deck_dummy_routine::
 
 ;;-----------------------------------------------------------------
 ;;
-;; man_deck_init
+;; man_deck_remove_card_from_hand
 ;;
 ;;  Initializaes a deck of cards
 ;;  Input: 
@@ -106,8 +106,20 @@ man_deck_remove_card_from_hand::
 ;;  Dummy execute routine to initialize a ard
 man_deck_execute_hit::
     ld a, c_damage(ix)                      ;; make samage
-    call man_foe_one_damage                 ;;
+    call man_oponent_one_damage             ;;
+    ret
 
+;;-----------------------------------------------------------------
+;;
+;; man_deck_execute_defend
+;;
+;;  Dummy execute routine to initialize a card
+man_deck_execute_defend::
+    ld b, c_block(ix)                      ;; load the block to add
+    push ix
+    ld ix, #player
+    call man_oponent_add_block                 ;;
+    pop ix
     ret
 
 

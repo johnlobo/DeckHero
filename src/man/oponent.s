@@ -18,6 +18,15 @@
 
 .module oponent_manager
 
+.include "man/oponent.h.s"
+.include "man/foe.h.s"
+;;.include "common.h.s"
+;;.include "man/deck.h.s"
+.include "man/array.h.s"
+;;.include "sys/input.h.s"
+;;.include "sys/render.h.s"
+.include "comp/component.h.s"
+.include "cpctelera.h.s"
 
 ;;
 ;; Start of _DATA area 
@@ -64,4 +73,60 @@ man_oponent_init::
 ;;  Modified: 
 ;;
 man_oponent_create::
+    ret
+
+;;-----------------------------------------------------------------
+;;
+;; man_oponent_one_damage
+;;
+;;  damages a foe
+;;  Input: a: damage to apply 
+;;  Output: 
+;;  Modified: 
+;;
+;; TODO: implment foe selector
+;;
+man_oponent_one_damage::
+    ld (m_o_o_d_damage), a
+
+    push ix
+    ld hl, #foes
+    ld a, #a_array
+    add_hl_a
+    ld__ix_hl
+
+m_o_o_d_damage = .+1    ;; Substract the damage done to the life
+    ld b, #0            ;;
+    ld a, o_life(ix)    ;;
+    sub b               ;;
+    ld o_life(ix), a    ;;
+    pop ix
+    ret
+
+;;-----------------------------------------------------------------
+;;
+;; man_oponent_all_damage
+;;
+;;  damages a foe
+;;  Input: 
+;;  Output: a random piece
+;;  Modified: 
+;;
+man_oponent_all_damage::
+    ret
+
+
+;;-----------------------------------------------------------------
+;;
+;; man_oponent_add_block
+;;
+;;  adds block to a oponent
+;;  Input: ix: oponent to add block
+;;  Output: b: amount of block to add
+;;  Modified: 
+;;
+man_oponent_add_block::
+    ld a, o_shield(ix)    ;;
+    add b               ;;
+    ld o_shield(ix), a    ;;
     ret

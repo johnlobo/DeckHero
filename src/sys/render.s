@@ -248,7 +248,7 @@ _erase_not_selected:
 ;;  Output: 
 ;;  Modified: AF, BC, DE, HL
 ;;
-sys_render_card:
+sys_render_card::
     ;; Get screen address of the card
     ld de, #CPCT_VMEM_START_ASM     ;; DE = Pointer to start of the screen
     call cpct_getScreenPtr_asm      ;; Calculate video memory location and return it in HL

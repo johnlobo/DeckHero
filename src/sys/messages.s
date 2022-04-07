@@ -34,6 +34,7 @@
 .area _DATA
 
 _window_data::
+_window_address: .dw #00
 _window_x: .db #00
 _window_y: .db #00
 _window_w: .db #00
@@ -43,12 +44,13 @@ _window_wait_for_key: .db #01
 _press_any_key_string: .asciz "PRESS ANY KEY"
 
 ;; Constants to reach window data
-w_x = 0
-w_y = 1
-w_w = 2
-w_h = 3
-w_message = 4
-w_wait_for_key = 6
+w_address = 0
+w_x = 2
+w_y = 3
+w_w = 4
+w_h = 5
+w_message = 6
+w_wait_for_key = 8
 
 
 ;;
@@ -71,13 +73,38 @@ w_wait_for_key = 6
 
 sys_messages_load_window_data::
     ld iy, #_window_data
-    ld w_w(iy), c
-    ld w_h(iy), b
-    ld w_x(iy), e
-    ld w_y(iy), d
     ld w_message(iy), l
     ld w_message+1(iy), h
-    ld w_wait_for_key(iy), a
+    ;;ld w_w(iy), c
+    ld w_h(iy), b
+    ;;ld w_x(iy), e             
+    ld w_y(iy), d
+    ld w_wait_for_key(iy), a  
+    ld h, w_message+1(iy)           ;; calculate length of the string
+    ld l, w_message(iy)             ;;
+    call sys_text_str_length        ;;
+    sla a                           ;; multiply string length by 2 to obtain bytes
+    inc a                           ;;
+    inc a                           ;; add a copule of bytes as padding
+    
+    ld w_w(iy), a                   ;; store this information as total width
+    inc w_w(iy)                     ;;
+    inc w_w(iy)                     ;;
+    inc w_w(iy)                     ;; width a little bit wider
+    
+    ld b, a                         ;; move string bytes to b
+    ld a, #80                       ;; move screen width to a
+    sub b                           ;; substract string length
+    sra a                           ;; divide a to obtain x
+    ld w_x(iy), a
+    dec w_x(iy)                     ;; x adjust
+    
+    ld c, w_x(iy)                   ;; c = x
+    ld b, w_y(iy)                   ;; b = y
+    ld de, #CPCT_VMEM_START_ASM     ;; DE = Pointer to start of the screen
+    call cpct_getScreenPtr_asm      ;; Calculate video memory location and return it in HL
+    ld w_address(iy), l             ;; keep address in memory
+    ld w_address+1(iy), h           ;;
     ret
 
 ;;-----------------------------------------------------------------
@@ -92,23 +119,18 @@ sys_messages_load_window_data::
 
 sys_messages_draw_window::
 
-    call sys_messages_load_window_data
-
     ;; Draw Back window
-    ld de, #CPCT_VMEM_START_ASM     ;; DE = Pointer to start of the screen
-    ld b, w_y(iy)                   ;; B = y coordinate 
-    ld c, w_x(iy)                   ;; C = x coordinate 
-    call cpct_getScreenPtr_asm      ;; Calculate video memory location and return it in HL
-    ex de, hl                       ;; move screen address to de
+    ld e, w_address(iy)                 ;; keep background information in message_buffer
+    ld d, w_address+1(iy)               ;; 
     ld c, w_w(iy)
     ld b, w_h(iy)
-    ld a,#0xff                      ;; Patern of solid box
+    ld a,#0xff                          ;; Patern of solid box
     call cpct_drawSolidBox_asm
 
     ;; Draw Front Window
     ld de, #CPCT_VMEM_START_ASM     ;; 
     ld c, w_x(iy)                   ;;
-    inc c                           ;; C = y coordinate + 1
+    inc c                           ;; C = x coordinate + 1
     ld b, w_y(iy)                   ;;
     inc b                           ;; B = y coordinate + 2
     inc b                           ;;
@@ -131,6 +153,29 @@ sys_messages_draw_window::
     ret
 
 
+
+;;-----------------------------------------------------------------
+;;
+;; sys_messages_restore_message_background
+;;
+;;  restores de background of the message
+;;  Input:  a : wait for key flag
+;;          de: x and y coord
+;;          bc: h and w of the window
+;;          hl: message to show 
+;;  Output:
+;;  Modified: af, hl, de, bc
+;;
+sys_messages_restore_message_background::
+    ld e, w_address(iy)                 ;; keep background information in message_buffer
+    ld d, w_address+1(iy)               ;;
+    ld hl, #message_buffer              ;;
+    ld c, w_w(iy)                       ;;
+    ld b, w_h(iy)                       ;;
+    call cpct_drawSprite_asm            ;;
+    ret
+
+
 ;;-----------------------------------------------------------------
 ;;
 ;; sys_messages_show
@@ -148,9 +193,18 @@ sys_messages_show::
 
     call sys_messages_load_window_data
 
+    ld l, w_address(iy)                 ;; restore background information from message_buffer
+    ld h, w_address+1(iy)               ;;
+    ld de, #message_buffer              ;;
+    ld c, w_w(iy)                       ;;
+    ld b, w_h(iy)                       ;;
+    call cpct_getScreenToSprite_asm     ;;
+
+
     call sys_messages_draw_window
 
     ;; Draw message
+    
     ld de, #CPCT_VMEM_START_ASM     ;; 
     ld c, w_x(iy)                   ;;
     inc c                           ;; 
@@ -180,7 +234,7 @@ y_coord:
 
     ;; Draw Press Any Key
 
-    ld a, w_wait_for_key(iy)  ;; check if we have to wait for a key
+    ld a, w_wait_for_key(iy)        ;; check if we have to wait for a key
     or a                            ;;
     ret z                           ;; return if not
 
@@ -206,6 +260,8 @@ y_coord:
     call sys_text_draw_string
 
     call sys_input_wait4anykey
+
+    call sys_messages_restore_message_background
 
     ret
 
@@ -284,3 +340,4 @@ down_line:
     ret
 width: .db #0
 height: .db #0
+message_buffer: .ds 3000

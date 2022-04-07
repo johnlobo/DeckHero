@@ -31,7 +31,17 @@
 .globl hand_selected
 
 .globl cemetery
+.globl cemetery_num
+.globl cemetery_pend
+.globl cemetery_array
+.globl cemetery_selected
+
 .globl sacrifice
+.globl sacrifice_num
+.globl sacrifice_pend
+.globl sacrifice_array
+.globl sacrifice_selected
+
 .globl player_energy
 
 ;;===============================================================================

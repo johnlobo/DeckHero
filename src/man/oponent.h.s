@@ -94,3 +94,6 @@ EndStruct o
 .globl man_oponent_init
 .globl man_oponent_create
 .globl man_oponent_update
+.globl man_oponent_add_block
+.globl man_oponent_one_damage
+.globl man_oponent_all_damage

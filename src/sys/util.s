@@ -81,27 +81,6 @@ sys_util_h_times_e::
 
 ;;-----------------------------------------------------------------
 ;;
-;;  10_times_a
-;;
-;;  Multiply a by 10
-;;  Input: a: number of type
-;;  Output: a ten times a
-;;  Destroyed: a
-;;
-sys_util_ten_times_a::
-  ld (sys_util_10_times_a_9+1), a
-  ld (sys_util_10_times_a_10+1), a
-  sla a           ;; a by 2
-  sla a           ;; a by 4
-  sla a           ;; a by 8
-sys_util_10_times_a_9:  
-  add #00         ;; a by 9
-sys_util_10_times_a_10:  
-  add #00         ;; a by 9
-  ret
-
-;;-----------------------------------------------------------------
-;;
 ;; sys_util_BCD_GetEnd
 ;;
 ;;  

@@ -95,6 +95,7 @@
 .globl cpct_getRandom_mxor_u8_asm
 .globl cpct_drawSpriteBlended_asm
 .globl cpct_px2byteM0_asm
+.globl cpct_getScreenToSprite_asm
 
 ;;===============================================================================
 ;; DEFINED CONSTANTS

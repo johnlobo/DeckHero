@@ -27,6 +27,7 @@
 .include "sys/render.h.s"
 .include "comp/component.h.s"
 .include "cpctelera.h.s"
+.include "sys/messages.h.s"
 
 
 
@@ -37,6 +38,9 @@
 ;;  right after _CODE area contents.
 ;;
 .area _DATA
+
+_fight_end_of_turn_string: .asciz "END OF PLAYER TURN"      ;;27 chars, 54 bytes
+
 
 fight_deck::
 DefineComponentArrayStructure_Size fight_deck, MAX_DECK_CARDS, sizeof_e     
@@ -88,10 +92,11 @@ man_fight_init::
     ld ix, #sacrifice                   ;; initialize scrifice
     call man_array_init                 ;;
 
-    ld b, #5
-    call man_fight_deal_cards
+    ld a, (hand_max)
+    ld b, a
+    call man_fight_deal_hand
 
-    ld a, #player_max_energy            ;; Load the max of energy of this fight to the player energy
+    ld a, (player_max_energy)            ;; Load the max of energy of this fight to the player energy
     ld (player_energy), a               ;;
 
     call man_foe_init
@@ -100,22 +105,38 @@ man_fight_init::
     call sys_render_fight_screen    ;; renders the fight screen
     ret
 
+
 ;;-----------------------------------------------------------------
 ;;
-;; man_fight_deal_cards 
+;; man_fight_deal_hand 
 ;;
 ;;  Deals a new set of cards to the player
 ;;  Input: b: amount of cards to deal
 ;;  Output: 
 ;;  Modified: 
 ;;
-man_fight_deal_cards::
+man_fight_deal_hand::
     push ix
+    ld ix, #hand
+    xor a
+    ld a_selected(ix), a
 _initial_set_of_cards:
     push bc                             ;; store loop index
+
+    ld b, #20                           ;; delay 
+    call cpct_waitHalts_asm
+
+    ld a, (hand_num)                    ;;
+    or a                                ;;
+    jr nz, _m_f_d_l_cards_in_hand
+    call man_fight_shuffle
+    jr _m_f_d_l_continue
+_m_f_d_l_cards_in_hand:
+    call nz, sys_render_erase_hand      ;; erase hand if there are any cards in hand
+_m_f_d_l_continue:
     ld ix, #fight_deck                  ;; working with fight_deck
     call man_array_get_random_element   ;; gen a random element form fight_deck
-    ld (m_f_d_c_ELEMENT_TO_ERASE),a             ;; store the element to be erased later
+    ld (m_f_d_c_ELEMENT_TO_ERASE),a     ;; store the element to be erased later
     ld ix, #hand                        ;; working with hand
     call man_array_create_element       ;; create the element in hand
     ld ix, #fight_deck                  ;; working with fight_deck
@@ -124,11 +145,50 @@ m_f_d_c_ELEMENT_TO_ERASE = . +1
     call man_array_remove_element       ;; Remove element from fight_deck
     
     call sys_render_deck                ;; Update number in deck
-    call sys_render_erase_hand          ;; erase hand
     call sys_render_hand                ;; update hand
 
     pop bc                              ;; restore loop index
     djnz _initial_set_of_cards
+    
+    pop ix
+    ret
+
+;;-----------------------------------------------------------------
+;;
+;; man_fight_discard_hand 
+;;
+;;  Discards the cards that are still in hand
+;;  Input: 
+;;  Output: 
+;;  Modified: 
+;;
+man_fight_discard_hand::
+    push ix
+    
+    ld a, (hand_num)                    ;; return if no cards in hand
+    or a
+    ret z
+_m_f_d_h_loop:
+
+    ld b, #20                           ;; delay 
+    call cpct_waitHalts_asm
+
+
+    call sys_render_erase_hand      ;; erase hand if there are any cards in hand
+    ld a, #00                           ;; set the element to be erased
+    call man_array_get_element          ;; get the first element of the hand
+    ld ix, #cemetery
+    call man_array_create_element       ;; create the element in hand
+    ld ix, #hand
+    ld a, #00                           ;; set the element to be erased
+    call man_array_remove_element       ;; Remove element from fight_deck  
+    
+    call sys_render_cemetery            ;; Update number in deck
+    call sys_render_hand                ;; update hand
+    
+    ld a, (hand_num)
+    or a
+    jr nz, _m_f_d_h_loop
     
     pop ix
     ret
@@ -144,7 +204,10 @@ m_f_d_c_ELEMENT_TO_ERASE = . +1
 ;;  Modified: 
 ;;
 man_fight_shuffle::
-    
+    ld a, (cemetery_num)                ;; if no cards in cemetery return
+    or a
+    ret z
+
     ld hl, #cemetery                    ;; move them from the cemetery to the fight_deck
     ld de, #fight_deck                  ;; to the deck     
     call man_array_move_all_elements    ;;
@@ -152,9 +215,11 @@ man_fight_shuffle::
     call sys_render_deck                ;; Update number in deck
     call sys_render_cemetery            ;; Update number in cemetery
     
-    ld b, #hand_max                     ;; deal a new hand of cards to the player
-    call man_fight_deal_cards           ;;
+    ;;ld a, (hand_max)
+    ;;ld b, a                             ;; deal a new hand of cards to the player
+    ;;call man_fight_deal_hand            ;;
 
+    ;;pop ix 
     ret
 
 ;;-----------------------------------------------------------------
@@ -218,6 +283,7 @@ m_f_e_c_exit:
     
     ld ix, #hand                            ;; if hand is empty shuffle
     ld a, a_count(ix)                       ;; 
+    or a                                    ;; check if there are no cards in hand
     call z, man_fight_shuffle               ;;
     
     pop ix
@@ -233,10 +299,46 @@ m_f_e_c_exit:
 ;;  Output: 
 ;;  Modified: 
 ;;
+man_fight_end_of_turn::
+    ld e, #10                           ;; x
+    ld d, #78                           ;; y
+    ld b, #44                           ;; h
+    ld c, #60                           ;; w
+    ld hl, #_fight_end_of_turn_string   ;; message
+    ld a,#1                             ;; wait for a key
+    call sys_messages_show
+
+    call man_fight_discard_hand
+
+    ld b, #100                           ;; delay 
+    call cpct_waitHalts_asm
+
+    ld a, (hand_max)
+    ld b, a
+    call man_fight_deal_hand
+
+    ld a, #3
+    ld (player_energy), a
+    call sys_render_energy              ;;
+
+    ret
+
+;;-----------------------------------------------------------------
+;;
+;; man_fight_update
+;;
+;;  Updates the state of a fight
+;;  Input: 
+;;  Output: 
+;;  Modified: 
+;;
 man_fight_update::
       
     call sys_input_debug_update
-    ld b, #20
+    ld a, (player_energy)
+    or a
+    call z, man_fight_end_of_turn
+    ld b, #10
     call cpct_waitHalts_asm
 ;;
 ;; Turn structure
