@@ -71,4 +71,5 @@ man_game_init::
 ;;
 man_game_update::
     call man_fight_update
+    call man_game_init
     ret

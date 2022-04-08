@@ -116,5 +116,6 @@ start:
 loop:
    
    call man_game_update
-
+   
+   
    jr    loop

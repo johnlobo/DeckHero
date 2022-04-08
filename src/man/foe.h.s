@@ -34,4 +34,6 @@
 .globl man_foe_init
 .globl man_foe_create
 .globl man_foe_remove
+.globl man_foe_number_of_foes
+.globl man_foe_kill_foe
 

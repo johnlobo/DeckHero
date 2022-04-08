@@ -23,3 +23,4 @@
 ;; PUBLIC METHODS
 ;;===============================================================================
 .globl man_player_init
+.globl man_player_get_life

@@ -68,6 +68,10 @@
 .globl _s_icons_3
 .globl _s_status_0
 .globl _s_status_1
+.globl _s_explotion_0
+.globl _s_explotion_1
+.globl _s_explotion_2
+.globl _s_explotion_3
 
 ;;===============================================================================
 ;; PUBLIC VARIBLES
