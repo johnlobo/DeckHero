@@ -20,6 +20,12 @@
 
 
 ;;===============================================================================
+;; PUBLIC VARIABLES
+;;===============================================================================
+.globl sys_render_back_buffer
+.globl sys_render_front_buffer
+
+;;===============================================================================
 ;; PUBLIC METHODS
 ;;===============================================================================
 .globl sys_render_init
@@ -35,3 +41,14 @@
 .globl sys_render_deck
 .globl sys_render_cemetery
 .globl sys_render_effects
+.globl sys_render_switch_buffers
+
+;;===============================================================================
+;; MACRO
+;;===============================================================================
+.mdelete ld_de_backbuffer
+.macro ld_de_backbuffer
+   ld   a, (sys_render_back_buffer)         ;; DE = Pointer to start of the screen
+   ld   d, a
+   ld   e, #00
+.endm

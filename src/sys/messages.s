@@ -22,6 +22,7 @@
 .include "sys/util.h.s"
 .include "sys/text.h.s"
 .include "sys/input.h.s"
+.include "sys/render.h.s"
 
 .module messages_system
 
@@ -101,8 +102,11 @@ sys_messages_load_window_data::
     
     ld c, w_x(iy)                   ;; c = x
     ld b, w_y(iy)                   ;; b = y
-    ld de, #CPCT_VMEM_START_ASM     ;; DE = Pointer to start of the screen
-    call cpct_getScreenPtr_asm      ;; Calculate video memory location and return it in HL
+    
+    ;;ld de, #CPCT_VMEM_START_ASM   ;; DE = Pointer to start of the screen
+    
+    ld_de_backbuffer                ;; Calculate video memory location and return it in HL
+    
     ld w_address(iy), l             ;; keep address in memory
     ld w_address+1(iy), h           ;;
     ret
@@ -128,7 +132,10 @@ sys_messages_draw_window::
     call cpct_drawSolidBox_asm
 
     ;; Draw Front Window
-    ld de, #CPCT_VMEM_START_ASM     ;; 
+    ;;ld de, #CPCT_VMEM_START_ASM   ;; DE = Pointer to start of the screen
+    
+    ld_de_backbuffer              ;; Calculate video memory location and return it in HL
+    
     ld c, w_x(iy)                   ;;
     inc c                           ;; C = x coordinate + 1
     ld b, w_y(iy)                   ;;
@@ -205,7 +212,10 @@ sys_messages_show::
 
     ;; Draw message
     
-    ld de, #CPCT_VMEM_START_ASM     ;; 
+    ;;ld de, #CPCT_VMEM_START_ASM   ;; DE = Pointer to start of the screen
+    
+    ld_de_backbuffer              ;; Calculate video memory location and return it in HL
+    
     ld c, w_x(iy)                   ;;
     inc c                           ;; 
     inc c                           ;; C = x + 1
@@ -238,7 +248,10 @@ y_coord:
     or a                            ;;
     ret z                           ;; return if not
 
-    ld de, #CPCT_VMEM_START_ASM     ;; 
+    ;;ld de, #CPCT_VMEM_START_ASM   ;; DE = Pointer to start of the screen
+    
+    ld_de_backbuffer              ;; Calculate video memory location and return it in HL
+    
     
     ld a, w_w(iy)                   ;;
     ld c, #26                       ;;

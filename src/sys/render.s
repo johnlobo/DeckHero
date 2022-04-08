@@ -43,12 +43,59 @@ FONT_NUMBERS: .dw #0000
 _show_deck_string: .asciz "PLAYERS DECK"            ;;12 chars, 24 bytes
 _press_any_key_string: .asciz "PRESS ANY KEY"       ;;14 chars, 28 bytes
 
+sys_render_front_buffer: .db 0xC0
+sys_render_back_buffer: .db 0x80
 
 ;;
 ;; Start of _CODE area
 ;; 
 .area _CODE
 
+
+
+
+
+;;====================================================
+;; sys_render_init_buffers
+;;  Initialize screen buffers
+;;  Entrada:
+;;  Salida:
+;;  Destruye: BC, DE, HL
+;;
+;; Code taken form Miss Input 
+;;====================================================
+sys_render_init_buffers::
+    ld hl, #0x8000
+    ld (hl), #0
+    ld de, #0x8000+1
+    ld bc, #0x4000-1
+
+    ldir
+
+ret
+
+;;====================================================
+;;  sys_render_switch_buffers
+;;  
+;;  Switches screen buffers
+;;  Entrada:
+;;  Salida:
+;;  Destruye: AF, HL
+;;
+;; Code taken form Miss Input 
+;;====================================================
+sys_render_switch_buffers::
+
+    ld hl, (sys_render_front_buffer)   ;; Inicialmente (80C0)
+    ld a, l                 ;; Carga el front buffer en el back buffer
+    ld (sys_render_back_buffer) , a
+    ld a, h                 ;; Carga el back buffer en el front buffer
+    ld (sys_render_front_buffer), a
+
+    srl a
+    srl a
+    ld l, a
+    jp cpct_setVideoMemoryPage_asm
 
 
 ;;-----------------------------------------------------------------
@@ -72,7 +119,9 @@ sys_render_init::
     ;;cpctm_setBorder_asm HW_BLACK            ;; Set Border
     cpctm_setBorder_asm HW_WHITE            ;; Set Border
 
-    cpctm_clearScreen_asm 0                 ;; Clear screen
+    call sys_render_init_buffers
+
+    ;;cpctm_clearScreen_asm 0                 ;; Clear screen
 
     ret
 
@@ -87,43 +136,6 @@ sys_render_init::
 ;;
 sys_render_update::
     ret
-
-
-;;-----------------------------------------------------------------
-;;
-;; sys_render_hor_line
-;;
-;;  Draws an horizaontal line on the screen
-;;  Input:  bc: y, x screen coords
-;;          a: length of the line
-;;          d: color
-;;  Output: 
-;;  Modified: AF, BC, DE, HL
-;;
-;;sys_render_hor_line::
-;;    push bc
-;;    ld (_HOR_LINE_LENGTH), a         ;; store the length of the line in the comparison.
-;;    ;; calculate color for pixels
-;;    ld h, d
-;;    ld l, d
-;;    call cpct_px2byteM0_asm
-;;    ld (_HOR_LINE_COLOR), a         ;; store the color of the pixel in the loop asignment
-;;
-;;    ;; Get screen address to start the line
-;;    pop bc                          ;; c is xcoord ,  is ycoord
-;;    ld de, #CPCT_VMEM_START_ASM     ;; DE = Pointer to start of the screen
-;;    call cpct_getScreenPtr_asm      ;; Calculate video memory location and return it in HL
-;;    
-;;    ;; draw loop
-;;_HOR_LINE_LENGTH = .+1
-;;    ld b, #0
-;;_HOR_LINE_COLOR = .+1    
-;;    ld a, #0
-;;_hor_line_loop:
-;;    ld (hl), a
-;;    inc hl
-;;    djnz _hor_line_loop
-;;    ret
 
 ;;-----------------------------------------------------------------
 ;;
@@ -156,8 +168,6 @@ _hor_line_loop:
     inc hl
     djnz _hor_line_loop
     ret
-
-
 
 ;;-----------------------------------------------------------------
 ;;
@@ -199,7 +209,9 @@ sys_render_erase_hand::
     ld b, #0                        ;; move num cards in deck to b (index)
 _e_d_loop01:    
     push bc                       
-    ld de, #CPCT_VMEM_START_ASM     ;; DE = Pointer to start of the screen
+    ;;ld de, #CPCT_VMEM_START_ASM     ;; DE = Pointer to start of the screen
+
+    ld_de_backbuffer
     
     ld a, a_selected(ix)            ;; compare card selected with current card
     cp b                            ;;
@@ -250,7 +262,10 @@ _erase_not_selected:
 ;;
 sys_render_card::
     ;; Get screen address of the card
-    ld de, #CPCT_VMEM_START_ASM     ;; DE = Pointer to start of the screen
+    ;;ld de, #CPCT_VMEM_START_ASM     ;; DE = Pointer to start of the screen
+    
+    ld_de_backbuffer
+    
     call cpct_getScreenPtr_asm      ;; Calculate video memory location and return it in HL
 
     ex de, hl
@@ -573,7 +588,10 @@ sys_render_effects::
 
 
     ;; Get screen address of the oponent
-    ld de, #CPCT_VMEM_START_ASM     ;; DE = Pointer to start of the screen
+    ;;ld de, #CPCT_VMEM_START_ASM     ;; DE = Pointer to start of the screen
+    
+    ld_de_backbuffer
+    
     call cpct_getScreenPtr_asm      ;; Calculate video memory location and return it in HL
     ex de, hl
     ;; Draw heart sprite
@@ -591,7 +609,10 @@ _X_COORD_HEART_EFFECT = .+1
 _Y_COORD_HEART_EFFECT = .+1
     add a, #0
     ld b, a
-    ld de, #CPCT_VMEM_START_ASM     ;; DE = Pointer to start of the screen
+    ;;ld de, #CPCT_VMEM_START_ASM     ;; DE = Pointer to start of the screen
+    
+    ld_de_backbuffer
+    
     call cpct_getScreenPtr_asm      ;; Calculate video memory location and return it in HL
     
     ex de, hl
@@ -638,7 +659,10 @@ _effects_loop:
     ld (_Y_COORD_EFFECT), a     ;; store in a memory spot for later use
 
     ;; Get screen address of the oponent
-    ld de, #CPCT_VMEM_START_ASM     ;; DE = Pointer to start of the screen
+    ;;ld de, #CPCT_VMEM_START_ASM     ;; DE = Pointer to start of the screen
+    
+    ld_de_backbuffer
+    
     call cpct_getScreenPtr_asm      ;; Calculate video memory location and return it in HL
     ex de, hl
     
@@ -667,7 +691,10 @@ _X_COORD_EFFECT = .+1
 _Y_COORD_EFFECT = .+1
     add a, #0
     ld b, a
-    ld de, #CPCT_VMEM_START_ASM     ;; DE = Pointer to start of the screen
+    ;;ld de, #CPCT_VMEM_START_ASM     ;; DE = Pointer to start of the screen
+        
+    ld_de_backbuffer
+    
     call cpct_getScreenPtr_asm      ;; Calculate video memory location and return it in HL
     
     ex de, hl
@@ -720,7 +747,10 @@ sys_render_life_line::
     inc b                           ;;
     inc b                           ;;
 
-    ld de, #CPCT_VMEM_START_ASM     ;; DE = Pointer to start of the screen
+    ;;ld de, #CPCT_VMEM_START_ASM     ;; DE = Pointer to start of the screen
+    
+    ld_de_backbuffer    
+    
     call cpct_getScreenPtr_asm      ;; Calculate video memory location and return it in HL
 
     push hl
@@ -755,7 +785,10 @@ sys_render_life_line::
 sys_render_oponent::
     
     ;; Get screen address of the oponent
-    ld de, #CPCT_VMEM_START_ASM     ;; DE = Pointer to start of the screen
+    ;;ld de, #CPCT_VMEM_START_ASM     ;; DE = Pointer to start of the screen
+    
+    ld_de_backbuffer    
+    
     ld c, o_sprite_x(ix)
     ld b, o_sprite_y(ix)
     call cpct_getScreenPtr_asm      ;; Calculate video memory location and return it in HL
@@ -787,7 +820,10 @@ _mid_sprite: .db #0
 sys_render_erase_oponent::
     
     ;; Get screen address of the oponent
-    ld de, #CPCT_VMEM_START_ASM     ;; DE = Pointer to start of the screen
+    ;;ld de, #CPCT_VMEM_START_ASM     ;; DE = Pointer to start of the screen
+    
+    ld_de_backbuffer
+
     ld c, o_sprite_x(ix)
     ld b, o_sprite_y(ix)
     call cpct_getScreenPtr_asm      ;; Calculate video memory location and return it in HL

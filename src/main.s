@@ -105,6 +105,8 @@ _main_init_keypress:
 ;;
 _main::
 
+   ld sp, #0x8000                               ;; Move the stack to 0x8000
+   
    call sys_system_disable_firmware
 
    call main_init
