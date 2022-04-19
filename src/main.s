@@ -75,6 +75,8 @@ main_init:
    xor a                               ;; don't wait for a key
    call sys_messages_show
 
+   call sys_render_switch_buffers
+
    ;; set random seed
    xor a
    push af                             ;; store a=0 in the stack
