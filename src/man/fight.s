@@ -349,6 +349,9 @@ _update_main_loop:
     or a                                ;;
     call z, man_fight_end_of_turn       ;;
     
+    call sys_render_fight_screen
+    call sys_render_switch_buffers
+
     ld b, #10                           ;; delay loop
     call cpct_waitHalts_asm             ;; delay loop
 

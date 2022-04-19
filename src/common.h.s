@@ -100,6 +100,7 @@
 .globl cpct_drawSpriteBlended_asm
 .globl cpct_px2byteM0_asm
 .globl cpct_getScreenToSprite_asm
+.globl cpct_setVideoMemoryPage_asm
 
 ;;===============================================================================
 ;; DEFINED CONSTANTS

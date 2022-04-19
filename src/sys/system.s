@@ -179,6 +179,7 @@ sys_system_disable_firmware::
    halt
    call cpct_waitVSYNC_asm
    call cpct_setInterruptHandler_asm
+   
    ret
 
 
