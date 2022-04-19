@@ -747,7 +747,7 @@ sys_render_life_line::
 ;;
 ;; sys_render_oponent
 ;;
-;;  Shows the the entire fight screen
+;;  Shows an oponent on the screen
 ;;  Input: 
 ;;  Output: 
 ;;  Modified: AF, BC, DE, HL
@@ -774,6 +774,36 @@ sys_render_oponent::
     
     ret
 _mid_sprite: .db #0
+
+;;-----------------------------------------------------------------
+;;
+;; sys_render_erase_oponent
+;;
+;;  Erases an oponent form the screen
+;;  Input: ix: pointer to the oponent
+;;  Output: 
+;;  Modified: AF, BC, DE, HL
+;;
+sys_render_erase_oponent::
+    
+    ;; Get screen address of the oponent
+    ld de, #CPCT_VMEM_START_ASM     ;; DE = Pointer to start of the screen
+    ld c, o_sprite_x(ix)
+    ld b, o_sprite_y(ix)
+    call cpct_getScreenPtr_asm      ;; Calculate video memory location and return it in HL
+
+    ex de, hl
+
+    ld c, o_sprite_w(ix)
+    ld b, o_sprite_h(ix)            
+    ld a, #S_SMALL_ICONS_HEIGHT     ;; Increase height to erase effects too
+    sla a                           ;;
+    add b                           ;;
+    ld b, a                         ;;
+    ld a, #0                        ;; Black color
+    call cpct_drawSolidBox_asm
+    
+    ret
 
 
 ;;-----------------------------------------------------------------
@@ -973,7 +1003,7 @@ sys_render_fight_screen::
     ld ix, #player
     call sys_render_oponent
     ;; render oponent
-    ld ix, #foes+a_array
+    ld ix, #foes_array
     call sys_render_oponent
     
     call sys_render_hand
