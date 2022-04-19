@@ -375,6 +375,8 @@ _update_end_of_fight:
     ld hl, #_fight_end_string           ;; message
     ld a,#1                             ;; wait for a key
     call sys_messages_show              ;; End of fight message
+    
+    call sys_render_switch_buffers
 
 ;; Turn structure
 ;; 1) Show foes intentions

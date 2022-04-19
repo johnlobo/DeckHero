@@ -68,6 +68,25 @@ sys_render_init_buffers::
     ld hl, #0x8000
     ld (hl), #0
     ld de, #0x8000+1
+    ld bc, #0x8000-1
+
+    ldir
+
+ret
+
+;;====================================================
+;; sys_render_init_back_buffer
+;;  Initialize screen buffers
+;;  Entrada:
+;;  Salida:
+;;  Destruye: BC, DE, HL
+;;
+;; Code taken form Miss Input 
+;;====================================================
+sys_render_init_back_buffer::
+    ld hl, #sys_render_back_buffer
+    ld (hl), #0
+    ld de, #0x8000+1
     ld bc, #0x4000-1
 
     ldir
@@ -241,9 +260,17 @@ _erase_not_selected:
     jr nz, _e_d_loop01              ;; return to loop if not lasta card reached
 
     ;; Erase description
+    ld_de_backbuffer    
+    ld b, #DESC_Y_1
+    ld c, #DESC_X
+    call cpct_getScreenPtr_asm      ;; Calculate video memory location and return it in HL
+    ex de, hl                       ;; move screen address to de
+    ;;cpctm_screenPtr_asm de, CPCT_VMEM_START_ASM, DESC_X, DESC_Y_1  ;; screen address in de
+
     ld c, #64
     ld b, #20    
-    cpctm_screenPtr_asm de, CPCT_VMEM_START_ASM, DESC_X, DESC_Y_1  ;; screen address in de
+    
+
     ld a, #0
     call cpct_drawSolidBox_asm
 
@@ -305,14 +332,25 @@ sys_render_show_deck::
 
     cpctm_clearScreen_asm 0
 
-    cpctm_screenPtr_asm de, CPCT_VMEM_START_ASM, 5, 10  ;; screen address in de
+    ld_de_backbuffer    
+    ld b, #10
+    ld c, #5
+    call cpct_getScreenPtr_asm      ;; Calculate video memory location and return it in HL
+    ex de, hl                       ;; move screen address to de
+    ;;cpctm_screenPtr_asm de, CPCT_VMEM_START_ASM, 5, 10  ;; screen address in de
+    
     ld b, #70
     ld c, #180
     ld a, #0xff
     call sys_messages_draw_box
 
+    ld_de_backbuffer    
+    ld b, #14
+    ld c, #27
+    call cpct_getScreenPtr_asm      ;; Calculate video memory location and return it in HL
+    ex de, hl                       ;; move screen address to de    
+    ;;cpctm_screenPtr_asm de, CPCT_VMEM_START_ASM, 27, 14  ;; screen address in de
     ld hl, #_show_deck_string
-    cpctm_screenPtr_asm de, CPCT_VMEM_START_ASM, 27, 14  ;; screen address in de
     ld c, #0
     call sys_text_draw_string
 
@@ -853,7 +891,8 @@ sys_render_erase_oponent::
 ;;
 sys_render_topbar::
     ;; draw life
-    cpctm_screenPtr_asm de, CPCT_VMEM_START_ASM, 0, 0  ;; screen address in de
+    ld_de_backbuffer    
+    ;;cpctm_screenPtr_asm de, CPCT_VMEM_START_ASM, 0, 0  ;; screen address in de
     ld hl, #_s_small_icons_00
     ld c, #S_SMALL_ICONS_WIDTH
     ld b, #S_SMALL_ICONS_HEIGHT

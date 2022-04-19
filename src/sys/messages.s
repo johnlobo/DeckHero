@@ -106,6 +106,7 @@ sys_messages_load_window_data::
     ;;ld de, #CPCT_VMEM_START_ASM   ;; DE = Pointer to start of the screen
     
     ld_de_backbuffer                ;; Calculate video memory location and return it in HL
+    call cpct_getScreenPtr_asm      ;; Calculate video memory location and return it in HL
     
     ld w_address(iy), l             ;; keep address in memory
     ld w_address+1(iy), h           ;;
