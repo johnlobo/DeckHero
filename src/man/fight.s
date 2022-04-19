@@ -23,7 +23,6 @@
 .include "man/array.h.s"
 .include "man/player.h.s"
 .include "man/foe.h.s"
-.include "man/oponent.h.s"
 .include "sys/input.h.s"
 .include "sys/render.h.s"
 .include "comp/component.h.s"
@@ -40,8 +39,7 @@
 ;;
 .area _DATA
 
-_fight_end_of_turn_string: .asciz "END OF TURN"      ;;
-_fight_end_string: .asciz "END OF COMBAT"      ;;
+_fight_end_of_turn_string: .asciz "END OF PLAYER TURN"      ;;27 chars, 54 bytes
 
 
 fight_deck::
@@ -63,7 +61,6 @@ DefineComponentArrayStructure_Size sacrifice, MAX_DECK_CARDS, sizeof_e
 hand_max:: .db 5
 player_energy:: .db 0
 player_max_energy:: .db 3
-ended_fight:: .db 0
 
 ;;
 ;; Start of _CODE area
@@ -84,7 +81,7 @@ man_fight_init::
     ld ix, #fight_deck                  ;; initialize fight_deck
     call man_array_init                 ;;
 
-    call man_deck_load_array_from_deck  ;; loads all the cards in deck in the pointer array
+    call man_deck_load_array_from_deck ;; loads all the cards in deck in the pointer array
 
     ld ix, #hand                        ;; initialize hand
     call man_array_init                 ;;
@@ -99,17 +96,13 @@ man_fight_init::
     ld b, a
     call man_fight_deal_hand
 
-    ld a, (player_max_energy)           ;; Load the max of energy of this fight to the player energy
+    ld a, (player_max_energy)            ;; Load the max of energy of this fight to the player energy
     ld (player_energy), a               ;;
 
     call man_foe_init
     call man_foe_create
 
-    call sys_render_fight_screen        ;; renders the fight screen
-
-    xor a                               ;; Set the end of fight flag 
-    ld (ended_fight), a                 ;;
-
+    call sys_render_fight_screen    ;; renders the fight screen
     ret
 
 
@@ -340,39 +333,14 @@ man_fight_end_of_turn::
 ;;  Modified: 
 ;;
 man_fight_update::
-
-_update_main_loop:
-    ;; Player turn
-    call sys_input_debug_update         ;; Check players actions
-
-    ld a, (player_energy)               ;; Check player's energy
-    or a                                ;;
-    call z, man_fight_end_of_turn       ;;
-    
-    ld b, #10                           ;; delay loop
-    call cpct_waitHalts_asm             ;; delay loop
-
-    ld ix, #player                      ;; Check players life
-    call man_oponent_get_life           ;;
-    or a                                ;;
-    jr z, _update_end_of_fight          ;;
-    jp m, _update_end_of_fight          ;;
-
-    call man_foe_number_of_foes         ;; Check if thera are enemies left
-    or a                                ;;
-    jr z, _update_end_of_fight          ;;
-
-    jr _update_main_loop
-
-_update_end_of_fight:
-    ld e, #10                           ;; x
-    ld d, #78                           ;; y
-    ld b, #44                           ;; h
-    ld c, #60                           ;; w
-    ld hl, #_fight_end_string           ;; message
-    ld a,#1                             ;; wait for a key
-    call sys_messages_show              ;; End of fight message
-
+      
+    call sys_input_debug_update
+    ld a, (player_energy)
+    or a
+    call z, man_fight_end_of_turn
+    ld b, #10
+    call cpct_waitHalts_asm
+;;
 ;; Turn structure
 ;; 1) Show foes intentions
 ;; 2) hero play cards

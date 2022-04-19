@@ -60,7 +60,6 @@ $(eval $(call IMG2SP, CONVERT         , assets/small-icons.png , 8, 10, s_small_
 $(eval $(call IMG2SP, CONVERT         , assets/coin.png , 8, 10, s_coin, ,))
 $(eval $(call IMG2SP, CONVERT         , assets/icons.png , 12, 17, s_icons, ,))
 $(eval $(call IMG2SP, CONVERT         , assets/status.png , 10, 12, s_status, ,))
-$(eval $(call IMG2SP, CONVERT         , assets/explotion.png , 16, 16, s_explotion, ,))
 $(eval $(call IMG2SP, SET_PALETTE_FW  , $(PALETTE1)         ))
 $(eval $(call IMG2SP, CONVERT_PALETTE , $(PALETTE1), g_palette1 ))
 $(eval $(call IMG2SP, SET_MODE        , 1                  ))

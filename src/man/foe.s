@@ -41,7 +41,7 @@
 ;; Character templates
 foe_blob::
 ;;_status, _name, _sprite, _sprite_x, _sprite_y, _sprite_w, _sprite_h, _life, _max_life, _money, _effects_count, _shield, _force, _dexterity, _buffer, _blessing, _thorns, _regen, _draw_card, _confuse, _poison
-DefineOponent 1, ^/BLOB           /, _s_blob_0,50, 75, S_BLOB_WIDTH, S_BLOB_HEIGHT, 20, 20, 99, 9, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10
+DefineOponent 1, ^/BLOB           /, _s_blob_0,50, 75, S_BLOB_WIDTH, S_BLOB_HEIGHT, 40, 40, 99, 9, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10
 ;; Characters
 foes::
 DefineComponentArrayStructure_Size foes, MAX_FOES, sizeof_o     
@@ -103,39 +103,6 @@ man_foe_create::
 ;;  Modified: 
 ;;
 man_foe_remove::
-    ret
-    
-;;-----------------------------------------------------------------
-;;
-;; man_foe_number_of_foes
-;;
-;;  return the number of remaining foes
-;;  Input: 
-;;  Output: a random piece
-;;  Modified: 
-;;
-man_foe_number_of_foes::
-    ld a, (foes_num)
-    ret
-
-;;-----------------------------------------------------------------
-;;
-;; man_foe_kill_foe
-;;
-;;  Kills the corresponding foe
-;;  Input: a number of foe to kill
-;;  Output:
-;;  Modified: 
-;;
-man_foe_kill_foe::
-    push ix
-    ld ix, #foes_array                      ;; erase first oponent form the scree
-    call sys_render_erase_oponent           ;; TODO: erase any foe
-    
-    ld ix, #foes
-    ld a, #0                                ;; TODO: erase any foe
-    call man_array_remove_element
-    pop ix
     ret
 
 

@@ -90,17 +90,16 @@ man_oponent_one_damage::
     ld (m_o_o_d_damage), a
 
     push ix
-
-    ld ix, #foes_array
+    ld hl, #foes
+    ld a, #a_array
+    add_hl_a
+    ld__ix_hl
 
 m_o_o_d_damage = .+1    ;; Substract the damage done to the life
     ld b, #0            ;;
     ld a, o_life(ix)    ;;
     sub b               ;;
     ld o_life(ix), a    ;;
-    call z, man_foe_kill_foe    ;; check if life has reached 0
-    call m, man_foe_kill_foe    ;; check if life is below 0
-
     pop ix
     ret
 
@@ -130,17 +129,4 @@ man_oponent_add_block::
     ld a, o_shield(ix)    ;;
     add b               ;;
     ld o_shield(ix), a    ;;
-    ret
-
-;;-----------------------------------------------------------------
-;;
-;; man_oponent_get_life
-;;
-;;  Returns the life of the oponent
-;;  Input: ix: oponent
-;;  Output: a: life of the player
-;;  Modified: 
-;;
-man_oponent_get_life::
-    ld a, o_life(ix)
     ret

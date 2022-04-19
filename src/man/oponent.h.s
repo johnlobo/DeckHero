@@ -97,4 +97,3 @@ EndStruct o
 .globl man_oponent_add_block
 .globl man_oponent_one_damage
 .globl man_oponent_all_damage
-.globl man_oponent_get_life

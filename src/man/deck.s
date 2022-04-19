@@ -139,6 +139,10 @@ man_deck_init::
     xor a
     ld  a_count(ix), a
 
+    ;;ld  hl, #deck               ;; Load in hl the first position of the array
+    ;;ld a, #a_array               ;;
+    ;;add_hl_a                    ;;
+
     ld hl, #deck_array
     
     ld a_pend(ix), l            ;; Update pointer to the next entity

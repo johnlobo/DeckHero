@@ -64,19 +64,4 @@ man_player_init::
     ldir
     ret
 
-;;-----------------------------------------------------------------
-;;
-;; man_player_get_life
-;;
-;;  Returns the life of the player
-;;  Input: 
-;;  Output: a: life of the player
-;;  Modified: 
-;;
-man_player_get_life::
-    push ix
-    ld ix, #player
-    ld a, o_life(ix)
-    pop ix
-    ret
 
