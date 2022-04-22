@@ -61,7 +61,7 @@ _game_loaded_string: .asciz "GAME LOADED - PRESS ANY KEY"      ;;27 chars, 54 by
 ;;  Output: 
 ;;  Destroyed: af, bc,de, hl
 ;;
-main_init:
+main_init::
 
 ;;   call sys_audio_init
 ;;
