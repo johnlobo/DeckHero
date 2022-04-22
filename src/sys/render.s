@@ -43,8 +43,8 @@ FONT_NUMBERS: .dw #0000
 _show_deck_string: .asciz "PLAYERS DECK"            ;;12 chars, 24 bytes
 _press_any_key_string: .asciz "PRESS ANY KEY"       ;;14 chars, 28 bytes
 
-sys_render_front_buffer: .db 0xC0
-sys_render_back_buffer: .db 0x80
+sys_render_front_buffer: .db 0xC0, 0x00
+sys_render_back_buffer: .db 0x80, 0x00
 
 ;;
 ;; Start of _CODE area
@@ -853,7 +853,8 @@ sys_render_erase_oponent::
 ;;
 sys_render_topbar::
     ;; draw life
-    cpctm_screenPtr_asm de, CPCT_VMEM_START_ASM, 0, 0  ;; screen address in de
+    ;;cpctm_screenPtr_asm de, CPCT_VMEM_START_ASM, 0, 0  ;; screen address in de
+    m_screenPtr_backbuffer 0,0      ;; Calculates backbuffer address
     ld hl, #_s_small_icons_00
     ld c, #S_SMALL_ICONS_WIDTH
     ld b, #S_SMALL_ICONS_HEIGHT
@@ -878,12 +879,14 @@ sys_render_topbar::
     inc hl
     ld (hl), #'0'
     ld hl, #aux_txt
-    cpctm_screenPtr_asm de, CPCT_VMEM_START_ASM, 5, 1  ;; screen address in de
+    ;;cpctm_screenPtr_asm de, CPCT_VMEM_START_ASM, 5, 1  ;; screen address in de
+    m_screenPtr_backbuffer 5,1      ;; Calculates backbuffer address
     ld c, #0
     call sys_text_draw_string
 
     ;;draw money
-    cpctm_screenPtr_asm de, CPCT_VMEM_START_ASM, 20, 0  ;; screen address in de
+    ;;cpctm_screenPtr_asm de, CPCT_VMEM_START_ASM, 20, 0  ;; screen address in de
+    m_screenPtr_backbuffer 20,0      ;; Calculates backbuffer address
     ld hl, #_s_coin
     ld c, #S_COIN_WIDTH
     ld b, #S_COIN_HEIGHT
@@ -897,13 +900,15 @@ sys_render_topbar::
     call sys_text_num2str8
 
     ld hl, #aux_txt
-    cpctm_screenPtr_asm de, CPCT_VMEM_START_ASM, 25, 1  ;; screen address in de
+    ;;cpctm_screenPtr_asm de, CPCT_VMEM_START_ASM, 25, 1  ;; screen address in de
+    m_screenPtr_backbuffer 25,1      ;; Calculates backbuffer address
     ld c, #0
     call sys_text_draw_string
 
     ld h, #0
     ld l, o_force(ix)
-    cpctm_screenPtr_asm de, CPCT_VMEM_START_ASM, 45, 1  ;; screen address in de
+    ;;cpctm_screenPtr_asm de, CPCT_VMEM_START_ASM, 45, 1  ;; screen address in de
+    m_screenPtr_backbuffer 45,1      ;; Calculates backbuffer address
     call sys_text_draw_small_number
 
     ret

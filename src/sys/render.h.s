@@ -52,3 +52,13 @@
    ld   d, a
    ld   e, #00
 .endm
+
+.mdelete m_screenPtr_backbuffer
+.macro m_screenPtr_backbuffer X, Y
+   push hl
+   ld de, #(80 * (Y / 8) + 2048 * (Y & 7) + X)
+   ld hl, (sys_render_back_buffer)         
+   add hl, de
+   ex de, hl
+   pop hl
+.endm
