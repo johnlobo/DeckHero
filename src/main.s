@@ -95,7 +95,8 @@ _main_init_keypress:
    pop af                              ;; retrieve last a value to set the seed
    call cpct_setSeed_xsp40_u8_asm      ;; change seed
 
-   cpctm_clearScreen_asm 0
+   ;;cpctm_clearScreen_asm 0
+   
    
    call man_game_init
 

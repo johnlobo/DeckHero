@@ -57,7 +57,9 @@
 .macro m_screenPtr_backbuffer X, Y
    push hl
    ld de, #(80 * (Y / 8) + 2048 * (Y & 7) + X)
-   ld hl, (sys_render_back_buffer)         
+   ld a, (sys_render_back_buffer)
+   ld h, a
+   ld l, #0         
    add hl, de
    ex de, hl
    pop hl

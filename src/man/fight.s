@@ -352,8 +352,8 @@ _update_main_loop:
     call sys_render_fight_screen
     call sys_render_switch_buffers
 
-    ld b, #10                           ;; delay loop
-    call cpct_waitHalts_asm             ;; delay loop
+    ;;ld b, #10                           ;; delay loop
+    ;;call cpct_waitHalts_asm             ;; delay loop
 
     ld ix, #player                      ;; Check players life
     call man_oponent_get_life           ;;
