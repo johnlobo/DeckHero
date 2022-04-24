@@ -45,6 +45,7 @@ _press_any_key_string: .asciz "PRESS ANY KEY"       ;;14 chars, 28 bytes
 
 sys_render_front_buffer: .db 0xC0
 sys_render_back_buffer: .db 0x80
+sys_render_touched_zones: .db 0x00
 
 ;;
 ;; Start of _CODE area
@@ -123,6 +124,8 @@ sys_render_switch_buffers::
     call sys_render_init_back_buffer
     ret
 
+
+
 ;;-----------------------------------------------------------------
 ;;
 ;; sys_render_init
@@ -150,6 +153,31 @@ sys_render_init::
 
     ret
 
+;;-----------------------------------------------------------------
+;;
+;; sys_render_erase_zone_topbar
+;;
+;;  Erases the numbers in the topbar line of the screen
+;;  Input: 
+;;  Output: a random piece
+;;  Modified: AF, BC, DE, HL
+;;
+sys_render_erase_zone_bar::
+    ;; erase life
+    m_screenPtr_backbuffer 5,1      ;; Calculates backbuffer address
+    ld c, #14
+    ld b, #9
+    ld a,#0                         ;; Patern of solid box
+    call cpct_drawSolidBox_asm
+
+    ;;erase money
+    m_screenPtr_backbuffer 25,1      ;; Calculates backbuffer address
+    ld c, #6
+    ld b, #9
+    ld a,#0                         ;; Patern of solid box
+    call cpct_drawSolidBox_asm
+
+    ret
 ;;-----------------------------------------------------------------
 ;;
 ;; sys_render_update
@@ -220,7 +248,7 @@ sys_render_get_X_start::
 
 ;;-----------------------------------------------------------------
 ;;
-;; sys_render_erase_deck
+;; sys_render_erase_hand
 ;;
 ;;  Erase the deck render area
 ;;  Input: 
