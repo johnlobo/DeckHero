@@ -71,7 +71,7 @@ main_init::
    ld d, #78                           ;; y
    ld b, #44                           ;; h
    ld c, #60                           ;; w
-   ld hl, #_game_loaded_string    ;; message
+   ld hl, #_game_loaded_string         ;; message
    xor a                               ;; don't wait for a key
    call sys_messages_show
 
@@ -81,6 +81,7 @@ main_init::
    xor a
    push af                             ;; store a=0 in the stack
 _main_init_keypress:
+	;;call cpct_scanKeyboard_if_asm
    pop af                              ;; retrive a value form stack
    inc a                               ;; inc a value
    push af                             ;; store a value in stack
@@ -95,9 +96,8 @@ _main_init_keypress:
    pop af                              ;; retrieve last a value to set the seed
    call cpct_setSeed_xsp40_u8_asm      ;; change seed
 
-   ;;cpctm_clearScreen_asm 0
-   
-   
+   call sys_render_clear_front_buffer
+      
    call man_game_init
 
    ret

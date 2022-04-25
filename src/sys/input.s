@@ -204,9 +204,9 @@ sys_input_show_deck:
 
     call sys_input_wait4anykey
     
-    cpctm_clearScreen_asm 0
+    call sys_render_clear_front_buffer
     
-    call sys_render_fight_screen
+    call sys_render_full_fight_screen
     ret
 
 ;;-----------------------------------------------------------------
@@ -374,6 +374,7 @@ first_key:
 ;;  Modified: iy, bc
 ;;
 sys_input_debug_update::
+	;;call cpct_scanKeyboard_if_asm
     ;;ld ix, #score_marker                     ;; get player1 struct
     ld iy, #sys_input_debug_key_actions
     call sys_input_generic_update

@@ -60,7 +60,7 @@ sacrifice::
 DefineComponentArrayStructure_Size sacrifice, MAX_DECK_CARDS, sizeof_e     
 .db 0   ;;ponemos este aqui como trampita para que siempre haya un tipo invalido al final
 
-hand_max:: .db 5
+hand_max:: .db 10
 player_energy:: .db 0
 player_max_energy:: .db 3
 ended_fight:: .db 0
@@ -105,7 +105,10 @@ man_fight_init::
     call man_foe_init
     call man_foe_create
 
-    call sys_render_fight_screen        ;; renders the fight screen
+    call sys_render_full_fight_screen   ;; renders the fight screen
+    call sys_render_switch_buffers
+    call sys_render_full_fight_screen   ;; renders the fight screen
+
 
     xor a                               ;; Set the end of fight flag 
     ld (ended_fight), a                 ;;
@@ -130,8 +133,8 @@ man_fight_deal_hand::
 _initial_set_of_cards:
     push bc                             ;; store loop index
 
-    ld b, #20                           ;; delay 
-    call cpct_waitHalts_asm
+    ;;ld b, #20                           ;; delay 
+    ;;call cpct_waitHalts_asm
 
     ld a, (hand_num)                    ;;
     or a                                ;;
@@ -343,13 +346,14 @@ man_fight_update::
 
 _update_main_loop:
     ;; Player turn
+    call sys_render_erase_fight_elements
     call sys_input_debug_update         ;; Check players actions
 
     ld a, (player_energy)               ;; Check player's energy
     or a                                ;;
     call z, man_fight_end_of_turn       ;;
     
-    call sys_render_fight_screen
+    call sys_render_partial_fight_screen
     call sys_render_switch_buffers
 
     ;;ld b, #10                           ;; delay loop

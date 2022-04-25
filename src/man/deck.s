@@ -159,6 +159,21 @@ _d_i_hit_loop:
     call man_array_create_element
     ld hl, #model_defend
     call man_array_create_element
+
+;;debug
+    ld hl, #model_defend
+    call man_array_create_element
+    ld hl, #model_defend
+    call man_array_create_element
+    ld hl, #model_defend
+    call man_array_create_element
+    ld hl, #model_defend
+    call man_array_create_element
+    ld hl, #model_defend
+    call man_array_create_element
+    ld hl, #model_defend
+    call man_array_create_element
+;;debug
 ret
 
 ;;-----------------------------------------------------------------

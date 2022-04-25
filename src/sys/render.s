@@ -47,32 +47,30 @@ sys_render_front_buffer: .db 0xC0
 sys_render_back_buffer: .db 0x80
 sys_render_touched_zones: .db 0x00
 
+sys_render_odd_frame: .db 0x01
+
 ;;
 ;; Start of _CODE area
 ;; 
 .area _CODE
 
-
-
-
-
 ;;====================================================
-;; sys_render_init_buffers
+;; sys_render_init_back_buffer
 ;;  Initialize screen buffers
-;;  Entrada:
+;;  Entrada: hl : buffer
 ;;  Salida:
 ;;  Destruye: BC, DE, HL
 ;;
 ;; Code taken form Miss Input 
 ;;====================================================
-sys_render_init_buffers::
-    ld hl, #0x8000
+sys_render_clear_buffer::
     ld (hl), #0
-    ld de, #0x8000+1
-    ld bc, #0x8000-1
+    ld d, h
+    ld e, l
+    inc de
+    ld bc, #0x4000-1
 
     ldir
-
 ret
 
 ;;====================================================
@@ -84,19 +82,30 @@ ret
 ;;
 ;; Code taken form Miss Input 
 ;;====================================================
-sys_render_init_back_buffer::
+sys_render_clear_back_buffer::
     ld a, (sys_render_back_buffer)
     ld h, a
     ld l, #0
-    ld (hl), #0
-    ld d, h
-    ld e, l
-    inc de
-    ld bc, #0x4000-1
+    call sys_render_clear_buffer
+    ret
 
-    ldir
+;;====================================================
+;; sys_render_init_back_buffer
+;;  Initialize screen buffers
+;;  Entrada:
+;;  Salida:
+;;  Destruye: BC, DE, HL
+;;
+;; Code taken form Miss Input 
+;;====================================================
+sys_render_clear_front_buffer::
+    ld a, (sys_render_front_buffer)
+    ld h, a
+    ld l, #0
+    call sys_render_clear_buffer
+    ret
 
-ret
+
 
 ;;====================================================
 ;;  sys_render_switch_buffers
@@ -109,6 +118,7 @@ ret
 ;; Code taken form Miss Input 
 ;;====================================================
 sys_render_switch_buffers::
+    call cpct_waitVSYNC_asm
 
     ld hl, (sys_render_front_buffer)   ;; Inicialmente (80C0)
     ld a, l                 ;; Carga el front buffer en el back buffer
@@ -121,7 +131,7 @@ sys_render_switch_buffers::
     ld l, a
     ;;jp cpct_setVideoMemoryPage_asm
     call cpct_setVideoMemoryPage_asm
-    call sys_render_init_back_buffer
+    ;call sys_render_init_back_buffer
     ret
 
 
@@ -147,7 +157,8 @@ sys_render_init::
     ;;cpctm_setBorder_asm HW_BLACK            ;; Set Border
     cpctm_setBorder_asm HW_WHITE            ;; Set Border
 
-    call sys_render_init_buffers
+    call sys_render_clear_back_buffer
+    call sys_render_clear_front_buffer
 
     ;;cpctm_clearScreen_asm 0                 ;; Clear screen
 
@@ -162,22 +173,98 @@ sys_render_init::
 ;;  Output: a random piece
 ;;  Modified: AF, BC, DE, HL
 ;;
-sys_render_erase_zone_bar::
+sys_render_erase_zone_topbar::
     ;; erase life
     m_screenPtr_backbuffer 5,1      ;; Calculates backbuffer address
     ld c, #14
     ld b, #9
-    ld a,#0                         ;; Patern of solid box
+    ld a,#1                         ;; Patern of solid box
     call cpct_drawSolidBox_asm
 
     ;;erase money
     m_screenPtr_backbuffer 25,1      ;; Calculates backbuffer address
     ld c, #6
     ld b, #9
-    ld a,#0                         ;; Patern of solid box
+    ld a,#1                         ;; Patern of solid box
     call cpct_drawSolidBox_asm
 
     ret
+
+;;-----------------------------------------------------------------
+;;
+;; sys_render_erase_zone_player_sprite
+;;
+;;  Erases the player sprite
+;;  Input: 
+;;  Output: a random piece
+;;  Modified: AF, BC, DE, HL
+;;
+sys_render_erase_zone_player_sprite::
+    ld ix, #player
+    call sys_render_erase_oponent
+    ret
+
+;;-----------------------------------------------------------------
+;;
+;; sys_render_erase_zone_enemy_sprite
+;;
+;;  Erases the player sprite
+;;  Input: 
+;;  Output: a random piece
+;;  Modified: AF, BC, DE, HL
+;;
+sys_render_erase_zone_enemy_sprite::
+    ld ix, #foes_array
+    call sys_render_erase_oponent
+    ret
+;;-----------------------------------------------------------------
+;;
+;; sys_render_erase_zone_hand
+;;
+;;  Erases the player sprite
+;;  Input: 
+;;  Output: a random piece
+;;  Modified: AF, BC, DE, HL
+;;
+sys_render_erase_zone_hand::
+    ;; erase cards
+    m_screenPtr_backbuffer 8, HAND_Y_2      ;; Calculates backbuffer address
+    ld c, #64
+    ld b, #(S_CARD_HEIGHT + 5)
+    ld a,#1                         ;; Patern of solid box
+    call cpct_drawSolidBox_asm
+
+    ;;erase text
+    m_screenPtr_backbuffer DESC_X, DESC_Y_1      ;; Calculates backbuffer address
+    ld c, #64
+    ld b, #20    
+    ld a, #1
+    call cpct_drawSolidBox_asm
+    ret
+
+
+;;-----------------------------------------------------------------
+;;
+;; sys_render_erase_fight_elements
+;;
+;;  Erases the player sprite
+;;  Input: 
+;;  Output: a random piece
+;;  Modified: AF, BC, DE, HL
+;;
+sys_render_erase_fight_elements::
+    call sys_render_erase_zone_topbar
+    ld a, (sys_render_odd_frame)                    ;; Render player and cards in different frames
+    or a                                            ;;
+    jr z, even_frame                                            ;;
+odd_frame:    
+    call sys_render_erase_zone_player_sprite
+    call sys_render_erase_zone_enemy_sprite
+    ret
+even_frame:
+    call sys_render_erase_zone_hand
+    ret
+
 ;;-----------------------------------------------------------------
 ;;
 ;; sys_render_update
@@ -242,7 +329,7 @@ sys_render_get_X_start::
 
     srl a                       ;; Divide (num cards*8) by 2
     ld c,a                      ;; move ((num cards*8)/2) to c
-    ld a, #40                   ;; a = 40
+    ld a, #39                   ;; a = 40
     sub c                       ;; a = 40 - ((num cards*8)/2)
     ret
 
@@ -925,7 +1012,7 @@ sys_render_erase_oponent::
     sla a                           ;;
     add b                           ;;
     ld b, a                         ;;
-    ld a, #0                        ;; Black color
+    ld a, #1                        ;; Black color
     call cpct_drawSolidBox_asm
     
     ret
@@ -1125,19 +1212,54 @@ sys_render_icons::
     ret
 ;;-----------------------------------------------------------------
 ;;
-;; sys_render_fight_screen
+;; sys_render_full_fight_screen
 ;;
 ;;  Shows the the entire fight screen
 ;;  Input: 
 ;;  Output: 
 ;;  Modified: AF, BC, DE, HL
 ;;
-sys_render_fight_screen::
+sys_render_partial_fight_screen::
     
     call sys_render_topbar
     
     call sys_render_icons
     
+    call sys_render_energy      ;; Energy number
+    call sys_render_sacrifice   ;; Sacrifice number
+    call sys_render_deck        ;; Deck number
+    call sys_render_cemetery    ;; Cemetery number
+
+    ld a, (sys_render_odd_frame)                    ;; Render player and cards in different frames
+    or a                                            ;;
+    jr z, even_frame_partial                        ;;
+
+odd_frame_partial:    
+    ;; render player
+    ld ix, #player
+    call sys_render_oponent
+    ;; render oponent
+    ld ix, #foes_array
+    call sys_render_oponent
+    ret
+
+even_frame_partial:
+    call sys_render_hand
+    ret
+
+;;-----------------------------------------------------------------
+;;
+;; sys_render_partial_fight_screen
+;;
+;;  Shows the the entire fight screen
+;;  Input: 
+;;  Output: 
+;;  Modified: AF, BC, DE, HL
+;;
+sys_render_full_fight_screen::
+    
+    call sys_render_topbar
+      
     call sys_render_energy      ;; Energy number
     call sys_render_sacrifice   ;; Sacrifice number
     call sys_render_deck        ;; Deck number

@@ -18,9 +18,11 @@
 
 .module system_system
 
-;;.include "cpctelera.h.s"
 ;;.include "sys/audio.h.s"
 .include "common.h.s"
+.include "cpctelera.h.s"
+.include "sys/render.h.s"
+
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -48,6 +50,7 @@ set_int_handler:
 ;;DESTROYS: AF, BC, DE
 ;;
 int_handler1:
+   cpctm_setBorder_asm HW_WHITE
 	ld hl, #int_handler2
  	call cpct_setInterruptHandler_asm	
 	ret
@@ -59,6 +62,8 @@ int_handler1:
 ;;DESTROYS: AF, BC, DE
 ;;
 int_handler2:
+   cpctm_setBorder_asm HW_RED
+
 	call cpct_scanKeyboard_if_asm
 
 
@@ -73,6 +78,8 @@ int_handler2:
 ;;DESTROYS: AF, BC, DE
 ;;
 int_handler3:
+   cpctm_setBorder_asm HW_GREEN
+
 	ld hl, #int_handler4
    call cpct_setInterruptHandler_asm
 	ret
@@ -84,6 +91,8 @@ int_handler3:
 ;;DESTROYS: AF, BC, DE
 ;;
 int_handler4:
+   cpctm_setBorder_asm HW_BLUE
+
 	ld hl, #int_handler5
    call cpct_setInterruptHandler_asm
 	ret
@@ -95,6 +104,8 @@ int_handler4:
 ;;DESTROYS: AF, BC, DE
 ;;
 int_handler5:
+   cpctm_setBorder_asm HW_ORANGE
+
 ;;  ld a, (music_switch)
 ;;  or a
 ;;  jr z, int_handler5_exit
@@ -123,6 +134,11 @@ int_handler5_exit:
 ;;DESTROYS: AF, BC, DE
 ;;
 int_handler6:
+   cpctm_setBorder_asm HW_PURPLE
+
+   ld a, (sys_render_odd_frame)
+   cpl
+   ld (sys_render_odd_frame), a
 	ld hl, #int_handler1
    call cpct_setInterruptHandler_asm
 	ret
