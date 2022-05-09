@@ -320,7 +320,7 @@ _hor_line_loop:
 ;;
 sys_render_get_X_start::
     ;; Calculate x start coord
-    ld a, (hand_num)
+    ld a, (hand_count)
     ld c, a                     ;; Multiply num cards by 6
     sla a                       ;;
     sla a                       ;; Multyply by 4
@@ -529,7 +529,7 @@ _render_not_selected_show:
 
     inc b                       ;; increment current card
 
-    ld a, (deck_num)            ;; compare with num of cards in deck
+    ld a, (deck_count)            ;; compare with num of cards in deck
     cp b                        ;;
     jr nz, _s_r_s_d_loop0         ;; return to loop if not lasta card reached
 
@@ -547,7 +547,7 @@ _render_not_selected_show:
 ;;
 sys_render_hand::
     ld ix, #hand
-    ld a,(hand_num)                         ;; retrieve num cards in deck
+    ld a,(hand_count)                         ;; retrieve num cards in deck
     or a                                    ;; If no cards ret
     ret z                                   ;;
 
@@ -611,7 +611,7 @@ _hand_render_not_selected:
 
     inc b                       ;; increment current card
 
-    ld a, (hand_num)            ;; compare with num of cards in deck
+    ld a, (hand_count)            ;; compare with num of cards in deck
     cp b                        ;;
     jr nz, _s_r_h_loop0         ;; return to loop if not lasta card reached
 

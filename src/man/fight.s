@@ -136,7 +136,7 @@ _initial_set_of_cards:
     ;;ld b, #20                           ;; delay 
     ;;call cpct_waitHalts_asm
 
-    ld a, (hand_num)                    ;;
+    ld a, (hand_count)                    ;;
     or a                                ;;
     jr nz, _m_f_d_l_cards_in_hand
     call man_fight_shuffle
@@ -149,6 +149,7 @@ _m_f_d_l_continue:
     ld (m_f_d_c_ELEMENT_TO_ERASE),a     ;; store the element to be erased later
     ld ix, #hand                        ;; working with hand
     call man_array_create_element       ;; create the element in hand
+    inc a_delta(ix)                     ;; increase delta flag
     ld ix, #fight_deck                  ;; working with fight_deck
 m_f_d_c_ELEMENT_TO_ERASE = . +1                 
     ld a, #00                           ;; set the element to be erased
@@ -175,7 +176,7 @@ m_f_d_c_ELEMENT_TO_ERASE = . +1
 man_fight_discard_hand::
     push ix
     
-    ld a, (hand_num)                    ;; return if no cards in hand
+    ld a, (hand_count)                    ;; return if no cards in hand
     or a
     ret z
 _m_f_d_h_loop:
@@ -192,11 +193,11 @@ _m_f_d_h_loop:
     ld ix, #hand
     ld a, #00                           ;; set the element to be erased
     call man_array_remove_element       ;; Remove element from fight_deck  
-    
+    dec a_delta(ix)                     ;; decreases delta flag
     call sys_render_cemetery            ;; Update number in deck
     call sys_render_hand                ;; update hand
     
-    ld a, (hand_num)
+    ld a, (hand_count)
     or a
     jr nz, _m_f_d_h_loop
     
@@ -214,7 +215,7 @@ _m_f_d_h_loop:
 ;;  Modified: 
 ;;
 man_fight_shuffle::
-    ld a, (cemetery_num)                ;; if no cards in cemetery return
+    ld a, (cemetery_count)                ;; if no cards in cemetery return
     or a
     ret z
 

@@ -115,7 +115,7 @@ man_foe_remove::
 ;;  Modified: 
 ;;
 man_foe_number_of_foes::
-    ld a, (foes_num)
+    ld a, (foes_count)
     ret
 
 ;;-----------------------------------------------------------------

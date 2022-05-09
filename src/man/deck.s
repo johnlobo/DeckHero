@@ -93,6 +93,7 @@ man_deck_remove_card_from_hand::
     pop af                          ;; retrieve card to erase
     ld ix, #hand
     call man_array_remove_element   ;; erase card from hand
+    dec a_delta(ix)                 ;; decrease delta flag
     call sys_render_deck
     call sys_render_cemetery
     call sys_render_hand            ;; update hand
@@ -187,7 +188,7 @@ ret
 ;;
 man_deck_load_array_from_deck::
     ld hl, #deck_array                  ;; hl points to the array of cards
-    ld a, (#deck_num)                   ;; a holds the number of cards to copy
+    ld a, (#deck_count)                   ;; a holds the number of cards to copy
     ld b, a                             ;; b = number of cards to copy
 _l_a_loop:
     cpctm_push bc, hl                   ;; save bc and hl

@@ -230,7 +230,8 @@ sys_input_add_card::
     call man_array_get_random_element   ;; get hl pointing to a random card, and a to the element in the array
     push af
     ld ix, #hand
-    call man_array_create_element        ;; create a card in the deck
+    call man_array_create_element       ;; create a card in the deck
+    inc a_delta(ix)                     ;; increase delta flag
     pop af
     ld ix, #fight_deck
     call man_array_remove_element       ;; erase card form hand
@@ -279,6 +280,7 @@ sys_input_remove_card::
     pop af                          ;; retrieve card to erase
     ld ix, #hand
     call man_array_remove_element   ;; erase card from hand
+    dec a_delta(ix)                 ;; decrease delta flag
     call sys_render_deck
     call sys_render_cemetery
     call sys_render_hand            ;; update hand

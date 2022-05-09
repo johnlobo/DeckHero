@@ -76,7 +76,8 @@ EndStruct c
 .globl model_deck
 
 .globl deck
-.globl deck_num
+.globl deck_count
+.globl deck_delta
 .globl deck_component_size
 .globl deck_pend
 .globl deck_selected

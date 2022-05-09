@@ -22,7 +22,7 @@
 ;; PUBLIC VARIABLES
 ;;===============================================================================
 .globl foes
-.globl foes_num
+.globl foes_count
 .globl foes_component_size
 .globl foes_pend
 .globl foes_selected

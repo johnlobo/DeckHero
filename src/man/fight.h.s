@@ -25,19 +25,19 @@
 .globl fight_deck
 
 .globl hand
-.globl hand_num
+.globl hand_count
 .globl hand_pend
 .globl hand_array
 .globl hand_selected
 
 .globl cemetery
-.globl cemetery_num
+.globl cemetery_count
 .globl cemetery_pend
 .globl cemetery_array
 .globl cemetery_selected
 
 .globl sacrifice
-.globl sacrifice_num
+.globl sacrifice_count
 .globl sacrifice_pend
 .globl sacrifice_array
 .globl sacrifice_selected
