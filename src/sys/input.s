@@ -224,7 +224,7 @@ sys_input_add_card::
     ret z                               ;; if 10 return
 
     call cpct_waitVSYNC_asm
-    call sys_render_erase_hand          ;; erase deck area
+    call sys_render_erase_current_hand          ;; erase deck area
 
     ld ix, #fight_deck
     call man_array_get_random_element   ;; get hl pointing to a random card, and a to the element in the array
@@ -270,7 +270,7 @@ sys_input_remove_card::
     ret z                           ;; if 0 return
 
     call cpct_waitVSYNC_asm
-    call sys_render_erase_hand      ;; erase deck area
+    call sys_render_erase_current_hand      ;; erase deck area
     ;;ld a, (hand_selected)
     ld a, a_selected(ix)
     push af                         ;; save a (card to move)
@@ -302,7 +302,7 @@ sys_input_selcted_left::
     ret z
 
     call cpct_waitVSYNC_asm
-    call sys_render_erase_hand      ;; erase deck area
+    call sys_render_erase_current_hand      ;; erase deck area
     ;;ld hl, #hand_selected
     dec a_selected(ix)              ;; decrement selected card
     call sys_render_hand
@@ -326,7 +326,7 @@ sys_input_selected_right::
     ret z
 
     call cpct_waitVSYNC_asm
-    call sys_render_erase_hand      ;; erase deck area
+    call sys_render_erase_current_hand      ;; erase deck area
     inc a_selected(ix)              ;; increment selected card
     call sys_render_hand
 

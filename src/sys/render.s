@@ -398,6 +398,82 @@ _erase_not_selected:
 
     ret
 
+
+;;-----------------------------------------------------------------
+;;
+;; sys_render_erase_current_hand
+;;
+;;  Erase the deck render area
+;;  Input: 
+;;  Output: a random piece
+;;  Modified: AF, BC, DE, HL
+;;
+sys_render_erase_current_hand::
+    push ix                         ;; save ix register
+    ld ix, #hand
+    ld b, a_count(ix)
+    sla b                           ;; multiply hand count by 4 (CARD_WIDTH/2)
+    sla b                           ;;
+    ld a, b                         ;;
+    ld (e_c_h_width), a             ;; saving with in cpct_drawsolidbox
+    
+    ld_de_backbuffer    
+    ld b, #HAND_Y - 5               ;; y coord
+    call sys_render_get_X_start     ;; get x coord to start rendering the deck
+    ld a, c                         ;; x coord
+    call cpct_getScreenPtr_asm      ;; Calculate video memory location and return it in HL
+    ex de, hl                       ;; move screen address to de
+e_c_h_width = .+1
+    ld c, #00
+    ld b, #S_CARD_HEIGHT
+    ld a,#0                         ;; Patern of solid box
+    call cpct_drawSolidBox_asm
+    pop ix
+    ret
+
+;;-----------------------------------------------------------------
+;;
+;; sys_render_erase_hand_op
+;;
+;;  Erase the deck render area
+;;  Input: 
+;;  Output: a random piece
+;;  Modified: AF, BC, DE, HL
+;;
+sys_render_erase_hand_op::
+    push ix                         ;; save ix register
+    ld ix, #hand
+    ld a, a_delta(ix)               ;; b = number of cards added or removed
+    or a
+    jp p, e_h_op_bigger_deck        ;; Not necessary to erase because the deck is bigger now
+    ld b, a                         ;; store delta in bb
+    sla b                           ;;
+    sla b                           ;; Multiply delta by 4 (CARD_WIDTH/2)
+    ld a, b
+    ld (e_h_op_width_left),a        ;; store width
+    push bc                         ;; save b
+    call sys_render_get_X_start     ;; get x coord to start rendering the deck
+    pop bc                          ;; restore b
+    sub b                           ;; substract b (delta*CARD_WIDTH/2) form x coord
+    
+
+    ;; Left side block
+    ld_de_backbuffer    
+    ld b, #HAND_Y - 5
+    ld c, a                         ;; previous calculus start_x - (delta*CARD_WIDTH/2)
+    call cpct_getScreenPtr_asm      ;; Calculate video memory location and return it in HL
+    ex de, hl                       ;; move screen address to de
+e_h_op_width_left = .+1
+    ld c, #00
+    ld b, #S_CARD_HEIGHT
+    ld a,#0                         ;; Patern of solid box
+    call cpct_drawSolidBox_asm
+    
+    pop ix                          ;; restore ix register
+e_h_op_bigger_deck:
+    ld a_delta(ix), #0              ;; reset delta flag
+    ret
+
 ;;-----------------------------------------------------------------
 ;;
 ;; sys_render_card

@@ -142,7 +142,7 @@ _initial_set_of_cards:
     call man_fight_shuffle
     jr _m_f_d_l_continue
 _m_f_d_l_cards_in_hand:
-    call nz, sys_render_erase_hand      ;; erase hand if there are any cards in hand
+    call nz, sys_render_erase_current_hand      ;; erase hand if there are any cards in hand
 _m_f_d_l_continue:
     ld ix, #fight_deck                  ;; working with fight_deck
     call man_array_get_random_element   ;; gen a random element form fight_deck
@@ -185,7 +185,7 @@ _m_f_d_h_loop:
     call cpct_waitHalts_asm
 
 
-    call sys_render_erase_hand      ;; erase hand if there are any cards in hand
+    call sys_render_erase_current_hand          ;; erase hand if there are any cards in hand
     ld a, #00                           ;; set the element to be erased
     call man_array_get_element          ;; get the first element of the hand
     ld ix, #cemetery
