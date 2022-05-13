@@ -39,7 +39,7 @@
 
 
 sys_input_debug_key_actions::
-    .dw Key_O,      sys_input_selcted_left
+    .dw Key_O,      sys_input_selected_left
     .dw Key_P,      sys_input_selected_right
     .dw Key_Q,      sys_input_add_card
     .dw Key_A,      sys_input_remove_card
@@ -288,13 +288,13 @@ sys_input_remove_card::
 
 ;;-----------------------------------------------------------------
 ;;
-;;  sys_input_selcted_left
+;;  sys_input_selected_left
 ;;
 ;;  move selected card to the left
 ;;  Output:
 ;;  Modified: AF, HL, IX
 ;;
-sys_input_selcted_left::
+sys_input_selected_left::
     ld ix, #hand
     ;;ld a, (hand_selected)
     ld a, a_selected(ix)

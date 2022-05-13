@@ -107,6 +107,7 @@ man_fight_init::
 
     call sys_render_full_fight_screen   ;; renders the fight screen
     call sys_render_switch_buffers
+    call sys_render_switch_crtc_start
     call sys_render_full_fight_screen   ;; renders the fight screen
 
 
@@ -142,7 +143,7 @@ _initial_set_of_cards:
     call man_fight_shuffle
     jr _m_f_d_l_continue
 _m_f_d_l_cards_in_hand:
-    call nz, sys_render_erase_current_hand      ;; erase hand if there are any cards in hand
+    ;;call nz, sys_render_erase_current_hand      ;; erase hand if there are any cards in hand
 _m_f_d_l_continue:
     ld ix, #fight_deck                  ;; working with fight_deck
     call man_array_get_random_element   ;; gen a random element form fight_deck
@@ -155,8 +156,8 @@ m_f_d_c_ELEMENT_TO_ERASE = . +1
     ld a, #00                           ;; set the element to be erased
     call man_array_remove_element       ;; Remove element from fight_deck
     
-    call sys_render_deck                ;; Update number in deck
-    call sys_render_hand                ;; update hand
+    ;;call sys_render_deck                ;; Update number in deck
+    ;;call sys_render_hand                ;; update hand
 
     pop bc                              ;; restore loop index
     djnz _initial_set_of_cards
@@ -185,7 +186,7 @@ _m_f_d_h_loop:
     call cpct_waitHalts_asm
 
 
-    call sys_render_erase_current_hand          ;; erase hand if there are any cards in hand
+    ;;call sys_render_erase_current_hand  ;; erase hand if there are any cards in hand
     ld a, #00                           ;; set the element to be erased
     call man_array_get_element          ;; get the first element of the hand
     ld ix, #cemetery
@@ -194,8 +195,8 @@ _m_f_d_h_loop:
     ld a, #00                           ;; set the element to be erased
     call man_array_remove_element       ;; Remove element from fight_deck  
     dec a_delta(ix)                     ;; decreases delta flag
-    call sys_render_cemetery            ;; Update number in deck
-    call sys_render_hand                ;; update hand
+    ;;call sys_render_cemetery            ;; Update number in deck
+    ;;call sys_render_hand                ;; update hand
     
     ld a, (hand_count)
     or a
@@ -223,8 +224,8 @@ man_fight_shuffle::
     ld de, #fight_deck                  ;; to the deck     
     call man_array_move_all_elements    ;;
     
-    call sys_render_deck                ;; Update number in deck
-    call sys_render_cemetery            ;; Update number in cemetery
+    ;;call sys_render_deck                ;; Update number in deck
+    ;;call sys_render_cemetery            ;; Update number in cemetery
     
     ;;ld a, (hand_max)
     ;;ld b, a                             ;; deal a new hand of cards to the player
@@ -347,15 +348,19 @@ man_fight_update::
 
 _update_main_loop:
     ;; Player turn
-    call sys_render_erase_fight_elements
+    ;;call sys_render_erase_fight_elements
     call sys_input_debug_update         ;; Check players actions
 
     ld a, (player_energy)               ;; Check player's energy
     or a                                ;;
     call z, man_fight_end_of_turn       ;;
     
-    call sys_render_partial_fight_screen
+    ;;call sys_render_partial_fight_screen
+    call sys_render_full_fight_screen
     call sys_render_switch_buffers
+    call sys_render_switch_crtc_start
+    call sys_render_full_fight_screen
+
 
     ;;ld b, #10                           ;; delay loop
     ;;call cpct_waitHalts_asm             ;; delay loop

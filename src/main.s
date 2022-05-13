@@ -76,6 +76,7 @@ main_init::
    call sys_messages_show
 
    call sys_render_switch_buffers
+   call sys_render_switch_crtc_start
 
    ;; set random seed
    xor a

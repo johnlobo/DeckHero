@@ -118,20 +118,31 @@ sys_render_clear_front_buffer::
 ;; Code taken form Miss Input 
 ;;====================================================
 sys_render_switch_buffers::
-    call cpct_waitVSYNC_asm
-
     ld hl, (sys_render_front_buffer)   ;; Inicialmente (80C0)
     ld a, l                 ;; Carga el front buffer en el back buffer
     ld (sys_render_back_buffer) , a
     ld a, h                 ;; Carga el back buffer en el front buffer
     ld (sys_render_front_buffer), a
+    ret
 
+;;====================================================
+;;  sys_render_switch_crtc_start
+;;  
+;;  Switches screen buffers
+;;  Entrada:
+;;  Salida:
+;;  Destruye: AF, HL
+;;
+;; Code taken form Miss Input 
+;;====================================================
+sys_render_switch_crtc_start::
+    call cpct_waitVSYNC_asm
+
+    ld a, (sys_render_front_buffer)   ;; Inicialmente (80C0)
     srl a
     srl a
     ld l, a
-    ;;jp cpct_setVideoMemoryPage_asm
     call cpct_setVideoMemoryPage_asm
-    ;call sys_render_init_back_buffer
     ret
 
 
@@ -256,7 +267,7 @@ sys_render_erase_fight_elements::
     call sys_render_erase_zone_topbar
     ld a, (sys_render_odd_frame)                    ;; Render player and cards in different frames
     or a                                            ;;
-    jr z, even_frame                                            ;;
+    jr z, even_frame                                ;;
 odd_frame:    
     call sys_render_erase_zone_player_sprite
     call sys_render_erase_zone_enemy_sprite
@@ -435,7 +446,7 @@ e_c_h_width = .+1
 ;;
 ;; sys_render_erase_hand_op
 ;;
-;;  Erase the deck render area
+;;  Erase the deck render area Optimized
 ;;  Input: 
 ;;  Output: a random piece
 ;;  Modified: AF, BC, DE, HL
