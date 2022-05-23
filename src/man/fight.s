@@ -63,6 +63,7 @@ DefineComponentArrayStructure_Size sacrifice, MAX_DECK_CARDS, sizeof_e
 hand_max:: .db 10
 player_energy:: .db 0
 player_max_energy:: .db 3
+player_updates:: .db 0
 ended_fight:: .db 0
 
 ;;
@@ -356,10 +357,16 @@ _update_main_loop:
     call z, man_fight_end_of_turn       ;;
     
     ;;call sys_render_partial_fight_screen
-    call sys_render_full_fight_screen
-    call sys_render_switch_buffers
-    call sys_render_switch_crtc_start
-    call sys_render_full_fight_screen
+    ;;call sys_render_full_fight_screen
+    ;;call sys_render_erase_hand
+    ;;call sys_render_hand
+    ;;call sys_render_switch_buffers
+    ;;call sys_render_switch_crtc_start
+    ;;call sys_render_erase_hand
+    ;;call sys_render_hand
+    ;;call sys_render_full_fight_screen
+
+    call sys_render_update_fight
 
 
     ;;ld b, #10                           ;; delay loop

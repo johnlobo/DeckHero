@@ -43,7 +43,7 @@ FONT_NUMBERS: .dw #0000
 _show_deck_string: .asciz "PLAYERS DECK"            ;;12 chars, 24 bytes
 _press_any_key_string: .asciz "PRESS ANY KEY"       ;;14 chars, 28 bytes
 
-sys_render_front_buffer: .db 0xC0
+sys_render_front_buffer: .db 0xc0
 sys_render_back_buffer: .db 0x80
 sys_render_touched_zones: .db 0x00
 
@@ -278,14 +278,41 @@ even_frame:
 
 ;;-----------------------------------------------------------------
 ;;
-;; sys_render_update
+;; sys_render_update_fight
 ;;
 ;;  Updates the render system
 ;;  Input: 
 ;;  Output: a random piece
 ;;  Modified: AF, BC, DE, HL
 ;;
-sys_render_update::
+sys_render_update_hand::
+    call sys_render_erase_hand
+    call sys_render_hand
+    call sys_render_switch_buffers
+    call sys_render_switch_crtc_start
+    call sys_render_erase_hand
+    call sys_render_hand
+    ret
+
+;;-----------------------------------------------------------------
+;;
+;; sys_render_update_fight
+;;
+;;  Updates the render system
+;;  Input: 
+;;  Output: a random piece
+;;  Modified: AF, BC, DE, HL
+;;
+sys_render_update_fight::
+    ld a, (player_updates)                      ;; check screen areas
+    ret z                                       ;; return if no update is necessary
+
+    and #updated_hand                           ;; check hand
+    call nz, sys_render_update_hand             ;;
+
+    xor a                                       ;; initilizes player updates
+    ld (player_updates), a                      ;;
+
     ret
 
 ;;-----------------------------------------------------------------
@@ -354,42 +381,49 @@ sys_render_get_X_start::
 ;;  Modified: AF, BC, DE, HL
 ;;
 sys_render_erase_hand::
-    ld ix, #hand
-    call sys_render_get_X_start     ;; get x coord to start rendering the deck
-    ld c, a                         ;; c = x coordinate  
-    ld b, #0                        ;; move num cards in deck to b (index)
-_e_d_loop01:    
-    push bc                       
-    ;;ld de, #CPCT_VMEM_START_ASM     ;; DE = Pointer to start of the screen
-
-    ld_de_backbuffer
+;;    ld ix, #hand
+;;    call sys_render_get_X_start     ;; get x coord to start rendering the deck
+;;    ld c, a                         ;; c = x coordinate  
+;;    ld b, #0                        ;; move num cards in deck to b (index)
+;;_e_d_loop01:    
+;;    push bc                       
+;;    ;;ld de, #CPCT_VMEM_START_ASM     ;; DE = Pointer to start of the screen
+;;
+;;    ld_de_backbuffer
+;;    
+;;    ld a, a_selected(ix)            ;; compare card selected with current card
+;;    cp b                            ;;
+;;    ld b, #HAND_Y                   ;; b = y coordinate by default
+;;    jr nz, _erase_not_selected      ;; jump if current card not selected
+;;    ld b, #HAND_Y - 5
+;;
+;;_erase_not_selected:
+;;    call cpct_getScreenPtr_asm      ;; Calculate video memory location and return it in HL
+;;    
+;;    ex de, hl                       ;; move screen address to de
+;;    ld c, #S_CARD_WIDTH
+;;    ld b, #S_CARD_HEIGHT
+;;    ld a,#0                         ;; Patern of solid box
+;;    call cpct_drawSolidBox_asm
+;;
+;;    pop bc                          ;; retrieve bc index of loop, and x coord
+;;    
+;;    ld a, #(S_CARD_WIDTH-2)             ;; add CARD WITH to x coord
+;;    add c                           ;;
+;;    ld c, a                         ;;
+;;
+;;    inc b                           ;; increment current card
+;;
+;;    ld a, a_count(ix)                ;; compare with num of cards in deck
+;;    cp b                            ;;
+;;    jr nz, _e_d_loop01              ;; return to loop if not lasta card reached
+;;
     
-    ld a, a_selected(ix)            ;; compare card selected with current card
-    cp b                            ;;
-    ld b, #HAND_Y                   ;; b = y coordinate by default
-    jr nz, _erase_not_selected      ;; jump if current card not selected
-    ld b, #HAND_Y - 5
-
-_erase_not_selected:
-    call cpct_getScreenPtr_asm      ;; Calculate video memory location and return it in HL
-    
-    ex de, hl                       ;; move screen address to de
-    ld c, #S_CARD_WIDTH
-    ld b, #S_CARD_HEIGHT
-    ld a,#0                         ;; Patern of solid box
+    m_screenPtr_backbuffer HAND_X, HAND_Y_2      ;; Calculates backbuffer address
+    ld c, #64
+    ld b, #(S_CARD_HEIGHT + 5)
+    ld a, #0
     call cpct_drawSolidBox_asm
-
-    pop bc                          ;; retrieve bc index of loop, and x coord
-    
-    ld a, #(S_CARD_WIDTH-2)             ;; add CARD WITH to x coord
-    add c                           ;;
-    ld c, a                         ;;
-
-    inc b                           ;; increment current card
-
-    ld a, a_count(ix)                ;; compare with num of cards in deck
-    cp b                            ;;
-    jr nz, _e_d_loop01              ;; return to loop if not lasta card reached
 
     ;; Erase description
     ;;ld_de_backbuffer    
@@ -399,11 +433,8 @@ _erase_not_selected:
     ;;ex de, hl                       ;; move screen address to de
     ;;cpctm_screenPtr_asm de, CPCT_VMEM_START_ASM, DESC_X, DESC_Y_1  ;; screen address in de
     m_screenPtr_backbuffer DESC_X,DESC_Y_1      ;; Calculates backbuffer address
-
     ld c, #64
     ld b, #20    
-    
-
     ld a, #0
     call cpct_drawSolidBox_asm
 
@@ -634,7 +665,7 @@ _render_not_selected_show:
 ;;
 sys_render_hand::
     ld ix, #hand
-    ld a,(hand_count)                         ;; retrieve num cards in deck
+    ld a,(hand_count)                       ;; retrieve num cards in deck
     or a                                    ;; If no cards ret
     ret z                                   ;;
 
