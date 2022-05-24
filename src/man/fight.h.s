@@ -22,12 +22,15 @@
 ;; TYPES
 ;;===============================================================================
 
-updated_none        = 0b00000000
-updated_topbar      = 0b00000001
-updated_hand        = 0b00000010
-updated_decks       = 0b00000100
-updated_player      = 0b00001000
-updated_enemy       = 0b00010000
+updated_none            = 0b00000000
+updated_topbar          = 0b00000001
+updated_player_sprite   = 0b00000010
+updated_player_effect   = 0b00000100
+updated_foe_sprite      = 0b00001000
+updated_foe_effect      = 0b00010000
+updated_hand            = 0b00100000
+updated_icon_numbers    = 0b01000000
+updated_zone_messages   = 0b10000000
 
 
 
@@ -57,6 +60,67 @@ updated_enemy       = 0b00010000
 .globl player_energy
 
 .globl player_updates
+
+
+;;===============================================================================
+;; PUBLIC MACROS
+;;===============================================================================
+.mdelete m_updated_topbar
+.macro m_updated_hand
+    ld a, (player_updates)
+    or #updated_topbar    
+    ld (player_updates), a
+.endm
+
+.mdelete m_updated_player_sprite
+.macro m_updated_player_sprite
+    ld a, (player_updates)
+    or #updated_player_sprite    
+    ld (player_updates), a
+.endm
+
+.mdelete m_updated_player_effects
+.macro m_updated_player_effects
+    ld a, (player_updates)
+    or #updated_player_effect    
+    ld (player_updates), a
+.endm
+
+.mdelete m_updated_foe_sprite
+.macro m_updated_foe_sprite
+    ld a, (player_updates)
+    or #updated_foe_sprite    
+    ld (player_updates), a
+.endm
+
+.mdelete m_updated_foe_effects
+.macro m_updated_foe_effects
+    ld a, (player_updates)
+    or #updated_foe_effect
+    ld (player_updates), a
+.endm
+
+.mdelete m_updated_hand
+.macro m_updated_hand
+    ld a, (player_updates)
+    or #updated_hand    
+    ld (player_updates), a
+.endm
+
+.mdelete m_updated_icon_numbers
+.macro m_updated_icon_numbers
+    ld a, (player_updates)
+    or #updated_icon_numbers    
+    ld (player_updates), a
+.endm
+
+.mdelete m_updated_zone_messages
+.macro m_updated_zone_messages
+    ld a, (player_updates)
+    or #updated_zone_messages
+    ld (player_updates), a
+.endm
+
 
 ;;===============================================================================
 ;; PUBLIC METHODS

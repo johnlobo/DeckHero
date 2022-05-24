@@ -19,9 +19,22 @@
 .module system_system
 
 ;;.include "sys/audio.h.s"
+.include "system.h.s"
 .include "common.h.s"
 .include "cpctelera.h.s"
 .include "sys/render.h.s"
+
+;;
+;; Start of _DATA area 
+;;
+.area _DATA
+
+nInterrupt:: .db 0
+
+;;
+;; Start of _CODE area
+;; 
+.area _CODE
 
 
 
@@ -40,6 +53,7 @@ set_int_handler:
 	ld (hl), #>int_handler1
 	inc hl
 	ld (hl), #0xc9
+   m_reset_nInterrupt                           ;; reset number of interruption
 	ret
 
 
@@ -51,6 +65,7 @@ set_int_handler:
 ;;
 int_handler1:
    cpctm_setBorder_asm HW_WHITE
+   m_inc_nInterrupt                                ;;increment the number of interruption
 	ld hl, #int_handler2
  	call cpct_setInterruptHandler_asm	
 	ret
@@ -63,6 +78,8 @@ int_handler1:
 ;;
 int_handler2:
    cpctm_setBorder_asm HW_RED
+
+   m_inc_nInterrupt                                ;;increment the number of interruption
 
 	call cpct_scanKeyboard_if_asm
 
@@ -80,6 +97,8 @@ int_handler2:
 int_handler3:
    cpctm_setBorder_asm HW_GREEN
 
+   m_inc_nInterrupt                                ;;increment the number of interruption
+
 	ld hl, #int_handler4
    call cpct_setInterruptHandler_asm
 	ret
@@ -93,6 +112,8 @@ int_handler3:
 int_handler4:
    cpctm_setBorder_asm HW_BLUE
 
+   m_inc_nInterrupt                                ;;increment the number of interruption
+
 	ld hl, #int_handler5
    call cpct_setInterruptHandler_asm
 	ret
@@ -105,6 +126,8 @@ int_handler4:
 ;;
 int_handler5:
    cpctm_setBorder_asm HW_ORANGE
+
+   m_inc_nInterrupt
 
 ;;  ld a, (music_switch)
 ;;  or a
@@ -136,9 +159,8 @@ int_handler5_exit:
 int_handler6:
    cpctm_setBorder_asm HW_PURPLE
 
-   ld a, (sys_render_odd_frame)
-   cpl
-   ld (sys_render_odd_frame), a
+   m_reset_nInterrupt
+
 	ld hl, #int_handler1
    call cpct_setInterruptHandler_asm
 	ret

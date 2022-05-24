@@ -18,6 +18,7 @@
 
 .module fight_manager
 
+.include "fight.h.s"
 .include "common.h.s"
 .include "man/deck.h.s"
 .include "man/array.h.s"
@@ -249,7 +250,8 @@ man_fight_decrease_energy::
     ld a, (player_energy)
     sub b
     ld (player_energy), a
-    call sys_render_energy                  ;;
+    m_updated_icon_numbers
+    ;;call sys_render_energy                  ;;
     
     ret
 
@@ -286,11 +288,13 @@ m_f_e_c_exit:
     call man_fight_decrease_energy          ;;
 
     ;; render oponent
-    ld ix, #foes_array
-    call sys_render_effects
+    ;;ld ix, #foes_array
+    ;;call sys_render_effects
+    m_updated_foe_effects
     ;; render oponent
-    ld ix, #player
-    call sys_render_effects
+    ;;ld ix, #player
+    ;;call sys_render_effects
+    m_updated_player_effects
 
     call man_deck_remove_card_from_hand
     
@@ -298,6 +302,8 @@ m_f_e_c_exit:
     ld a, a_count(ix)                       ;; 
     or a                                    ;; check if there are no cards in hand
     call z, man_fight_shuffle               ;;
+
+    m_updated_hand                  ;; marks that the hand has been updated
     
     pop ix
     ret
@@ -349,28 +355,13 @@ man_fight_update::
 
 _update_main_loop:
     ;; Player turn
-    ;;call sys_render_erase_fight_elements
     call sys_input_debug_update         ;; Check players actions
 
     ld a, (player_energy)               ;; Check player's energy
     or a                                ;;
     call z, man_fight_end_of_turn       ;;
     
-    ;;call sys_render_partial_fight_screen
-    ;;call sys_render_full_fight_screen
-    ;;call sys_render_erase_hand
-    ;;call sys_render_hand
-    ;;call sys_render_switch_buffers
-    ;;call sys_render_switch_crtc_start
-    ;;call sys_render_erase_hand
-    ;;call sys_render_hand
-    ;;call sys_render_full_fight_screen
-
-    call sys_render_update_fight
-
-
-    ;;ld b, #10                           ;; delay loop
-    ;;call cpct_waitHalts_asm             ;; delay loop
+    call sys_render_update_fight        ;; renders the screen
 
     ld ix, #player                      ;; Check players life
     call man_oponent_get_life           ;;

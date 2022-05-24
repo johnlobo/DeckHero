@@ -18,5 +18,31 @@
 
 .module system_system
 
+
+;;===============================================================================
+;; PUBLIC VARIABLES
+;;===============================================================================
+.globl nInterrupt
+
+;;===============================================================================
+;; PUBLIC MACROS
+;;===============================================================================
+.mdelete m_inc_nInterrupt
+.macro m_inc_nInterrupt
+    ld a, (nInterrupt)
+    inc a
+    ld (nInterrupt), a 
+.endm
+
+.mdelete m_reset_nInterrupt
+.macro m_reset_nInterrupt
+    xor a
+    ld (nInterrupt), a 
+.endm
+
+
+;;===============================================================================
+;; PUBLIC METHODS
+;;===============================================================================
 .globl sys_system_enable_firmware
 .globl sys_system_disable_firmware

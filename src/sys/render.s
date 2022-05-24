@@ -47,7 +47,12 @@ sys_render_front_buffer: .db 0xc0
 sys_render_back_buffer: .db 0x80
 sys_render_touched_zones: .db 0x00
 
-sys_render_odd_frame: .db 0x01
+sys_render_blank_sprite4x5::
+    .db 0x00, 0x00, 0x00, 0x00
+	.db 0x00, 0x00, 0x00, 0x00
+	.db 0x00, 0x00, 0x00, 0x00
+	.db 0x00, 0x00, 0x00, 0x00
+	.db 0x00, 0x00, 0x00, 0x00
 
 ;;
 ;; Start of _CODE area
@@ -256,29 +261,64 @@ sys_render_erase_zone_hand::
 
 ;;-----------------------------------------------------------------
 ;;
-;; sys_render_erase_fight_elements
+;; sys_render_update_foe_effects
 ;;
-;;  Erases the player sprite
+;;  Updates the render system
 ;;  Input: 
 ;;  Output: a random piece
 ;;  Modified: AF, BC, DE, HL
 ;;
-sys_render_erase_fight_elements::
-    call sys_render_erase_zone_topbar
-    ld a, (sys_render_odd_frame)                    ;; Render player and cards in different frames
-    or a                                            ;;
-    jr z, even_frame                                ;;
-odd_frame:    
-    call sys_render_erase_zone_player_sprite
-    call sys_render_erase_zone_enemy_sprite
-    ret
-even_frame:
-    call sys_render_erase_zone_hand
+sys_render_update_foe_effects::
+    ld a, (player_updates)
+    and #updated_foe_effect                 ;; check if player effects have been updated
+    ret z                                   ;; return if no update is necessary
+    push ix                                 ;; save ix
+    ld ix, #foes_array
+    call sys_render_effects
+    pop ix                                  ;; restore ix
     ret
 
 ;;-----------------------------------------------------------------
 ;;
-;; sys_render_update_fight
+;; sys_render_update_player_effects
+;;
+;;  Updates the render system
+;;  Input: 
+;;  Output: a random piece
+;;  Modified: AF, BC, DE, HL
+;;
+sys_render_update_player_effects::
+    ld a, (player_updates)
+    and #updated_player_effect              ;; check if player effects have been updated
+    ret z                                   ;; return if no update is necessary
+    push ix                                 ;; save ix
+    ld ix, #player                          ;; point ix to player struct
+    call sys_render_effects
+    pop ix                                  ;; restore ix
+    ret
+
+;;-----------------------------------------------------------------
+;;
+;; sys_render_update_icon_numbers
+;;
+;;  Updates the render system
+;;  Input: 
+;;  Output: a random piece
+;;  Modified: AF, BC, DE, HL
+;;
+sys_render_update_icon_numbers::
+    ld a, (player_updates)
+    and #updated_icon_numbers           ;; check if icons have been updated
+    ret z                               ;; return if no update is necessary
+    call sys_render_energy              ;; Energy number
+    call sys_render_sacrifice           ;; Sacrifice number
+    call sys_render_deck                ;; Deck number
+    call sys_render_cemetery            ;; Cemetery number
+    ret
+
+;;-----------------------------------------------------------------
+;;
+;; sys_render_update_hand
 ;;
 ;;  Updates the render system
 ;;  Input: 
@@ -286,10 +326,9 @@ even_frame:
 ;;  Modified: AF, BC, DE, HL
 ;;
 sys_render_update_hand::
-    call sys_render_erase_hand
-    call sys_render_hand
-    call sys_render_switch_buffers
-    call sys_render_switch_crtc_start
+    ld a, (player_updates)
+    and #updated_hand                     ;; check if hand has been updated
+    ret z                                 ;; return if no update is necessary
     call sys_render_erase_hand
     call sys_render_hand
     ret
@@ -307,8 +346,20 @@ sys_render_update_fight::
     ld a, (player_updates)                      ;; check screen areas
     ret z                                       ;; return if no update is necessary
 
-    and #updated_hand                           ;; check hand
-    call nz, sys_render_update_hand             ;;
+    
+    call sys_render_update_hand                 ;;
+    call sys_render_update_foe_effects          ;;  render zones back buffer
+    call sys_render_update_player_effects       ;;
+    call sys_render_update_icon_numbers         ;;
+    
+    call sys_render_switch_buffers              ;; switch buffers
+    call sys_render_switch_crtc_start           ;;
+    
+    call sys_render_update_hand                 ;;
+    call sys_render_update_foe_effects          ;;  render zones front buffer
+    call sys_render_update_player_effects       ;;
+    call sys_render_update_icon_numbers         ;;
+    
 
     xor a                                       ;; initilizes player updates
     ld (player_updates), a                      ;;
@@ -911,10 +962,14 @@ _Y_COORD_HEART_EFFECT = .+1
     
     ex de, hl
 
+    push de                         ;; erases previous number
+    m_draw_blank_small_number       ;;
+    pop de                          ;;
+
     ld h, #0
     ld l, o_life(ix)
     
-    call sys_text_draw_small_number
+    call sys_text_draw_small_number ;; draws number
 
 
 
@@ -1002,6 +1057,11 @@ _Y_COORD_EFFECT = .+1
     jr nc, _draw_effect_number
     inc de
 _draw_effect_number:
+    push af
+    push de                         ;; erases previous number
+    m_draw_blank_small_number       ;;
+    pop de                          ;;
+    pop af
     ld h, #0
     ld l, a    
     call sys_text_draw_small_number
@@ -1100,7 +1160,7 @@ sys_render_oponent::
     call sys_render_effects
     
     ret
-_mid_sprite: .db #0
+
 
 ;;-----------------------------------------------------------------
 ;;
@@ -1251,7 +1311,7 @@ sys_render_sacrifice::
 
 ;;-----------------------------------------------------------------
 ;;
-;; sys_render_sacrifice
+;; sys_render_deck
 ;;
 ;;  Draws the deck amount of cards
 ;;  Input: 
@@ -1328,46 +1388,10 @@ sys_render_icons::
     call cpct_drawSprite_asm
 
     ret
-;;-----------------------------------------------------------------
-;;
-;; sys_render_full_fight_screen
-;;
-;;  Shows the the entire fight screen
-;;  Input: 
-;;  Output: 
-;;  Modified: AF, BC, DE, HL
-;;
-sys_render_partial_fight_screen::
-    
-    call sys_render_topbar
-    
-    call sys_render_icons
-    
-    call sys_render_energy      ;; Energy number
-    call sys_render_sacrifice   ;; Sacrifice number
-    call sys_render_deck        ;; Deck number
-    call sys_render_cemetery    ;; Cemetery number
-
-    ld a, (sys_render_odd_frame)                    ;; Render player and cards in different frames
-    or a                                            ;;
-    jr z, even_frame_partial                        ;;
-
-odd_frame_partial:    
-    ;; render player
-    ld ix, #player
-    call sys_render_oponent
-    ;; render oponent
-    ld ix, #foes_array
-    call sys_render_oponent
-    ret
-
-even_frame_partial:
-    call sys_render_hand
-    ret
 
 ;;-----------------------------------------------------------------
 ;;
-;; sys_render_partial_fight_screen
+;;  sys_render_full_fight_screen
 ;;
 ;;  Shows the the entire fight screen
 ;;  Input: 
@@ -1378,10 +1402,13 @@ sys_render_full_fight_screen::
     
     call sys_render_topbar
       
-    call sys_render_energy      ;; Energy number
-    call sys_render_sacrifice   ;; Sacrifice number
-    call sys_render_deck        ;; Deck number
-    call sys_render_cemetery    ;; Cemetery number
+    call sys_render_icons
+    
+    call sys_render_energy              ;; Energy number
+    call sys_render_sacrifice           ;; Sacrifice number
+    call sys_render_deck                ;; Deck number
+    call sys_render_cemetery            ;; Cemetery number
+
     ;; render player
     ld ix, #player
     call sys_render_oponent

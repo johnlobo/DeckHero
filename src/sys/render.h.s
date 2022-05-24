@@ -37,7 +37,6 @@ sys_render_zone_messages      = 0b10000000
 .globl sys_render_back_buffer
 .globl sys_render_front_buffer
 .globl sys_render_touched_zones
-.globl sys_render_odd_frame
 
 
 ;;===============================================================================
@@ -53,7 +52,6 @@ sys_render_zone_messages      = 0b10000000
 .globl sys_render_show_array
 .globl sys_render_erase_oponent
 .globl sys_render_full_fight_screen
-.globl sys_render_partial_fight_screen
 .globl sys_render_energy
 .globl sys_render_sacrifice
 .globl sys_render_deck
@@ -61,7 +59,6 @@ sys_render_zone_messages      = 0b10000000
 .globl sys_render_effects
 .globl sys_render_switch_buffers
 .globl sys_render_switch_crtc_start
-.globl sys_render_erase_fight_elements
 .globl sys_render_clear_front_buffer
 .globl sys_render_clear_back_buffer
 
@@ -85,4 +82,12 @@ sys_render_zone_messages      = 0b10000000
    add hl, de
    ex de, hl
    pop hl
+.endm
+
+.mdelete m_draw_blank_small_number
+.macro m_draw_blank_small_number
+   ld hl, #sys_render_blank_sprite4x5
+   ld c, #4
+   ld b, #5
+   call cpct_drawSprite_asm
 .endm
