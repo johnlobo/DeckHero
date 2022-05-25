@@ -89,11 +89,9 @@ _main_init_keypress:
 
    call cpct_setSeed_mxor_asm
 
-
    call sys_render_clear_front_buffer
-      
-   call man_game_init
-
+   call sys_render_clear_back_buffer
+     
    ret
 ;;-----------------------------------------------------------------
 ;;
@@ -109,12 +107,12 @@ _main::
    call main_init
 
 start:
-;;   call man_game_init
 
-   ;; Loop forever
+   call man_game_init
+
+;; Loop forever
 loop:
    
    call man_game_update
-   
    
    jr    loop

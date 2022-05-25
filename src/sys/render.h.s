@@ -86,8 +86,14 @@ sys_render_zone_messages      = 0b10000000
 
 .mdelete m_draw_blank_small_number
 .macro m_draw_blank_small_number
-   ld hl, #sys_render_blank_sprite4x5
+   push de
+   ;;ld hl, #sys_render_blank_sprite4x5
+   ;;ld c, #4
+   ;;ld b, #5
+   ;;call cpct_drawSprite_asm
    ld c, #4
    ld b, #5
-   call cpct_drawSprite_asm
+   ld a, #0                         ;; Patern of solid box
+   call cpct_drawSolidBox_asm
+   pop de
 .endm

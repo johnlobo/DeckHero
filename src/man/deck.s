@@ -147,7 +147,8 @@ man_deck_init::
 
     ld  (hl), #e_type_invalid   ;;ponemos el primer elemento del array con tipo invalido
     
-    ;; Load default cards in deck 4 hits + 2 defends
+;; Load default cards in deck 4 hits + 2 defends
+;; hit loop
     ld b, #4
 _d_i_hit_loop:
     push bc
@@ -155,25 +156,25 @@ _d_i_hit_loop:
     call man_array_create_element
     pop bc
     djnz _d_i_hit_loop
-
+;; defends
     ld hl, #model_defend
     call man_array_create_element
     ld hl, #model_defend
     call man_array_create_element
 
 ;;debug
-    ld hl, #model_defend
-    call man_array_create_element
-    ld hl, #model_defend
-    call man_array_create_element
-    ld hl, #model_defend
-    call man_array_create_element
-    ld hl, #model_defend
-    call man_array_create_element
-    ld hl, #model_defend
-    call man_array_create_element
-    ld hl, #model_defend
-    call man_array_create_element
+;;    ld hl, #model_defend
+;;    call man_array_create_element
+;;    ld hl, #model_defend
+;;    call man_array_create_element
+;;    ld hl, #model_defend
+;;    call man_array_create_element
+;;    ld hl, #model_defend
+;;    call man_array_create_element
+;;    ld hl, #model_defend
+;;    call man_array_create_element
+;;    ld hl, #model_defend
+;;    call man_array_create_element
 ;;debug
 ret
 

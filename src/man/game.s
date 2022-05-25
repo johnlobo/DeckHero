@@ -18,6 +18,7 @@
 
 .module game_manager
 .include "common.h.s"
+.include "sys/render.h.s"
 .include "man/fight.h.s"
 .include "man/player.h.s"
 .include "man/oponent.h.s"
@@ -71,5 +72,5 @@ man_game_init::
 ;;
 man_game_update::
     call man_fight_update
-    call man_game_init
+    call man_fight_init
     ret

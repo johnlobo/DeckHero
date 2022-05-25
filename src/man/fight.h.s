@@ -38,6 +38,10 @@ updated_zone_messages   = 0b10000000
 ;; PUBLIC VARIABLES
 ;;===============================================================================
 .globl fight_deck
+.globl fight_deck_count
+.globl fight_deck_pend
+.globl fight_deck_array
+.globl fight_deck_selected
 
 .globl hand
 .globl hand_count

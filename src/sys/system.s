@@ -64,7 +64,7 @@ set_int_handler:
 ;;DESTROYS: AF, BC, DE
 ;;
 int_handler1:
-   cpctm_setBorder_asm HW_WHITE
+   ;;cpctm_setBorder_asm HW_WHITE
    m_inc_nInterrupt                                ;;increment the number of interruption
 	ld hl, #int_handler2
  	call cpct_setInterruptHandler_asm	
@@ -77,7 +77,7 @@ int_handler1:
 ;;DESTROYS: AF, BC, DE
 ;;
 int_handler2:
-   cpctm_setBorder_asm HW_RED
+   ;;cpctm_setBorder_asm HW_RED
 
    m_inc_nInterrupt                                ;;increment the number of interruption
 
@@ -95,7 +95,7 @@ int_handler2:
 ;;DESTROYS: AF, BC, DE
 ;;
 int_handler3:
-   cpctm_setBorder_asm HW_GREEN
+   ;;cpctm_setBorder_asm HW_GREEN
 
    m_inc_nInterrupt                                ;;increment the number of interruption
 
@@ -110,7 +110,7 @@ int_handler3:
 ;;DESTROYS: AF, BC, DE
 ;;
 int_handler4:
-   cpctm_setBorder_asm HW_BLUE
+   ;;cpctm_setBorder_asm HW_BLUE
 
    m_inc_nInterrupt                                ;;increment the number of interruption
 
@@ -125,7 +125,7 @@ int_handler4:
 ;;DESTROYS: AF, BC, DE
 ;;
 int_handler5:
-   cpctm_setBorder_asm HW_ORANGE
+   ;;cpctm_setBorder_asm HW_ORANGE
 
    m_inc_nInterrupt
 
@@ -157,7 +157,7 @@ int_handler5_exit:
 ;;DESTROYS: AF, BC, DE
 ;;
 int_handler6:
-   cpctm_setBorder_asm HW_PURPLE
+   ;;cpctm_setBorder_asm HW_PURPLE
 
    m_reset_nInterrupt
 
@@ -165,41 +165,7 @@ int_handler6:
    call cpct_setInterruptHandler_asm
 	ret
 
-;;-----------------------------------------------------------------
-;;
-;; sys_system_enable_firmware
-;; Disable firmware
-;;  Input:  
-;;  Output: 
-;;  Destroyed: af, bc,de, hl
-;;
-sys_system_enable_firmware::        
-    DI   
-;;    LD SP,#0xC000     ; On remet la pile a sa valeur initiale
-;      IM 1             ; on restaure le mode d'interruption standard (pas utile
-                        ; la plupart du temps... ).    
-    EXX                 ; On preserve les registre normaux
-    LD BC,#0x7F88       ;connexion sur ROM inferieure
-    OUT (C),C
-    EXX
-    XOR A               ; utile ?
-    EX AF,AF' 
-    CALL #0x0044        ; Restore 'High Kernel jump' 
-                        ; Init zones ram &0 a &3f, &B900 a &BAE4
-    CALL #0x08BD        ; Restore 'Main Jump adress'
-                        ; Init zone ram &BB00 a ?
-    ;;CALL #0x1B5C      ; Init gestion clavier
-    ;;CALL #0x1074      ; Init du 'pack' texte
-    EXX  
-    LD BC,#0x7F8C       ; On deconnecte la rom inferieure
-    OUT (C),C           ; et on se met accessoirement en mode 0
-    EXX
-    EI                  ; hop, on n'oublie pas de remettre les interruptions
-    LD HL,#0xABFF       ; Init classique du systeme disque
-    LD DE,#0x0040       ; via le vecteur Amsdos regenere !
-    LD C,#0x07
-    CALL #0xBCCE
-    ret
+
 
 ;;-----------------------------------------------------------------
 ;;

@@ -42,6 +42,7 @@
 .area _DATA
 
 _fight_end_of_turn_string: .asciz "END OF TURN"      ;;
+_fight_init_string: .asciz "START OF COMBAT"      ;;
 _fight_end_string: .asciz "END OF COMBAT"      ;;
 
 
@@ -61,7 +62,7 @@ sacrifice::
 DefineComponentArrayStructure_Size sacrifice, MAX_DECK_CARDS, sizeof_e     
 .db 0   ;;ponemos este aqui como trampita para que siempre haya un tipo invalido al final
 
-hand_max:: .db 10
+hand_max:: .db 5
 player_energy:: .db 0
 player_max_energy:: .db 3
 player_updates:: .db 0
@@ -82,7 +83,25 @@ ended_fight:: .db 0
 ;;  Modified: 
 ;;
 man_fight_init::
+
+    call sys_render_clear_front_buffer
+    call sys_render_clear_back_buffer
+
+    ld e, #10                           ;; x
+    ld d, #78                           ;; y
+    ld b, #44                           ;; h
+    ld c, #60                           ;; w
+    ld hl, #_fight_init_string          ;; message
+    xor a                               ;; don't wait for a key
+    call sys_messages_show
     
+    ld b, #200                          ;; delay 1 sec.
+_mfi_delay:
+    push bc
+    call cpct_waitVSYNC_asm
+    pop bc
+    djnz _mfi_delay
+
     ld ix, #fight_deck                  ;; initialize fight_deck
     call man_array_init                 ;;
 
@@ -97,10 +116,6 @@ man_fight_init::
     ld ix, #sacrifice                   ;; initialize scrifice
     call man_array_init                 ;;
 
-    ld a, (hand_max)
-    ld b, a
-    call man_fight_deal_hand
-
     ld a, (player_max_energy)           ;; Load the max of energy of this fight to the player energy
     ld (player_energy), a               ;;
 
@@ -112,6 +127,9 @@ man_fight_init::
     call sys_render_switch_crtc_start
     call sys_render_full_fight_screen   ;; renders the fight screen
 
+    ld a, (hand_max)
+    ld b, a
+    call man_fight_deal_hand
 
     xor a                               ;; Set the end of fight flag 
     ld (ended_fight), a                 ;;
@@ -131,35 +149,51 @@ man_fight_init::
 man_fight_deal_hand::
     push ix
     ld ix, #hand
-    xor a
-    ld a_selected(ix), a
+    xor a                               ;; Selected card=0
+    ld a_selected(ix), a                ;;
+
 _initial_set_of_cards:
     push bc                             ;; store loop index
 
-    ;;ld b, #20                           ;; delay 
+    ;;ld b, #20                         ;; delay 
     ;;call cpct_waitHalts_asm
 
-    ld a, (hand_count)                    ;;
+;;    ld a, (hand_count)                  ;; still cards in hand??
+;;    or a                                ;;
+;;    jr nz, _mfdl_cards_in_hand          ;;
+;;
+;;    
+;;    
+;;    jr _mfdl_continue
+;;_mfdl_cards_in_hand:
+;;    ;;call nz, sys_render_erase_current_hand      ;; erase hand if there are any cards in hand
+;;_mfdl_continue:
+    
+    ld a, (fight_deck_count)            ;; check if there are cards in the fight deck
     or a                                ;;
-    jr nz, _m_f_d_l_cards_in_hand
-    call man_fight_shuffle
-    jr _m_f_d_l_continue
-_m_f_d_l_cards_in_hand:
-    ;;call nz, sys_render_erase_current_hand      ;; erase hand if there are any cards in hand
-_m_f_d_l_continue:
+    jr nz, _mfdc_get_card               ;; if so jump to get one
+
+    call man_fight_shuffle              ;; otherwise dump cemetery in the fight deck
+
+_mfdc_get_card:
     ld ix, #fight_deck                  ;; working with fight_deck
     call man_array_get_random_element   ;; gen a random element form fight_deck
-    ld (m_f_d_c_ELEMENT_TO_ERASE),a     ;; store the element to be erased later
+    ld (mfdc_ELEMENT_TO_ERASE),a        ;; store the element to be erased later
     ld ix, #hand                        ;; working with hand
     call man_array_create_element       ;; create the element in hand
     inc a_delta(ix)                     ;; increase delta flag
     ld ix, #fight_deck                  ;; working with fight_deck
-m_f_d_c_ELEMENT_TO_ERASE = . +1                 
+mfdc_ELEMENT_TO_ERASE = . +1                 
     ld a, #00                           ;; set the element to be erased
     call man_array_remove_element       ;; Remove element from fight_deck
     
     ;;call sys_render_deck                ;; Update number in deck
     ;;call sys_render_hand                ;; update hand
+
+    m_updated_hand
+    m_updated_icon_numbers
+
+    call sys_render_update_fight
 
     pop bc                              ;; restore loop index
     djnz _initial_set_of_cards
@@ -199,6 +233,11 @@ _m_f_d_h_loop:
     dec a_delta(ix)                     ;; decreases delta flag
     ;;call sys_render_cemetery            ;; Update number in deck
     ;;call sys_render_hand                ;; update hand
+
+    m_updated_hand
+    m_updated_icon_numbers
+
+    call sys_render_update_fight
     
     ld a, (hand_count)
     or a
@@ -224,7 +263,35 @@ man_fight_shuffle::
 
     ld hl, #cemetery                    ;; move them from the cemetery to the fight_deck
     ld de, #fight_deck                  ;; to the deck     
-    call man_array_move_all_elements    ;;
+    ;;call man_array_move_all_elements    ;;
+
+    ld (_mfs_FIRST_ARRAY), hl
+    ld (_mfs_THIRD_ARRAY), hl
+    ex de, hl
+    ld (_mfs_SECOND_ARRAY), hl
+_mfs_move_loop:
+_mfs_FIRST_ARRAY = .+2
+    ld ix, #0000
+    xor a
+    call man_array_get_element
+
+_mfs_SECOND_ARRAY = .+2
+    ld ix, #0000
+    call man_array_create_element
+
+_mfs_THIRD_ARRAY = .+2    
+    ld ix, #0000
+    xor a
+    call man_array_remove_element
+
+    m_updated_hand
+    m_updated_icon_numbers
+
+    call sys_render_update_fight
+    
+    ld a, a_count(ix)
+    or a
+    jr nz, _mfs_move_loop
     
     ;;call sys_render_deck                ;; Update number in deck
     ;;call sys_render_cemetery            ;; Update number in cemetery
@@ -328,9 +395,13 @@ man_fight_end_of_turn::
     call sys_messages_show
 
     call man_fight_discard_hand
+    
+    m_updated_icon_numbers
 
-    ;;ld b, #100                           ;; delay 
-    ;;call cpct_waitHalts_asm
+    call sys_render_update_fight
+
+    ld b, #100                           ;; delay 
+    call cpct_waitHalts_asm
 
     ld a, (hand_max)
     ld b, a
@@ -360,6 +431,9 @@ man_fight_update::
 _update_main_loop:
     ;; Player turn
     call sys_input_debug_update         ;; Check players actions
+    
+    ;;ld b, #40                           ;; delay
+    ;;call cpct_waitHalts_asm             ;;
 
     call sys_render_update_fight        ;; renders the screen
 
@@ -388,7 +462,6 @@ _update_end_of_fight:
     ld a,#1                             ;; wait for a key
     call sys_messages_show              ;; End of fight message
     
-    call sys_render_switch_buffers
 
 ;; Turn structure
 ;; 1) Show foes intentions

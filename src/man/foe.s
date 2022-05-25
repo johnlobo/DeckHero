@@ -23,6 +23,7 @@
 .include "man/deck.h.s"
 .include "man/oponent.h.s"
 .include "man/array.h.s"
+.include "man/fight.h.s"
 .include "sys/input.h.s"
 .include "sys/render.h.s"
 .include "comp/component.h.s"
@@ -129,12 +130,12 @@ man_foe_number_of_foes::
 ;;
 man_foe_kill_foe::
     push ix
-    ld ix, #foes_array                      ;; erase first oponent form the scree
-    call sys_render_erase_oponent           ;; TODO: erase any foe
-    
     ld ix, #foes
     ld a, #0                                ;; TODO: erase any foe
     call man_array_remove_element
+
+    m_updated_foe_sprite
+
     pop ix
     ret
 

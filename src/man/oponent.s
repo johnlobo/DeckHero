@@ -93,13 +93,17 @@ man_oponent_one_damage::
 
     ld ix, #foes_array
 
-m_o_o_d_damage = .+1    ;; Substract the damage done to the life
-    ld b, #0            ;;
-    ld a, o_life(ix)    ;;
-    sub b               ;;
-    ld o_life(ix), a    ;;
-    call z, man_foe_kill_foe    ;; check if life has reached 0
-    call m, man_foe_kill_foe    ;; check if life is below 0
+m_o_o_d_damage = .+1            ;; Substract the damage done to the life
+    ld b, #0                    ;;
+    ld a, o_life(ix)            ;;
+    sub b                       ;;
+    ld o_life(ix), a            ;; asign substraction to oponent life
+    jp p, _mood_exit            ;; check if oponent still has energy
+    xor a                       ;; in case it's killed, set his life to 0 
+    ld o_life(ix), a            ;;
+    call man_foe_kill_foe       ;; Kill foe
+    
+_mood_exit:
 
     pop ix
     ret

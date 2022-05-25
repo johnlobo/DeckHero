@@ -41,10 +41,10 @@
 sys_input_debug_key_actions::
     .dw Key_O,      sys_input_selected_left
     .dw Key_P,      sys_input_selected_right
-    .dw Key_Q,      sys_input_add_card
-    .dw Key_A,      sys_input_remove_card
     .dw Key_D,      sys_input_show_deck
     .dw Key_Space,  sys_input_action
+    ;;.dw Key_Q,      sys_input_add_card
+    ;;.dw Key_A,      sys_input_remove_card
     ;;.dw Key_Esc,    _score_cancel_entry
     ;;.dw Joy0_Left,  _score_move_left
     ;;.dw Joy0_Right, _score_move_right
@@ -209,82 +209,6 @@ sys_input_show_deck:
     call sys_render_full_fight_screen
     ret
 
-;;-----------------------------------------------------------------
-;;
-;;  sys_input_add_card
-;;
-;;  Add card to deck
-;;  Output:
-;;  Modified: iy, bc
-;;
-sys_input_add_card::
-    ld ix, #hand
-    ld a, a_count(ix)                   ;; Check if we already have 10 cards in the deck
-    cp #10                              ;;
-    ret z                               ;; if 10 return
-
-    call cpct_waitVSYNC_asm
-    call sys_render_erase_current_hand          ;; erase deck area
-
-    ld ix, #fight_deck
-    call man_array_get_random_element   ;; get hl pointing to a random card, and a to the element in the array
-    push af
-    ld ix, #hand
-    call man_array_create_element       ;; create a card in the deck
-    inc a_delta(ix)                     ;; increase delta flag
-    pop af
-    ld ix, #fight_deck
-    call man_array_remove_element       ;; erase card form hand
-    
-    call sys_render_deck                ;; Update number in deck
-    
-    call sys_render_hand                ;; update hand
-
-    ld ix, #fight_deck
-    ld a, a_count(ix)                   ;; Check if we have any card left in the deck
-    or a
-    ret nz                              ;; return if we have more cards in the deck
-    
-    ld hl, #cemetery                    ;; if no more cards in the deck, move them from the cemetery
-    ld de, #fight_deck                  ;; to the deck     
-    call man_array_move_all_elements    ;;
-
-    call sys_render_deck                ;; Update number in deck
-    call sys_render_cemetery            ;; Update number in cemetery
-
-    ret
-
-;;-----------------------------------------------------------------
-;;
-;;  sys_input_remove_card
-;;
-;;  Remove card from deck
-;;  Input: a: number of card to remove
-;;  Output:
-;;  Modified: iy, bc
-;;
-sys_input_remove_card::
-    ld ix, #hand
-    ld a, a_count(ix)               ;; Check if we dont have any card in the deck
-    or a                            ;;
-    ret z                           ;; if 0 return
-
-    call cpct_waitVSYNC_asm
-    call sys_render_erase_current_hand      ;; erase deck area
-    ;;ld a, (hand_selected)
-    ld a, a_selected(ix)
-    push af                         ;; save a (card to move)
-    call man_array_get_element      ;; obtain content of a
-    ld ix, #cemetery                ;; operate on cemetery
-    call man_array_create_element   ;; create card in cemetery
-    pop af                          ;; retrieve card to erase
-    ld ix, #hand
-    call man_array_remove_element   ;; erase card from hand
-    dec a_delta(ix)                 ;; decrease delta flag
-    call sys_render_deck
-    call sys_render_cemetery
-    call sys_render_hand            ;; update hand
-    ret
 
 ;;-----------------------------------------------------------------
 ;;
