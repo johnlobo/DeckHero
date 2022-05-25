@@ -86,8 +86,13 @@ sys_messages_load_window_data::
     call sys_text_str_length        ;;
     sla a                           ;; multiply string length by 2 to obtain bytes
     inc a                           ;;
-    inc a                           ;; add a copule of bytes as padding
+    inc a                           ;; add three of bytes as padding
+
+    cp #MINIMUM_WINDOW_WIDTH        ;; compare calculated width with minimun width
+    jp p, width_ok                  ;;
+    ld a, #MINIMUM_WINDOW_WIDTH     ;;
     
+width_ok:
     ld w_w(iy), a                   ;; store this information as total width
     inc w_w(iy)                     ;;
     inc w_w(iy)                     ;;
@@ -247,8 +252,14 @@ y_coord:
 
     ld a, w_wait_for_key(iy)        ;; check if we have to wait for a key
     or a                            ;;
-    ret z                           ;; return if not
+    jr  nz, wait_for_key            ;;
 
+    call sys_render_switch_buffers
+    call sys_render_switch_crtc_start
+
+    ret
+
+wait_for_key:
     ;;ld de, #CPCT_VMEM_START_ASM   ;; DE = Pointer to start of the screen
     
     ld_de_backbuffer              ;; Calculate video memory location and return it in HL
@@ -273,9 +284,15 @@ y_coord:
     ld hl, #_press_any_key_string
     call sys_text_draw_string
 
+    call sys_render_switch_buffers
+    call sys_render_switch_crtc_start
+
     call sys_input_wait4anykey
 
     call sys_messages_restore_message_background
+
+    call sys_render_switch_buffers
+    call sys_render_switch_crtc_start
 
     ret
 

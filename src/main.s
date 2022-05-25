@@ -75,27 +75,20 @@ main_init::
    xor a                               ;; don't wait for a key
    call sys_messages_show
 
-   call sys_render_switch_buffers
-   call sys_render_switch_crtc_start
-
    ;; set random seed
-   xor a
-   push af                             ;; store a=0 in the stack
+   push hl
 _main_init_keypress:
 	;;call cpct_scanKeyboard_if_asm
-   pop af                              ;; retrive a value form stack
-   inc a                               ;; inc a value
-   push af                             ;; store a value in stack
-   
-   inc hl
+   pop hl                              ;; retrive a value form stack
+   inc hl                               ;; inc a value
+   push hl                             ;; store a value in stack   
    call cpct_isAnyKeyPressed_asm
    or a
    jr z, _main_init_keypress
+   pop hl
 
-   ld hl, #0xbc00
-   ld de, #0xac00
-   pop af                              ;; retrieve last a value to set the seed
-   call cpct_setSeed_xsp40_u8_asm      ;; change seed
+   call cpct_setSeed_mxor_asm
+
 
    call sys_render_clear_front_buffer
       

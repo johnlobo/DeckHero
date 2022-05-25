@@ -184,8 +184,8 @@ man_fight_discard_hand::
     ret z
 _m_f_d_h_loop:
 
-    ld b, #20                           ;; delay 
-    call cpct_waitHalts_asm
+    ;;ld b, #20                           ;; delay 
+    ;;call cpct_waitHalts_asm
 
 
     ;;call sys_render_erase_current_hand  ;; erase hand if there are any cards in hand
@@ -311,7 +311,7 @@ m_f_e_c_exit:
 
 ;;-----------------------------------------------------------------
 ;;
-;; man_fight_update
+;; man_fight_end_of_turn
 ;;
 ;;  Updates the state of a fight
 ;;  Input: 
@@ -329,16 +329,20 @@ man_fight_end_of_turn::
 
     call man_fight_discard_hand
 
-    ld b, #100                           ;; delay 
-    call cpct_waitHalts_asm
+    ;;ld b, #100                           ;; delay 
+    ;;call cpct_waitHalts_asm
 
     ld a, (hand_max)
     ld b, a
     call man_fight_deal_hand
+    m_updated_hand
 
     ld a, #3
     ld (player_energy), a
-    call sys_render_energy              ;;
+    m_updated_icon_numbers
+
+    call sys_render_update_fight
+    ;;call sys_render_energy              ;;
 
     ret
 
@@ -357,11 +361,11 @@ _update_main_loop:
     ;; Player turn
     call sys_input_debug_update         ;; Check players actions
 
+    call sys_render_update_fight        ;; renders the screen
+
     ld a, (player_energy)               ;; Check player's energy
     or a                                ;;
     call z, man_fight_end_of_turn       ;;
-    
-    call sys_render_update_fight        ;; renders the screen
 
     ld ix, #player                      ;; Check players life
     call man_oponent_get_life           ;;

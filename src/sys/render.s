@@ -344,6 +344,7 @@ sys_render_update_hand::
 ;;
 sys_render_update_fight::
     ld a, (player_updates)                      ;; check screen areas
+    or a                                        ;;
     ret z                                       ;; return if no update is necessary
 
     

@@ -83,8 +83,8 @@ man_deck_dummy_routine::
 man_deck_remove_card_from_hand::
     push ix
     ld ix, #hand
-    call cpct_waitVSYNC_asm
-    call sys_render_erase_current_hand      ;; erase deck area
+    ;;call cpct_waitVSYNC_asm
+    ;;call sys_render_erase_current_hand      ;; erase deck area
     ld a, a_selected(ix)
     push af                         ;; save a (card to move)
     call man_array_get_element      ;; obtain content of a
@@ -94,9 +94,9 @@ man_deck_remove_card_from_hand::
     ld ix, #hand
     call man_array_remove_element   ;; erase card from hand
     dec a_delta(ix)                 ;; decrease delta flag
-    call sys_render_deck
-    call sys_render_cemetery
-    call sys_render_hand            ;; update hand
+    ;;call sys_render_deck
+    ;;call sys_render_cemetery
+    ;;call sys_render_hand            ;; update hand
     pop ix
     ret
 

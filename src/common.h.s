@@ -91,13 +91,12 @@
 .globl cpct_isKeyPressed_asm
 .globl cpct_waitHalts_asm
 .globl cpct_drawSolidBox_asm
-.globl cpct_setSeed_xsp40_u8_asm
+.globl cpct_setSeed_mxor_asm
 .globl cpct_isAnyKeyPressed_asm
 .globl cpct_setInterruptHandler_asm
 .globl cpct_waitVSYNC_asm
 .globl _cpct_keyboardStatusBuffer
 .globl cpct_getRandom_mxor_u8_asm
-.globl cpct_drawSpriteBlended_asm
 .globl cpct_px2byteM0_asm
 .globl cpct_getScreenToSprite_asm
 .globl cpct_setVideoMemoryPage_asm
