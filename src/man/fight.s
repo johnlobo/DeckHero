@@ -220,7 +220,7 @@ _m_f_d_h_loop:
 
     ;;ld b, #20                           ;; delay 
     ;;call cpct_waitHalts_asm
-
+    ld ix, #hand
     ld a, #00                           ;; set the element to be erased
     call man_array_get_element          ;; get the first element of the hand
     ld ix, #cemetery
