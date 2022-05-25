@@ -221,8 +221,6 @@ _m_f_d_h_loop:
     ;;ld b, #20                           ;; delay 
     ;;call cpct_waitHalts_asm
 
-
-    ;;call sys_render_erase_current_hand  ;; erase hand if there are any cards in hand
     ld a, #00                           ;; set the element to be erased
     call man_array_get_element          ;; get the first element of the hand
     ld ix, #cemetery

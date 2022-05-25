@@ -339,37 +339,6 @@ sys_render_update_fight::
 
     ret
 
-;;-----------------------------------------------------------------
-;;
-;; sys_render_hor_line
-;;
-;;  Draws an horizaontal line on the screen
-;;  Input:  hl: screen address
-;;          a: length of the line
-;;          d: color
-;;  Output: 
-;;  Modified: AF, BC, DE, HL
-;;
-sys_render_hor_line::
-    push hl
-    ld (_HOR_LINE_LENGTH), a         ;; store the length of the line in the comparison.
-    
-    ;; calculate color for pixels
-    ld h, d
-    ld l, d
-    call cpct_px2byteM0_asm
-
-    pop hl
-
-    ;; draw loop
-_HOR_LINE_LENGTH = .+1
-    ld b, #0
-
-_hor_line_loop:
-    ld (hl), a
-    inc hl
-    djnz _hor_line_loop
-    ret
 
 ;;-----------------------------------------------------------------
 ;;
@@ -462,82 +431,6 @@ sys_render_erase_hand::
     ld a, #0
     call cpct_drawSolidBox_asm
 
-    ret
-
-
-;;-----------------------------------------------------------------
-;;
-;; sys_render_erase_current_hand
-;;
-;;  Erase the deck render area
-;;  Input: 
-;;  Output: a random piece
-;;  Modified: AF, BC, DE, HL
-;;
-sys_render_erase_current_hand::
-    push ix                         ;; save ix register
-    ld ix, #hand
-    ld b, a_count(ix)
-    sla b                           ;; multiply hand count by 4 (CARD_WIDTH/2)
-    sla b                           ;;
-    ld a, b                         ;;
-    ld (e_c_h_width), a             ;; saving with in cpct_drawsolidbox
-    
-    ld_de_backbuffer    
-    ld b, #HAND_Y - 5               ;; y coord
-    call sys_render_get_X_start     ;; get x coord to start rendering the deck
-    ld a, c                         ;; x coord
-    call cpct_getScreenPtr_asm      ;; Calculate video memory location and return it in HL
-    ex de, hl                       ;; move screen address to de
-e_c_h_width = .+1
-    ld c, #00
-    ld b, #S_CARD_HEIGHT
-    ld a,#0                         ;; Patern of solid box
-    call cpct_drawSolidBox_asm
-    pop ix
-    ret
-
-;;-----------------------------------------------------------------
-;;
-;; sys_render_erase_hand_op
-;;
-;;  Erase the deck render area Optimized
-;;  Input: 
-;;  Output: a random piece
-;;  Modified: AF, BC, DE, HL
-;;
-sys_render_erase_hand_op::
-    push ix                         ;; save ix register
-    ld ix, #hand
-    ld a, a_delta(ix)               ;; b = number of cards added or removed
-    or a
-    jp p, e_h_op_bigger_deck        ;; Not necessary to erase because the deck is bigger now
-    ld b, a                         ;; store delta in bb
-    sla b                           ;;
-    sla b                           ;; Multiply delta by 4 (CARD_WIDTH/2)
-    ld a, b
-    ld (e_h_op_width_left),a        ;; store width
-    push bc                         ;; save b
-    call sys_render_get_X_start     ;; get x coord to start rendering the deck
-    pop bc                          ;; restore b
-    sub b                           ;; substract b (delta*CARD_WIDTH/2) form x coord
-    
-
-    ;; Left side block
-    ld_de_backbuffer    
-    ld b, #HAND_Y - 5
-    ld c, a                         ;; previous calculus start_x - (delta*CARD_WIDTH/2)
-    call cpct_getScreenPtr_asm      ;; Calculate video memory location and return it in HL
-    ex de, hl                       ;; move screen address to de
-e_h_op_width_left = .+1
-    ld c, #00
-    ld b, #S_CARD_HEIGHT
-    ld a,#0                         ;; Patern of solid box
-    call cpct_drawSolidBox_asm
-    
-    pop ix                          ;; restore ix register
-e_h_op_bigger_deck:
-    ld a_delta(ix), #0              ;; reset delta flag
     ret
 
 ;;-----------------------------------------------------------------
@@ -1052,55 +945,6 @@ _y_coord_base: .db #0
 
 ;;-----------------------------------------------------------------
 ;;
-;; sys_render_life_line
-;;
-;;  Shows the the entire fight screen
-;;  Input: ix : oponent struct
-;;  Output: 
-;;  Modified: AF, BC, DE, HL
-;;
-sys_render_life_line::
-    ;; Get screen address for the life line
-    ld c, o_sprite_x(ix)            ;; c = sprite_x
-    ld a, o_sprite_w(ix)            ;;
-    sra a                           ;; a = sprite_w / 2
-
-    ld b, o_sprite_y(ix)            ;; b = sprite_y + sprite_h + 2
-    ld a, o_sprite_h(ix)            ;;
-    add b                           ;;
-    ld b, a                         ;;
-    inc b                           ;;
-    inc b                           ;;
-
-    ;;ld de, #CPCT_VMEM_START_ASM     ;; DE = Pointer to start of the screen
-    
-    ld_de_backbuffer    
-    
-    call cpct_getScreenPtr_asm      ;; Calculate video memory location and return it in HL
-
-    push hl
-    ex de, hl
-
-    m_draw_blank_small_number       ;; erases previous number
-
-    ld h, #0
-    ld l, o_life(ix)
-    call sys_text_draw_small_number
-
-    pop hl
-    inc hl
-    inc hl
-    inc hl
-    inc hl
-
-    ld a, #8                        ;; a = length
-    ld d, #8                        ;; d = color
-    call sys_render_hor_line        ;; render line
-
-    ret
-
-;;-----------------------------------------------------------------
-;;
 ;; sys_render_oponent
 ;;
 ;;  Shows an oponent on the screen
@@ -1126,8 +970,6 @@ sys_render_oponent::
     ld c, o_sprite_w(ix)
     ld b, o_sprite_h(ix)
     call cpct_drawSprite_asm
-
-    ;;call sys_render_life_line
       
     call sys_render_effects
     

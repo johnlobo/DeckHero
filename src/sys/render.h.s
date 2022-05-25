@@ -45,8 +45,6 @@ sys_render_zone_messages      = 0b10000000
 .globl sys_render_init
 .globl sys_render_update_fight
 .globl sys_render_erase_hand
-.globl sys_render_erase_hand_op
-.globl sys_render_erase_current_hand
 .globl sys_render_hand
 .globl sys_render_show_deck
 .globl sys_render_show_array
