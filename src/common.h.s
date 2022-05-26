@@ -100,6 +100,7 @@
 .globl cpct_px2byteM0_asm
 .globl cpct_getScreenToSprite_asm
 .globl cpct_setVideoMemoryPage_asm
+.globl cpct_waitVSYNCStart_asm
 
 ;;===============================================================================
 ;; DEFINED CONSTANTS

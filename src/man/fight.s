@@ -41,9 +41,10 @@
 ;;
 .area _DATA
 
-_fight_end_of_turn_string: .asciz "END OF TURN"      ;;
-_fight_init_string: .asciz "START OF COMBAT"      ;;
-_fight_end_string: .asciz "END OF COMBAT"      ;;
+_fight_end_of_turn_string: .asciz " END OF TURN "      ;;
+_fight_init_string: .asciz " START OF COMBAT "      ;;
+_fight_end_string: .asciz " END OF COMBAT "      ;;
+_fight_player_turn_string: .asciz " PLAYER TURN "      ;;
 
 
 fight_deck::
@@ -92,7 +93,7 @@ man_fight_init::
     ld b, #44                           ;; h
     ld c, #60                           ;; w
     ld hl, #_fight_init_string          ;; message
-    xor a                               ;; don't wait for a key
+    ld a, #2                            ;; don't wait for a key
     call sys_messages_show
     
     ld b, #200                          ;; delay 1 sec.
@@ -428,16 +429,22 @@ man_fight_update::
 
 _update_main_loop:
     ;; Player turn
+    ld e, #10                           ;; x
+    ld d, #78                           ;; y
+    ld b, #44                           ;; h
+    ld c, #60                           ;; w
+    ld hl, #_fight_player_turn_string   ;; message
+    ld a,#2                             ;; wait for a key
+    call sys_messages_show              ;; End of fight message
+
+_mfu_player_loop:
+
     call sys_input_debug_update         ;; Check players actions
     
     ;;ld b, #40                           ;; delay
     ;;call cpct_waitHalts_asm             ;;
 
     call sys_render_update_fight        ;; renders the screen
-
-    ld a, (player_energy)               ;; Check player's energy
-    or a                                ;;
-    call z, man_fight_end_of_turn       ;;
 
     ld ix, #player                      ;; Check players life
     call man_oponent_get_life           ;;
@@ -448,6 +455,12 @@ _update_main_loop:
     call man_foe_number_of_foes         ;; Check if thera are enemies left
     or a                                ;;
     jr z, _update_end_of_fight          ;;
+
+    ld a, (player_energy)               ;; Check player's energy
+    or a                                ;;
+    jr nz, _mfu_player_loop
+
+    call man_fight_end_of_turn          ;;
 
     jr _update_main_loop
 

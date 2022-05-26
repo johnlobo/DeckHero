@@ -180,3 +180,19 @@ _random_mod_loop:
   add hl,bc                           ;; Adds MAX_MODEL_CARD to hl back to get back to positive values
   ld a,l                              ;; loads the normalized random number in a
 ret
+
+;;-----------------------------------------------------------------
+;;
+;; sys_util_delay
+;;
+;;  Waits a determined number of frames 
+;;  Input:  b: number of frames
+;;  Output: 
+;;  Destroyed: af, bc
+;;
+sys_util_delay::
+  push bc
+  call cpct_waitVSYNCStart_asm
+  pop bc
+  djnz sys_util_delay
+  ret

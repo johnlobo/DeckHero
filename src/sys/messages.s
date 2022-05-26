@@ -219,8 +219,7 @@ sys_messages_show::
     ;; Draw message
     
     ;;ld de, #CPCT_VMEM_START_ASM   ;; DE = Pointer to start of the screen
-    
-    ld_de_backbuffer              ;; Calculate video memory location and return it in HL
+    ld_de_backbuffer                ;; Calculate video memory location and return it in HL
     
     ld c, w_x(iy)                   ;;
     inc c                           ;; 
@@ -229,13 +228,13 @@ sys_messages_show::
     
     ld b, w_y(iy)                   ;;
 
-    ld a, w_wait_for_key(iy)        ;; check if we have to wait for a key
-    or a                            ;;
-    jr z, no_wait4key               ;; return if not
+    ld a, w_wait_for_key(iy)        ;; check if we have to show the message press any key
+    cp #1                           ;;
+    jr nz, no_wait4key               ;; 
     ld a, #10                       ;; B = y + 10
     jr y_coord
 no_wait4key:
-    ld a, #15
+    ld a, #15                       ;; B = y + 15
 y_coord:
     add b                           ;;
     ld b, a                         ;;
@@ -249,14 +248,23 @@ y_coord:
     call sys_text_draw_string
 
     ;; Draw Press Any Key
-
     ld a, w_wait_for_key(iy)        ;; check if we have to wait for a key
-    or a                            ;;
-    jr  nz, wait_for_key            ;;
+    cp #1                           ;;
+    jr  z, wait_for_key             ;;
 
     call sys_render_switch_buffers
     call sys_render_switch_crtc_start
 
+    ld a, w_wait_for_key(iy)        ;; check if we have to wait for a key
+    cp #2                           ;;
+    jr  nz, _sms_exit               ;;
+
+_sms_wait_delay:
+    ld b, #50
+    call sys_util_delay
+    call sys_messages_restore_message_background
+
+_sms_exit:
     ret
 
 wait_for_key:
@@ -288,11 +296,14 @@ wait_for_key:
     call sys_render_switch_crtc_start
 
     call sys_input_wait4anykey
+    push hl                         ;; store number of loops waited
 
     call sys_messages_restore_message_background
 
     call sys_render_switch_buffers
     call sys_render_switch_crtc_start
+
+    pop hl                          ;; return number of loops waited
 
     ret
 

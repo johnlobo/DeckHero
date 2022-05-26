@@ -44,7 +44,7 @@
 ;;
 .area _DATA
 
-_game_loaded_string: .asciz "GAME LOADED - PRESS ANY KEY"      ;;27 chars, 54 bytes
+_game_loaded_string: .asciz " GAME LOADED "      ;;27 chars, 54 bytes
 
 
 ;;
@@ -72,20 +72,10 @@ main_init::
    ld b, #44                           ;; h
    ld c, #60                           ;; w
    ld hl, #_game_loaded_string         ;; message
-   xor a                               ;; don't wait for a key
+   ld a, #1                            ;; wait for a key
    call sys_messages_show
 
-   ;; set random seed
-   push hl
-_main_init_keypress:
-	;;call cpct_scanKeyboard_if_asm
-   pop hl                              ;; retrive a value form stack
-   inc hl                               ;; inc a value
-   push hl                             ;; store a value in stack   
-   call cpct_isAnyKeyPressed_asm
-   or a
-   jr z, _main_init_keypress
-   pop hl
+   ;; set random seed using hl form message show
 
    call cpct_setSeed_mxor_asm
 
