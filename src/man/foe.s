@@ -26,6 +26,7 @@
 .include "man/fight.h.s"
 .include "sys/input.h.s"
 .include "sys/render.h.s"
+.include "sys/behaviour.h.s"
 .include "comp/component.h.s"
 .include "cpctelera.h.s"
 
@@ -42,7 +43,8 @@
 ;; Character templates
 foe_blob::
 ;;_status, _name, _sprite, _sprite_x, _sprite_y, _sprite_w, _sprite_h, _life, _max_life, _money, _effects_count, _shield, _force, _dexterity, _buffer, _blessing, _thorns, _regen, _draw_card, _confuse, _poison
-DefineOponent 1, ^/BLOB           /, _s_blob_0,50, 75, S_BLOB_WIDTH, S_BLOB_HEIGHT, 20, 20, 99, 9, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10
+DefineOponent 1, ^/BLOB           /, _s_blob_0,50, 75, S_BLOB_WIDTH, S_BLOB_HEIGHT, 20, 20, 99, 1, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, #sys_behaviour_blob, 0
+;;DefineOponent 1, ^/BLOB           /, _s_blob_0,50, 75, S_BLOB_WIDTH, S_BLOB_HEIGHT, 20, 20, 99, 9, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, #sys_behaviour_blob, 0
 ;; Characters
 foes::
 DefineComponentArrayStructure_Size foes, MAX_FOES, sizeof_o     

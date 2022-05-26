@@ -16,62 +16,71 @@
 ;;  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;-------------------------------------------------------------------------------
 
-.module game_manager
-.include "common.h.s"
-.include "sys/render.h.s"
+.module behaviour_system
+
 .include "sys/behaviour.h.s"
-.include "man/fight.h.s"
-.include "man/player.h.s"
+.include "cpctelera.h.s"
 .include "man/oponent.h.s"
-.include "man/deck.h.s"
 
-
-
-;;
-;; Start of _DATA area 
-;;  SDCC requires at least _DATA and _CODE areas to be declared, but you may use
-;;  any one of them for any purpose. Usually, compiler puts _DATA area contents
-;;  right after _CODE area contents.
-;;
-.area _DATA
-
-
-blob_template::
-DefineOponent 1, ^/BLOB           /, _s_blob_0, 60, 60, S_BLOB_WIDTH, S_BLOB_HEIGHT, 20, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, #sys_behaviour_blob, 0
-
-foe::
-DefineOponent 1, ^/FOE   1        /, _s_blob_0, 60, 60, S_BLOB_WIDTH, S_BLOB_HEIGHT, 100, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, #sys_behaviour_blob, 0
-
-;;
-;; Start of _CODE area
-;; 
-.area _CODE
 
 ;;-----------------------------------------------------------------
 ;;
-;; man_game_init
+;; sys_behaviour_update_one_entity
 ;;
-;;   gets a random number between 0 and 18
+;;  Excutes the beahviour of an entity
 ;;  Input: 
 ;;  Output: a random piece
-;;  Modified: AF, BC, DE, HL
+;;  Modified: 
 ;;
-man_game_init::
-    call man_player_init    ;; Initialize player
-    call man_deck_init      ;; Initialize deck
-    call man_fight_init     ;; Initialize fight
+sys_behaviour_update_one_entity::
+
+    ret
+;;-----------------------------------------------------------------
+;;
+;; sys_behaviour_update_one_entity
+;;
+;;  Excutes the beahviour of an entity
+;;  Input: 
+;;  Output: a random piece
+;;  Modified: 
+;;
+sys_behaviour_update::
+
     ret
 
 ;;-----------------------------------------------------------------
 ;;
-;; man_game_update
+;; sys_behaviour_get_behaviour
 ;;
-;;   gets a random number between 0 and 18
-;;  Input: 
-;;  Output: a random piece
-;;  Modified: AF, BC, DE, HL
+;;  Excutes the beahviour of an entity
+;;  Input: hl: beahviour array
+;;          a: step
+;;  Output: b: behaviour id
+;;          c: behaviour amount
+;;  Modified: af, bc, hl
 ;;
-man_game_update::
-    call man_fight_update
-    call man_fight_init
+sys_behaviour_get_behaviour::
+    sla a
+    add_hl_a
+    ld a, (hl)
+    ld b, a
+    inc hl
+    ld a, (hl)
+    ld c, a
     ret
+
+;;-----------------------------------------------------------------
+;;
+;; sys_behaviour_blob
+;;
+sys_behaviour_blob::
+    .db damage, 6
+    .db shield, 5
+    .db damage, 6
+    .db shield, 5
+    .db damage, 6
+    .db shield, 5
+    .db damage, 6
+    .db eof_behaviour, 0
+
+

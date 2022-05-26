@@ -106,6 +106,8 @@
 ;; DEFINED CONSTANTS
 ;;===============================================================================
 
+null_ptr = 0x0000
+
 ;;tipos de cartas
 e_type_invalid              = 0x00
 e_type_card_in_hand         = 0x01

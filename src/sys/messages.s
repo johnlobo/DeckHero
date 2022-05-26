@@ -253,7 +253,7 @@ y_coord:
     jr  z, wait_for_key             ;;
 
     call sys_render_switch_buffers
-    call sys_render_switch_crtc_start
+    ;call sys_render_switch_crtc_start
 
     ld a, w_wait_for_key(iy)        ;; check if we have to wait for a key
     cp #2                           ;;
@@ -293,7 +293,7 @@ wait_for_key:
     call sys_text_draw_string
 
     call sys_render_switch_buffers
-    call sys_render_switch_crtc_start
+    ;call sys_render_switch_crtc_start
 
     call sys_input_wait4anykey
     push hl                         ;; store number of loops waited
@@ -301,7 +301,7 @@ wait_for_key:
     call sys_messages_restore_message_background
 
     call sys_render_switch_buffers
-    call sys_render_switch_crtc_start
+    ;call sys_render_switch_crtc_start
 
     pop hl                          ;; return number of loops waited
 

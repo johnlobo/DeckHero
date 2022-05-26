@@ -26,6 +26,7 @@
 .include "sys/text.h.s"
 .include "sys/util.h.s"
 .include "sys/messages.h.s"
+.include "sys/behaviour.h.s"
 .include "cpctelera.h.s"
 .include "common.h.s"
 .include "comp/component.h.s"
@@ -123,12 +124,16 @@ sys_render_clear_front_buffer::
 ;; Code taken form Miss Input 
 ;;====================================================
 sys_render_switch_buffers::
-    ld hl, (sys_render_front_buffer)   ;; Inicialmente (80C0)
-    ld a, l                 ;; Carga el front buffer en el back buffer
+    ld hl, (sys_render_front_buffer)    ;; Inicialmente (80C0)
+    ld a, l                             ;; Carga el front buffer en el back buffer
     ld (sys_render_back_buffer) , a
-    ld a, h                 ;; Carga el back buffer en el front buffer
+    ld a, h                             ;; Carga el back buffer en el front buffer
     ld (sys_render_front_buffer), a
-    ret
+    srl a
+    srl a
+    ld l, a
+    call cpct_waitVSYNC_asm
+    jp cpct_setVideoMemoryPage_asm
 
 ;;====================================================
 ;;  sys_render_switch_crtc_start
@@ -324,15 +329,16 @@ sys_render_update_fight::
     call sys_render_update_foe_effects          ;;  render zones back buffer
     call sys_render_update_player_effects       ;;
     call sys_render_update_icon_numbers         ;;
+    call sys_render_current_behaviour
     
     call sys_render_switch_buffers              ;; switch buffers
-    call sys_render_switch_crtc_start           ;;
+    ;call sys_render_switch_crtc_start           ;;
     
     call sys_render_update_hand                 ;;
     call sys_render_update_foe_effects          ;;  render zones front buffer
     call sys_render_update_player_effects       ;;
     call sys_render_update_icon_numbers         ;;
-    
+    call sys_render_current_behaviour
 
     xor a                                       ;; initilizes player updates
     ld (player_updates), a                      ;;
@@ -759,6 +765,73 @@ ARRAY_COUNT = .+1
     cp b                            ;;
     jr nz, _s_r_s_a_loop0           ;; return to loop if not lasta card reached
 
+    ret
+
+;;-----------------------------------------------------------------
+;;
+;; sys_render_current_behaviour
+;;
+;;  Shows the the entire fight screen
+;;  Input: IX: foe structure
+;;  Output: 
+;;  Modified: AF, BC, DE, HL
+;;
+sys_render_current_behaviour::
+    push ix
+    ld ix, #foes_array
+    ld c, o_sprite_x(ix)                ;; read x position of foe sprite
+    inc c                               ;; inc x
+    inc c                               ;; inc x
+    ld a, o_sprite_y(ix)                ;; read y position of foe sprite
+    ld b, #(S_SMALL_ICONS_HEIGHT+3)     ;; substract vertical offset
+    sub b                               ;;
+    ld b, a                             ;;
+    ld_de_backbuffer
+    call cpct_getScreenPtr_asm          ;; Calculate video memory location and return it in HL
+    ex de, hl                           ;; Move video address location to de
+    
+    
+    ;; Draw behaviour sprite
+    ld l, o_behaviour_func(ix)          ;; obtain current behaviour
+    ld h, o_behaviour_func + 1(ix)      ;;
+    ld a, o_behaviour_step(ix)          ;;
+    call sys_behaviour_get_behaviour    ;;
+    
+    push bc                             ;; save behaviuour and amount in stack
+    push de                             ;; save screen address to draw the number
+
+    ld hl, #0                           ;; initializes hl
+    ld a, b                             ;; move behaviour to a
+    ld b, #0
+    ld c, #S_SMALL_ICONS_SIZE           ;; load in bc the width of the icons
+_srcb_add_effect_loop:
+    or a 
+    jr z, _srcb_add_effect_endloop      ;; check if we are finished
+    add hl, bc                          ;; add width of icons to hl
+    dec a                               ;; decrement index
+    jr _srcb_add_effect_loop            ;; jump back to the loop 
+_srcb_add_effect_endloop:
+
+    ld bc, #_s_small_icons_00           ;; set bc to point to the first icon
+    add hl, bc                          ;; and move hl to the specific icon
+
+    ld c, #S_SMALL_ICONS_WIDTH
+    ld b, #S_SMALL_ICONS_HEIGHT
+    call cpct_drawSprite_asm
+    
+    pop de                              ;; retrieve the screen address
+    ld hl, #(S_SMALL_ICONS_WIDTH + 1)   ;; calcualte offset
+    add hl, de                          ;; sum address + offset
+    ex de, hl                           ;; Move video adress location to de
+    m_draw_blank_small_number           ;; erases previous number
+
+    pop bc                              ;; retrieve behaviour and amount from stack
+    ld h, #0
+    ld l, c
+    
+    call sys_text_draw_small_number ;; draws number
+
+    pop ix
     ret
 
 ;;-----------------------------------------------------------------

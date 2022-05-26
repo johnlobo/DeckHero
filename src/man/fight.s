@@ -45,6 +45,7 @@ _fight_end_of_turn_string: .asciz " END OF TURN "      ;;
 _fight_init_string: .asciz " START OF COMBAT "      ;;
 _fight_end_string: .asciz " END OF COMBAT "      ;;
 _fight_player_turn_string: .asciz " PLAYER TURN "      ;;
+_fight_enemy_turn_string: .asciz " ENEMY TURN "      ;;
 
 
 fight_deck::
@@ -125,7 +126,7 @@ _mfi_delay:
 
     call sys_render_full_fight_screen   ;; renders the fight screen
     call sys_render_switch_buffers
-    call sys_render_switch_crtc_start
+    ;call sys_render_switch_crtc_start
     call sys_render_full_fight_screen   ;; renders the fight screen
 
     ld a, (hand_max)
@@ -374,6 +375,19 @@ m_f_e_c_exit:
     pop ix
     ret
 
+;;-----------------------------------------------------------------
+;;
+;; man_fight_enemy_turn
+;;
+;;  Updates the state of a fight
+;;  Input: 
+;;  Output: 
+;;  Modified: 
+;;
+man_fight_enemy_turn::
+
+    ret
+
 
 ;;-----------------------------------------------------------------
 ;;
@@ -401,6 +415,11 @@ man_fight_end_of_turn::
 
     ld b, #100                           ;; delay 
     call cpct_waitHalts_asm
+
+    push ix
+    ld ix, #foes_array
+    inc o_behaviour_step(ix)
+    pop ix
 
     ld a, (hand_max)
     ld b, a
@@ -460,6 +479,18 @@ _mfu_player_loop:
     or a                                ;;
     jr nz, _mfu_player_loop
 
+    ;; Enemy turn
+    ld e, #10                           ;; x
+    ld d, #78                           ;; y
+    ld b, #44                           ;; h
+    ld c, #60                           ;; w
+    ld hl, #_fight_enemy_turn_string   ;; message
+    ld a,#2                             ;; wait for a key
+    call sys_messages_show              ;; End of fight message
+
+    call man_fight_enemy_turn
+    
+    ;; End of turn
     call man_fight_end_of_turn          ;;
 
     jr _update_main_loop

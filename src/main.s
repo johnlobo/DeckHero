@@ -79,8 +79,8 @@ main_init::
 
    call cpct_setSeed_mxor_asm
 
-   call sys_render_clear_front_buffer
-   call sys_render_clear_back_buffer
+   ;;call sys_render_clear_front_buffer
+   ;;call sys_render_clear_back_buffer
      
    ret
 ;;-----------------------------------------------------------------

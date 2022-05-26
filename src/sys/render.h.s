@@ -54,6 +54,7 @@ sys_render_zone_messages      = 0b10000000
 .globl sys_render_sacrifice
 .globl sys_render_deck
 .globl sys_render_cemetery
+.globl sys_render_current_behaviour
 .globl sys_render_effects
 .globl sys_render_switch_buffers
 .globl sys_render_switch_crtc_start
