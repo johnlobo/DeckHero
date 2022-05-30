@@ -30,6 +30,7 @@
 .include "comp/component.h.s"
 .include "cpctelera.h.s"
 .include "sys/messages.h.s"
+.include "sys/behaviour.h.s"
 
 
 
@@ -416,11 +417,6 @@ man_fight_end_of_turn::
     ld b, #100                           ;; delay 
     call cpct_waitHalts_asm
 
-    push ix
-    ld ix, #foes_array
-    inc o_behaviour_step(ix)
-    pop ix
-
     ld a, (hand_max)
     ld b, a
     call man_fight_deal_hand
@@ -488,7 +484,8 @@ _mfu_player_loop:
     ld a,#2                             ;; wait for a key
     call sys_messages_show              ;; End of fight message
 
-    call man_fight_enemy_turn
+    call sys_behaviour_update
+    call sys_render_update_fight        ;; renders the screen
     
     ;; End of turn
     call man_fight_end_of_turn          ;;

@@ -23,9 +23,11 @@
 .include "comp/component.h.s"
 .include "sys/util.h.s"
 .include "sys/render.h.s"
+.include "sys/behaviour.h.s"
 .include "man/array.h.s"
 .include "man/fight.h.s"
 .include "man/oponent.h.s"
+.include "man/foe.h.s"
 
 
 
@@ -101,10 +103,17 @@ man_deck_remove_card_from_hand::
 ;;
 ;; man_deck_execute_hit
 ;;
-;;  Dummy execute routine to initialize a ard
+;;  Dummy execute routine to initialize a card
 man_deck_execute_hit::
-    ld a, c_damage(ix)                      ;; make samage
-    call man_oponent_one_damage             ;;
+    push ix
+    ld c, c_damage(ix)                        ;; make samage
+    ld ix, #foes_array
+    ;;call man_oponent_one_damage             ;;
+    call sys_behaviour_damage_oponent
+    
+    m_updated_foe_effects
+    
+    pop ix
     ret
 
 ;;-----------------------------------------------------------------

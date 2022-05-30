@@ -33,19 +33,19 @@ o_type_dead                 = 0x02
 NUM_EFFECTS = 9
 
 ;;Efeccts
-life            = 0
-shield          = 1
-force           = 2
-dexterity       = 3 
-buffer          = 4 
-blessing        = 5 
-thorns          = 6
-regen           = 7
-confuse         = 8
-poison          = 9
-damage          = 10
+beh_life            = 0
+beh_shield          = 1
+beh_force           = 2
+beh_dexterity       = 3 
+beh_buffer          = 4 
+beh_blessing        = 5 
+beh_thorns          = 6
+beh_regen           = 7
+beh_confuse         = 8
+beh_poison          = 9
+beh_damage          = 10
 
-eof_behaviour   = 255
+beh_eof_behaviour    = 255
 
 ;;===============================================================================
 ;; OPONENT DEFINITION MACRO
