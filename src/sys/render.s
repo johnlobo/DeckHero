@@ -987,6 +987,8 @@ _Y_COORD_EFFECT = .+1
     
     ex de, hl
 
+    m_draw_blank_small_number       ;; erases previous number
+    
     pop bc
     pop hl
     push hl
@@ -996,12 +998,10 @@ _Y_COORD_EFFECT = .+1
     jr nc, _draw_effect_number
     inc de
 _draw_effect_number:
-    push af
-    m_draw_blank_small_number       ;; erases previous number
-    pop af
     ld h, #0
     ld l, a    
     call sys_text_draw_small_number
+
 
 
 _next_effect:

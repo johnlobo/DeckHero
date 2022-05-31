@@ -90,9 +90,9 @@ sys_render_zone_messages      = 0b10000000
    ;;ld c, #4
    ;;ld b, #5
    ;;call cpct_drawSprite_asm
-   ld c, #4
+   ld c, #5
    ld b, #5
-   ld a, #33                         ;; Patern of solid box
+   ld a, #0                         ;; Patern of solid box
    call cpct_drawSolidBox_asm
    pop de
 .endm
