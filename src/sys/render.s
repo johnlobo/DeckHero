@@ -870,9 +870,26 @@ sys_render_effects::
     ld b, a
     ld (_Y_COORD_HEART_EFFECT), a     ;; store in a memory spot for later use
 
+    push bc
+
+    ;; Erase previous effects
+    ld_de_backbuffer    
+    ld a, (_y_coord_base)
+    ld b, a
+    ld a, (_x_coord_base)
+    ld c, a
+    call cpct_getScreenPtr_asm      ;; Calculate video memory location and return it in HL
+    ex de, hl                       ;; move screen address to de
+    
+    ld c, #20
+    ld b, #16    
+    ld a, #0
+    call cpct_drawSolidBox_asm
 
     ;; Get screen address of the oponent
     ;;ld de, #CPCT_VMEM_START_ASM     ;; DE = Pointer to start of the screen
+
+    pop bc
     
     ld_de_backbuffer
     
@@ -912,6 +929,7 @@ _Y_COORD_HEART_EFFECT = .+1
 
 
     ;; Check if effects > 0
+
     ld a, o_effects_count(ix)   ;; Check if effects count > 0
     or a                        ;;
     ret z                       ;;

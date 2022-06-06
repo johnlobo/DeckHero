@@ -46,18 +46,23 @@ sys_behaviour_update_one_entity::
 ;;  Excutes the beahviour of an entity
 ;;  Input: hl: beahviour array
 ;;          a: step
-;;  Output: b: behaviour id
+;;  Output: a: oponent (self, oponent)
+;;          b: behaviour id
 ;;          c: behaviour amount
 ;;  Modified: af, bc, hl
 ;;
 sys_behaviour_get_behaviour::
-    sla a
-    add_hl_a
-    ld a, (hl)
-    ld b, a
-    inc hl
-    ld a, (hl)
-    ld c, a
+    ld c, a             ;; save a to make 3
+    sla a               ;; multiply a by 2
+    add c               ;; add a to make 3
+    add_hl_a            ;; add ax3 to the start of the behaviour array
+    ld a, (hl)          ;; store id in b
+    ld b, a             ;;
+    inc hl              ;;
+    ld a, (hl)          ;; store amount in c
+    ld c, a             ;;
+    inc hl              ;;
+    ld a, (hl)          ;; store oponent in a
     ret
 
 ;;-----------------------------------------------------------------
@@ -76,22 +81,46 @@ sys_behaviour_execute_one::
     ld a, o_behaviour_step(ix)          ;;
     call sys_behaviour_get_behaviour    ;; get b=behaviour id, c=behaviour amount   
 
+    ld (EFFECT_OPONENT), a              ;; self modifying code to set effect oponent
+
     ld a, b                             ;; load behaviour id in a
                                     
     cp #10                              ;; check if behaviour id addable 
-    jp m, sbe_add_effect
+    jp m, sbe_add_effect                ;;
 
-    ;;cp #10                            ;; already compared 10
-    call z, sys_behaviour_damage_oponent
+    ;;cp #10                            ;; already compared to 10
+    jr z, sbe_damage_oponent            ;; if id = 10 -> damage oponent
+
     jr sbe_exit
+sbe_damage_oponent:         
+    push ix                             ;; damage oponent always damage player
+    ld ix, #player                      ;;
+    call sys_behaviour_damage_oponent   ;;
+    pop ix                              ;;
+    m_updated_player_effects            ;; update player effects flag
+    jr sbe_exit                         ;;
 
 sbe_add_effect:
-    call sys_behaviour_add2Effect    ;;
+EFFECT_OPONENT = . +1
+    ld a, #00                           ;; self modifying code to test the oponent
+    or a                                ;; 
+    jr z, sbe_effect_to_self            ;; if oponent = self jump
+    push ix                             ;; else set oponent = player
+    ld ix, #player                      ;;
+    call sys_behaviour_add2Effect       ;;
+    pop ix
+    m_updated_player_effects            ;; update player effects flag
+    jr sbe_exit
 
+sbe_effect_to_self:
+    call sys_behaviour_add2Effect       ;;
+    m_updated_foe_effects               ;; update foe effects flag
+
+    
 sbe_exit:
     inc o_behaviour_step(ix)            ;; Increment behaviour step
-    ld a, o_behaviour_step(ix)              ;; check if behaviour step should be restarted.
-    cp #beh_eof_behaviour                ;;
+    ld a, o_behaviour_step(ix)          ;; check if behaviour step should be restarted.
+    cp #beh_eof_behaviour               ;;
     ret nz                              ;;
     
     xor a                               ;; retart behaviour step
@@ -159,14 +188,14 @@ sbdp_shield_enough:
 ;; sys_behaviour_blob
 ;;
 sys_behaviour_blob::
-    .db beh_damage, 6
-    .db beh_shield, 5
-    .db beh_damage, 6
-    .db beh_shield, 5
-    .db beh_damage, 6
-    .db beh_shield, 5
-    .db beh_damage, 6
-    .db beh_eof_behaviour, 0
+    .db beh_damage, 6, beh_oponent
+    .db beh_shield, 5, beh_self
+    .db beh_damage, 6, beh_oponent
+    .db beh_shield, 5, beh_self
+    .db beh_damage, 6, beh_oponent
+    .db beh_shield, 5, beh_self
+    .db beh_damage, 6, beh_oponent
+    .db beh_eof_behaviour, 0, 0
 
 ;;-----------------------------------------------------------------
 ;;
