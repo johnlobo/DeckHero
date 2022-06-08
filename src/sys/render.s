@@ -135,27 +135,6 @@ sys_render_switch_buffers::
     call cpct_waitVSYNC_asm
     jp cpct_setVideoMemoryPage_asm
 
-;;====================================================
-;;  sys_render_switch_crtc_start
-;;  
-;;  Switches screen buffers
-;;  Entrada:
-;;  Salida:
-;;  Destruye: AF, HL
-;;
-;; Code taken form Miss Input 
-;;====================================================
-sys_render_switch_crtc_start::
-    call cpct_waitVSYNC_asm
-
-    ld a, (sys_render_front_buffer)   ;; Inicialmente (80C0)
-    srl a
-    srl a
-    ld l, a
-    call cpct_setVideoMemoryPage_asm
-    ret
-
-
 
 ;;-----------------------------------------------------------------
 ;;
@@ -163,7 +142,7 @@ sys_render_switch_crtc_start::
 ;;
 ;;  Initilizes render system
 ;;  Input: 
-;;  Output: a random piece
+;;  Output: 
 ;;  Modified: AF, BC, DE, HL
 ;;
 sys_render_init::
@@ -186,33 +165,6 @@ sys_render_init::
     ret
 
 
-;;-----------------------------------------------------------------
-;;
-;; sys_render_erase_zone_player_sprite
-;;
-;;  Erases the player sprite
-;;  Input: 
-;;  Output: a random piece
-;;  Modified: AF, BC, DE, HL
-;;
-sys_render_erase_zone_player_sprite::
-    ld ix, #player
-    call sys_render_erase_oponent
-    ret
-
-;;-----------------------------------------------------------------
-;;
-;; sys_render_erase_zone_enemy_sprite
-;;
-;;  Erases the player sprite
-;;  Input: 
-;;  Output: a random piece
-;;  Modified: AF, BC, DE, HL
-;;
-sys_render_erase_zone_enemy_sprite::
-    ld ix, #foes_array
-    call sys_render_erase_oponent
-    ret
 
 ;;-----------------------------------------------------------------
 ;;
@@ -220,7 +172,7 @@ sys_render_erase_zone_enemy_sprite::
 ;;
 ;;  Updates the render system
 ;;  Input: 
-;;  Output: a random piece
+;;  Output: 
 ;;  Modified: AF, BC, DE, HL
 ;;
 sys_render_update_foe_effects::
@@ -239,7 +191,7 @@ sys_render_update_foe_effects::
 ;;
 ;;  Updates the render system
 ;;  Input: 
-;;  Output: a random piece
+;;  Output: 
 ;;  Modified: AF, BC, DE, HL
 ;;
 sys_render_update_foe_sprite::
@@ -261,7 +213,7 @@ sys_render_update_foe_sprite::
 ;;
 ;;  Updates the render system
 ;;  Input: 
-;;  Output: a random piece
+;;  Output: 
 ;;  Modified: AF, BC, DE, HL
 ;;
 sys_render_update_player_effects::
@@ -280,7 +232,7 @@ sys_render_update_player_effects::
 ;;
 ;;  Updates the render system
 ;;  Input: 
-;;  Output: a random piece
+;;  Output: 
 ;;  Modified: AF, BC, DE, HL
 ;;
 sys_render_update_icon_numbers::
@@ -299,7 +251,7 @@ sys_render_update_icon_numbers::
 ;;
 ;;  Updates the render system
 ;;  Input: 
-;;  Output: a random piece
+;;  Output: 
 ;;  Modified: AF, BC, DE, HL
 ;;
 sys_render_update_hand::
@@ -312,11 +264,23 @@ sys_render_update_hand::
 
 ;;-----------------------------------------------------------------
 ;;
+;; sys_render_update_animations
+;;
+;;  Updates the render system
+;;  Input: 
+;;  Output: 
+;;  Modified: AF, BC, DE, HL
+;;
+sys_render_update_animations::
+    ret
+
+;;-----------------------------------------------------------------
+;;
 ;; sys_render_update_fight
 ;;
 ;;  Updates the render system
 ;;  Input: 
-;;  Output: a random piece
+;;  Output: 
 ;;  Modified: AF, BC, DE, HL
 ;;
 sys_render_update_fight::
@@ -331,8 +295,9 @@ sys_render_update_fight::
     call sys_render_update_icon_numbers         ;;
     call sys_render_current_behaviour
     
+    call sys_render_update_animations           ;; update animations
+
     call sys_render_switch_buffers              ;; switch buffers
-    ;call sys_render_switch_crtc_start           ;;
     
     call sys_render_update_hand                 ;;
     call sys_render_update_foe_effects          ;;  render zones front buffer
@@ -376,48 +341,11 @@ sys_render_get_X_start::
 ;;
 ;;  Erase the deck render area
 ;;  Input: 
-;;  Output: a random piece
+;;  Output: 
 ;;  Modified: AF, BC, DE, HL
 ;;
 sys_render_erase_hand::
-;;    ld ix, #hand
-;;    call sys_render_get_X_start     ;; get x coord to start rendering the deck
-;;    ld c, a                         ;; c = x coordinate  
-;;    ld b, #0                        ;; move num cards in deck to b (index)
-;;_e_d_loop01:    
-;;    push bc                       
-;;    ;;ld de, #CPCT_VMEM_START_ASM     ;; DE = Pointer to start of the screen
-;;
-;;    ld_de_backbuffer
-;;    
-;;    ld a, a_selected(ix)            ;; compare card selected with current card
-;;    cp b                            ;;
-;;    ld b, #HAND_Y                   ;; b = y coordinate by default
-;;    jr nz, _erase_not_selected      ;; jump if current card not selected
-;;    ld b, #HAND_Y - 5
-;;
-;;_erase_not_selected:
-;;    call cpct_getScreenPtr_asm      ;; Calculate video memory location and return it in HL
-;;    
-;;    ex de, hl                       ;; move screen address to de
-;;    ld c, #S_CARD_WIDTH
-;;    ld b, #S_CARD_HEIGHT
-;;    ld a,#0                         ;; Patern of solid box
-;;    call cpct_drawSolidBox_asm
-;;
-;;    pop bc                          ;; retrieve bc index of loop, and x coord
-;;    
-;;    ld a, #(S_CARD_WIDTH-2)             ;; add CARD WITH to x coord
-;;    add c                           ;;
-;;    ld c, a                         ;;
-;;
-;;    inc b                           ;; increment current card
-;;
-;;    ld a, a_count(ix)                ;; compare with num of cards in deck
-;;    cp b                            ;;
-;;    jr nz, _e_d_loop01              ;; return to loop if not lasta card reached
-;;
-    
+
     m_screenPtr_backbuffer HAND_X, HAND_Y_2      ;; Calculates backbuffer address
     ld c, #64
     ld b, #(S_CARD_HEIGHT + 5)
@@ -425,12 +353,6 @@ sys_render_erase_hand::
     call cpct_drawSolidBox_asm
 
     ;; Erase description
-    ;;ld_de_backbuffer    
-    ;;ld b, #DESC_Y_1
-    ;;ld c, #DESC_X
-    ;;call cpct_getScreenPtr_asm      ;; Calculate video memory location and return it in HL
-    ;;ex de, hl                       ;; move screen address to de
-    ;;cpctm_screenPtr_asm de, CPCT_VMEM_START_ASM, DESC_X, DESC_Y_1  ;; screen address in de
     m_screenPtr_backbuffer DESC_X,DESC_Y_1      ;; Calculates backbuffer address
     ld c, #64
     ld b, #20    
@@ -452,8 +374,7 @@ sys_render_erase_hand::
 ;;
 sys_render_card::
     ;; Get screen address of the card
-    ;;ld de, #CPCT_VMEM_START_ASM     ;; DE = Pointer to start of the screen
-    
+       
     ld_de_backbuffer
     
     call cpct_getScreenPtr_asm      ;; Calculate video memory location and return it in HL
@@ -480,102 +401,6 @@ sys_render_card::
     call cpct_drawSprite_asm
 
     ret
-
-
-;;-----------------------------------------------------------------
-;;
-;; sys_render_show_deck
-;;
-;;  Shows the current deck on screen
-;;  Input: 
-;;  Output: 
-;;  Modified: AF, BC, DE, HL
-;;
-sys_render_show_deck::
-
-    cpctm_clearScreen_asm 0
-
-    ;;ld_de_backbuffer    
-    ;;ld b, #10
-    ;;ld c, #5
-    ;;call cpct_getScreenPtr_asm      ;; Calculate video memory location and return it in HL
-    ;;ex de, hl                       ;; move screen address to de
-    ;;cpctm_screenPtr_asm de, CPCT_VMEM_START_ASM, 5, 10  ;; screen address in de
-    m_screenPtr_backbuffer 5,10      ;; Calculates backbuffer address
-    
-    ld b, #70
-    ld c, #180
-    ld a, #0xff
-    call sys_messages_draw_box
-
-    ;;ld_de_backbuffer    
-    ;;ld b, #14
-    ;;ld c, #27
-    ;;call cpct_getScreenPtr_asm      ;; Calculate video memory location and return it in HL
-    ;;ex de, hl                       ;; move screen address to de    
-    ;;cpctm_screenPtr_asm de, CPCT_VMEM_START_ASM, 27, 14  ;; screen address in de
-    m_screenPtr_backbuffer 27,14      ;; Calculates backbuffer address
-
-    ld hl, #_show_deck_string
-    ld c, #0
-    call sys_text_draw_string
-
-    ld ix, #deck_array
-    ld c, #DECK_X                     ;; c = x coordinate 
-    ld b, #0
-_s_r_s_d_loop0:
-    push bc     
-    push ix                                                 ;; Save b and c values 
-
-    ld a, (deck_selected)                                   ;; compare card selected with current card
-    cp b                                                    ;;
-    ld b, #DECK_Y                                           ;; c = y coordinate by default
-    jr nz, _render_not_selected_show                             ;; jump if current card not selected
-    ld b, #DECK_Y - 5
-
-    cpctm_push AF, BC, DE, HL , IX                                  ;; Save values              
-    ;; Render Card Name
-    ld de, #c_name                                              ;; load name address in hl
-    ld__hl_ix                                                   ;; load card index in hl
-    add hl, de                                                  ;; add name offset to hl
-    ;;cpctm_screenPtr_asm de, CPCT_VMEM_START_ASM, DESC_SHOW_X, DESC_SHOW_Y_1    ;; screen address in de
-    m_screenPtr_backbuffer DESC_SHOW_X, DESC_SHOW_Y_1           ;; Calculates backbuffer address
-
-    ld c, #1                                                    ;; first color
-    call sys_text_draw_string                                   ;; draw card name
-    ;; Render Card Description
-    ld de, #c_description                                       ;; load description address in hl
-    ld__hl_ix                                                   ;; load card index in hl
-    add hl, de                                                  ;; add name offset to hl
-    ;;cpctm_screenPtr_asm de, CPCT_VMEM_START_ASM, DESC_SHOW_X, DESC_SHOW_Y_2    ;; screen address in de
-    m_screenPtr_backbuffer DESC_SHOW_X, DESC_SHOW_Y_2           ;; Calculates backbuffer address
-
-    ld c, #0                                                    ;; first color
-    call sys_text_draw_string                                   ;; draw card name
-
-    cpctm_pop IX, HL, DE, BC, AF                                    ;; Restore values    
-
-_render_not_selected_show:
-    call  sys_render_card
-
-    pop ix                      ;; Move ix to the next card
-    ld de, #sizeof_c            ;;
-    add ix, de                  ;;
-
-    pop bc                      ;; retrive b value for the loop
-
-    ld a, #(S_CARD_WIDTH)         ;; Calculate x coord in C
-    add c                       ;;
-    ld c, a                     ;;
-
-    inc b                       ;; increment current card
-
-    ld a, (deck_count)            ;; compare with num of cards in deck
-    cp b                        ;;
-    jr nz, _s_r_s_d_loop0         ;; return to loop if not lasta card reached
-
-    ret
-
 
 ;;-----------------------------------------------------------------
 ;;
@@ -617,7 +442,6 @@ _s_r_h_loop0:
     ld de, #c_name                                              ;; load name address in hl
     ld__hl_iy                                                   ;; load card index in hl
     add hl, de                                                  ;; add name offset to hl
-    ;;cpctm_screenPtr_asm de, CPCT_VMEM_START_ASM, DESC_X, DESC_Y_1    ;; screen address in de
     m_screenPtr_backbuffer DESC_X, DESC_Y_1                     ;; Calculates backbuffer address
 
     ld c, #1                                                    ;; first color
@@ -626,7 +450,6 @@ _s_r_h_loop0:
     ld de, #c_description                                       ;; load description address in hl
     ld__hl_iy                                                   ;; load card index in hl
     add hl, de                                                  ;; add name offset to hl
-    ;;cpctm_screenPtr_asm de, CPCT_VMEM_START_ASM, DESC_X, DESC_Y_2    ;; screen address in de
     m_screenPtr_backbuffer DESC_X, DESC_Y_2           ;; Calculates backbuffer address
 
     ld c, #0                                                    ;; first color
@@ -673,15 +496,13 @@ sys_render_show_array::
 
     cpctm_clearScreen_asm 0
 
-    ;;cpctm_screenPtr_asm de, CPCT_VMEM_START_ASM, 5, 10      ;; screen address in de
     m_screenPtr_backbuffer 5, 10           ;; Calculates backbuffer address
-    ld b, #70
-    ld c, #180
+    ld c, #70
+    ld b, #180
     ld a, #0xff
     call sys_messages_draw_box
 
     ld hl, #_show_deck_string
-    ;;cpctm_screenPtr_asm de, CPCT_VMEM_START_ASM, 27, 14     ;; screen address in de
     m_screenPtr_backbuffer 27, 14                           ;; Calculates backbuffer address
 
     ld c, #0
@@ -728,7 +549,6 @@ SELECTED_CARD = . +1
     ld de, #c_name                                              ;; load name address in hl
     ld__hl_ix                                                   ;; load card index in hl
     add hl, de                                                  ;; add name offset to hl
-    ;;cpctm_screenPtr_asm de, CPCT_VMEM_START_ASM, DESC_SHOW_X, DESC_SHOW_Y_1    ;; screen address in de
     m_screenPtr_backbuffer DESC_SHOW_X, DESC_SHOW_Y_1           ;; Calculates backbuffer address
     ld c, #1                                                    ;; first color
     call sys_text_draw_string                                   ;; draw card name
@@ -736,7 +556,6 @@ SELECTED_CARD = . +1
     ld de, #c_description                                       ;; load description address in hl
     ld__hl_ix                                                   ;; load card index in hl
     add hl, de                                                  ;; add name offset to hl
-    ;;cpctm_screenPtr_asm de, CPCT_VMEM_START_ASM, DESC_SHOW_X, DESC_SHOW_Y_2    ;; screen address in de
     m_screenPtr_backbuffer DESC_SHOW_X, DESC_SHOW_Y_2           ;; Calculates backbuffer address
     ld c, #0                                                    ;; first color
     call sys_text_draw_string                                   ;; draw card name
@@ -887,7 +706,6 @@ sys_render_effects::
     call cpct_drawSolidBox_asm
 
     ;; Get screen address of the oponent
-    ;;ld de, #CPCT_VMEM_START_ASM     ;; DE = Pointer to start of the screen
 
     pop bc
     
@@ -911,7 +729,6 @@ _Y_COORD_HEART_EFFECT = .+1
     add a, #0
     ld b, a
     inc b
-    ;;ld de, #CPCT_VMEM_START_ASM     ;; DE = Pointer to start of the screen
     
     ld_de_backbuffer
     
@@ -964,7 +781,6 @@ _effects_loop:
     ld (_Y_COORD_EFFECT), a     ;; store in a memory spot for later use
 
     ;; Get screen address of the oponent
-    ;;ld de, #CPCT_VMEM_START_ASM     ;; DE = Pointer to start of the screen
     
     ld_de_backbuffer
     
@@ -997,7 +813,6 @@ _Y_COORD_EFFECT = .+1
     add a, #0
     ld b, a
     inc b
-    ;;ld de, #CPCT_VMEM_START_ASM     ;; DE = Pointer to start of the screen
         
     ld_de_backbuffer
     
@@ -1046,7 +861,6 @@ _y_coord_base: .db #0
 sys_render_oponent::
     
     ;; Get screen address of the oponent
-    ;;ld de, #CPCT_VMEM_START_ASM     ;; DE = Pointer to start of the screen
     
     ld_de_backbuffer    
     
@@ -1079,7 +893,6 @@ sys_render_oponent::
 sys_render_erase_oponent::
     
     ;; Get screen address of the oponent
-    ;;ld de, #CPCT_VMEM_START_ASM     ;; DE = Pointer to start of the screen
     
     ld_de_backbuffer
 
@@ -1112,7 +925,6 @@ sys_render_erase_oponent::
 ;;
 sys_render_topbar::
     ;; draw life
-    ;;cpctm_screenPtr_asm de, CPCT_VMEM_START_ASM, 0, 0  ;; screen address in de
     m_screenPtr_backbuffer 0,0      ;; Calculates backbuffer address
 
     ld hl, #_s_small_icons_00
@@ -1139,14 +951,12 @@ sys_render_topbar::
     inc hl
     ld (hl), #'0'
     ld hl, #aux_txt
-    ;;cpctm_screenPtr_asm de, CPCT_VMEM_START_ASM, 5, 1  ;; screen address in de
     m_screenPtr_backbuffer 5,1      ;; Calculates backbuffer address
 
     ld c, #0
     call sys_text_draw_string
 
     ;;draw money
-    ;;cpctm_screenPtr_asm de, CPCT_VMEM_START_ASM, 20, 0  ;; screen address in de
     m_screenPtr_backbuffer 20,0      ;; Calculates backbuffer address
 
     ld hl, #_s_coin
@@ -1162,14 +972,11 @@ sys_render_topbar::
     call sys_text_num2str8
 
     ld hl, #aux_txt
-    ;;cpctm_screenPtr_asm de, CPCT_VMEM_START_ASM, 25, 1  ;; screen address in de
     m_screenPtr_backbuffer 25,1      ;; Calculates backbuffer address
 
     ld c, #0
     call sys_text_draw_string
 
-
-    ;;cpctm_screenPtr_asm de, CPCT_VMEM_START_ASM, 45, 1  ;; screen address in de
     m_screenPtr_backbuffer 45,1      ;; Calculates backbuffer address
 
     m_draw_blank_small_number       ;; erases previous number
@@ -1192,7 +999,6 @@ sys_render_topbar::
 ;;
 sys_render_energy::
 
-    ;;cpctm_screenPtr_asm de, CPCT_VMEM_START_ASM, 1, 136  ;; screen address in de
     m_screenPtr_backbuffer 1, 137           ;; Calculates backbuffer address
     
     m_draw_blank_small_number       ;; erases previous number
@@ -1214,7 +1020,6 @@ sys_render_energy::
 ;;
 sys_render_sacrifice::
     ld ix, #sacrifice
-    ;;cpctm_screenPtr_asm de, CPCT_VMEM_START_ASM, 75, 136  ;; screen address in de
     m_screenPtr_backbuffer 75, 137           ;; Calculates backbuffer address
     
     m_draw_blank_small_number       ;; erases previous number
@@ -1236,7 +1041,6 @@ sys_render_sacrifice::
 sys_render_deck::
     ld ix, #fight_deck
 
-    ;;cpctm_screenPtr_asm de, CPCT_VMEM_START_ASM, 1, 166  ;; screen address in de
     m_screenPtr_backbuffer 1, 166           ;; Calculates backbuffer address
     
     m_draw_blank_small_number       ;; erases previous number
@@ -1257,7 +1061,6 @@ sys_render_deck::
 ;;
 sys_render_cemetery::
     ld ix, #cemetery
-    ;;cpctm_screenPtr_asm de, CPCT_VMEM_START_ASM, 75, 166  ;; screen address in de
     m_screenPtr_backbuffer 75, 166  ;; Calculates backbuffer address
 
     m_draw_blank_small_number       ;; erases previous number
@@ -1278,7 +1081,6 @@ sys_render_cemetery::
 ;;
 sys_render_icons::
     ;; energy icon
-    ;;cpctm_screenPtr_asm de, CPCT_VMEM_START_ASM, 0, 118  ;; screen address in de
     m_screenPtr_backbuffer 0, 119           ;; Calculates backbuffer address
     ld hl, #_s_icons_2
     ld c, #S_ICONS_WIDTH
@@ -1286,7 +1088,6 @@ sys_render_icons::
     call cpct_drawSprite_asm
 
     ;; sacrifice icon
-    ;;cpctm_screenPtr_asm de, CPCT_VMEM_START_ASM, 74, 118  ;; screen address in de
     m_screenPtr_backbuffer 74, 119           ;; Calculates backbuffer address
     ld hl, #_s_icons_0
     ld c, #S_ICONS_WIDTH
@@ -1294,7 +1095,6 @@ sys_render_icons::
     call cpct_drawSprite_asm
     
     ;; deck
-    ;;cpctm_screenPtr_asm de, CPCT_VMEM_START_ASM, 0, 148  ;; screen address in de
     m_screenPtr_backbuffer 0, 148           ;; Calculates backbuffer address
     ld hl, #_s_icons_3
     ld c, #S_ICONS_WIDTH
@@ -1302,7 +1102,6 @@ sys_render_icons::
     call cpct_drawSprite_asm
 
     ;; cemetery
-    ;;cpctm_screenPtr_asm de, CPCT_VMEM_START_ASM, 74, 148  ;; screen address in de
     m_screenPtr_backbuffer 74, 148           ;; Calculates backbuffer address
     ld hl, #_s_icons_1
     ld c, #S_ICONS_WIDTH
@@ -1322,7 +1121,6 @@ sys_render_icons::
 ;;
 sys_render_full_fight_screen::
 
-    ;;call sys_render_clear_front_buffer
     call sys_render_clear_back_buffer
     
     call sys_render_topbar

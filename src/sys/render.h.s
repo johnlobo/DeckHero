@@ -46,7 +46,6 @@ sys_render_zone_messages      = 0b10000000
 .globl sys_render_update_fight
 .globl sys_render_erase_hand
 .globl sys_render_hand
-.globl sys_render_show_deck
 .globl sys_render_show_array
 .globl sys_render_erase_oponent
 .globl sys_render_full_fight_screen
@@ -57,7 +56,6 @@ sys_render_zone_messages      = 0b10000000
 .globl sys_render_current_behaviour
 .globl sys_render_effects
 .globl sys_render_switch_buffers
-.globl sys_render_switch_crtc_start
 .globl sys_render_clear_front_buffer
 .globl sys_render_clear_back_buffer
 

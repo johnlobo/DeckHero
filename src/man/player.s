@@ -53,7 +53,7 @@ DefineOponent 1, ^/PLAYER1        /, _s_player_0, PLAYER_SPRITE_X, PLAYER_SPRITE
 ;;
 ;;  Initializes a fight
 ;;  Input: 
-;;  Output: a random piece
+;;  Output: 
 ;;  Modified: 
 ;;
 man_player_init::

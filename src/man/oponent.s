@@ -47,7 +47,7 @@
 ;;
 ;;  Initializes a oponent
 ;;  Input: 
-;;  Output: a random piece
+;;  Output: 
 ;;  Modified: 
 ;;
 man_oponent_update::
@@ -58,7 +58,7 @@ man_oponent_update::
 ;;
 ;;  main loop of a oponent
 ;;  Input: 
-;;  Output: a random piece
+;;  Output: 
 ;;  Modified: 
 ;;
 man_oponent_init::
@@ -69,7 +69,7 @@ man_oponent_init::
 ;;
 ;;  creates an oponent
 ;;  Input: 
-;;  Output: a random piece
+;;  Output: 
 ;;  Modified: 
 ;;
 man_oponent_create::
@@ -114,7 +114,7 @@ _mood_exit:
 ;;
 ;;  damages a foe
 ;;  Input: 
-;;  Output: a random piece
+;;  Output: 
 ;;  Modified: 
 ;;
 man_oponent_all_damage::

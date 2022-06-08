@@ -82,7 +82,7 @@ ended_fight:: .db 0
 ;;
 ;;  Initializes a fight
 ;;  Input: 
-;;  Output: a random piece
+;;  Output: 
 ;;  Modified: 
 ;;
 man_fight_init::
@@ -127,7 +127,6 @@ _mfi_delay:
 
     call sys_render_full_fight_screen   ;; renders the fight screen
     call sys_render_switch_buffers
-    ;call sys_render_switch_crtc_start
     call sys_render_full_fight_screen   ;; renders the fight screen
 
     ld a, (hand_max)
@@ -157,21 +156,7 @@ man_fight_deal_hand::
 
 _initial_set_of_cards:
     push bc                             ;; store loop index
-
-    ;;ld b, #20                         ;; delay 
-    ;;call cpct_waitHalts_asm
-
-;;    ld a, (hand_count)                  ;; still cards in hand??
-;;    or a                                ;;
-;;    jr nz, _mfdl_cards_in_hand          ;;
-;;
-;;    
-;;    
-;;    jr _mfdl_continue
-;;_mfdl_cards_in_hand:
-;;    ;;call nz, sys_render_erase_current_hand      ;; erase hand if there are any cards in hand
-;;_mfdl_continue:
-    
+   
     ld a, (fight_deck_count)            ;; check if there are cards in the fight deck
     or a                                ;;
     jr nz, _mfdc_get_card               ;; if so jump to get one
@@ -190,9 +175,6 @@ mfdc_ELEMENT_TO_ERASE = . +1
     ld a, #00                           ;; set the element to be erased
     call man_array_remove_element       ;; Remove element from fight_deck
     
-    ;;call sys_render_deck                ;; Update number in deck
-    ;;call sys_render_hand                ;; update hand
-
     m_updated_hand
     m_updated_icon_numbers
 
@@ -221,8 +203,6 @@ man_fight_discard_hand::
     ret z
 _m_f_d_h_loop:
 
-    ;;ld b, #20                           ;; delay 
-    ;;call cpct_waitHalts_asm
     ld ix, #hand
     ld a, #00                           ;; set the element to be erased
     call man_array_get_element          ;; get the first element of the hand
@@ -232,8 +212,6 @@ _m_f_d_h_loop:
     ld a, #00                           ;; set the element to be erased
     call man_array_remove_element       ;; Remove element from fight_deck  
     dec a_delta(ix)                     ;; decreases delta flag
-    ;;call sys_render_cemetery            ;; Update number in deck
-    ;;call sys_render_hand                ;; update hand
 
     m_updated_hand
     m_updated_icon_numbers
@@ -294,14 +272,6 @@ _mfs_THIRD_ARRAY = .+2
     or a
     jr nz, _mfs_move_loop
     
-    ;;call sys_render_deck                ;; Update number in deck
-    ;;call sys_render_cemetery            ;; Update number in cemetery
-    
-    ;;ld a, (hand_max)
-    ;;ld b, a                             ;; deal a new hand of cards to the player
-    ;;call man_fight_deal_hand            ;;
-
-    ;;pop ix 
     ret
 
 ;;-----------------------------------------------------------------
@@ -427,7 +397,6 @@ man_fight_end_of_turn::
     m_updated_icon_numbers
 
     call sys_render_update_fight
-    ;;call sys_render_energy              ;;
 
     ret
 
@@ -443,6 +412,7 @@ man_fight_end_of_turn::
 man_fight_update::
 
 _update_main_loop:
+
     ;; Player turn
     ld e, #10                           ;; x
     ld d, #78                           ;; y
@@ -455,9 +425,6 @@ _update_main_loop:
 _mfu_player_loop:
 
     call sys_input_debug_update         ;; Check players actions
-    
-    ;;ld b, #40                           ;; delay
-    ;;call cpct_waitHalts_asm             ;;
 
     call sys_render_update_fight        ;; renders the screen
 

@@ -20,6 +20,9 @@
 .include "common.h.s"
 .include "sys/render.h.s"
 .include "sys/behaviour.h.s"
+.include "sys/messages.h.s"
+.include "sys/text.h.s"
+.include "sys/input.h.s"
 .include "man/fight.h.s"
 .include "man/player.h.s"
 .include "man/oponent.h.s"
@@ -34,7 +37,7 @@
 ;;  right after _CODE area contents.
 ;;
 .area _DATA
-
+_add_card_string: .asciz "ADD A CARD TO YOUR DECK"      ;;
 
 blob_template::
 DefineOponent 1, ^/BLOB           /, _s_blob_0, 60, 60, S_BLOB_WIDTH, S_BLOB_HEIGHT, 20, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, #sys_behaviour_blob, 0
@@ -51,9 +54,9 @@ DefineOponent 1, ^/FOE   1        /, _s_blob_0, 60, 60, S_BLOB_WIDTH, S_BLOB_HEI
 ;;
 ;; man_game_init
 ;;
-;;   gets a random number between 0 and 18
+;;  
 ;;  Input: 
-;;  Output: a random piece
+;;  Output: 
 ;;  Modified: AF, BC, DE, HL
 ;;
 man_game_init::
@@ -64,14 +67,45 @@ man_game_init::
 
 ;;-----------------------------------------------------------------
 ;;
+;; man_fight_add_new_card
+;;
+;;   
+;;  Input: 
+;;  Output: 
+;;  Modified: AF, BC, DE, HL
+;;
+man_fight_add_new_card::
+    m_screenPtr_backbuffer 8, 10           ;; Calculates backbuffer address
+    ld c, #64
+    ld b, #180
+    ld a, #0x33
+    call sys_messages_draw_box
+
+    ld hl, #_add_card_string
+    m_screenPtr_backbuffer 18, 14                           ;; Calculates backbuffer address
+    ld c, #0
+    call sys_text_draw_string
+
+    call sys_render_switch_buffers
+    call sys_input_wait4anykey
+
+    ret
+
+;;-----------------------------------------------------------------
+;;
 ;; man_game_update
 ;;
-;;   gets a random number between 0 and 18
+;;   
 ;;  Input: 
-;;  Output: a random piece
+;;  Output: 
 ;;  Modified: AF, BC, DE, HL
 ;;
 man_game_update::
+    call man_fight_add_new_card
+
     call man_fight_update
+
+    call man_fight_add_new_card
+    
     call man_fight_init
     ret

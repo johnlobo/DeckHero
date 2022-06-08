@@ -253,7 +253,6 @@ y_coord:
     jr  z, wait_for_key             ;;
 
     call sys_render_switch_buffers
-    ;call sys_render_switch_crtc_start
 
     ld a, w_wait_for_key(iy)        ;; check if we have to wait for a key
     cp #2                           ;;
@@ -293,7 +292,6 @@ wait_for_key:
     call sys_text_draw_string
 
     call sys_render_switch_buffers
-    ;call sys_render_switch_crtc_start
 
     call sys_input_wait4anykey
     push hl                         ;; store number of loops waited
@@ -301,7 +299,6 @@ wait_for_key:
     call sys_messages_restore_message_background
 
     call sys_render_switch_buffers
-    ;call sys_render_switch_crtc_start
 
     pop hl                          ;; return number of loops waited
 
@@ -322,32 +319,38 @@ wait_for_key:
 ;; Implementation partly copied form cpctelera drawSolidBox
 ;;
 sys_messages_draw_box::
+    ;; Draw Back window
+    cpctm_push de, bc, af
+    ld a,#0x00                          ;; Patern of solid box
+    call cpct_drawSolidBox_asm
+    cpctm_pop af, bc, de
+
     ld (#draw_border+1), a
     ld (#draw_border2+1), a
     ld (#draw_line+1), a
-    ld a, b
+    ld a, c
     ld (width), a
  	ld h, d
 	ld l, e	
-    inc c                   ;; increment height in one 
+    inc b                   ;; increment height in one 
 	jr draw_line
 
 next_line:
-	ld a, c
+	ld a, b
 	dec a
 	or a
 	ret z
 
-	ld c, a
+	ld b, a
 	ld a, (width)
-	ld b,a
+	ld c,a
 
-	ld a, c
+	ld a, b
 	cp #1
 	jr z, draw_line		;; Si estoy en la ultima linea salto a line
 draw_border:
 	ld (hl), #0xff
-    ld a, b
+    ld a, c
     dec a
     add_hl_a
 draw_border2:
@@ -357,7 +360,11 @@ draw_border2:
 draw_line:
 	ld (hl), #0xff
 	inc hl
-	djnz draw_line
+	;;djnz draw_line
+    dec c
+    ld a, c
+    or a
+    jr nz, draw_line
 
 down_line:
 	ld a, #8          	    ;; [2] / HL = DE = DE + 0x800

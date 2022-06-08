@@ -32,6 +32,7 @@ MINIMUM_WINDOW_WIDTH = 30
 ;; Global routines
 ;;------------------------------------------------------------------------------
 
+.globl sys_messages_load_window_data
 .globl sys_messages_draw_window
 .globl sys_messages_show
 .globl sys_messages_draw_box

@@ -109,7 +109,7 @@ ret
 ;;
 ;;  Remove a card pointed by a from the hand
 ;;  Input: a: number of card to remove
-;;  Output: a random piece
+;;  Output: 
 ;;  Modified: AF, BC, DE, HL
 ;;
 man_array_remove_element::

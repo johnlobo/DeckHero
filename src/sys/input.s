@@ -230,11 +230,7 @@ sys_input_selected_left::
     or a
     ret z
 
-    ;;call cpct_waitVSYNC_asm
-    ;;call sys_render_erase_current_hand      ;; erase deck area
-    ;;ld hl, #hand_selected
     dec a_selected(ix)              ;; decrement selected card
-    ;;call sys_render_hand
    
     m_updated_hand                  ;; marks that the hand has been updated
     
@@ -256,10 +252,7 @@ sys_input_selected_right::
     cp b
     ret z
 
-    ;;call cpct_waitVSYNC_asm
-    ;;call sys_render_erase_current_hand      ;; erase deck area
     inc a_selected(ix)              ;; increment selected card
-    ;;call sys_render_hand
     
     m_updated_hand                  ;; marks that the hand has been updated
 

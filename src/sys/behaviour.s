@@ -31,7 +31,7 @@
 ;;
 ;;  Excutes the beahviour of an entity
 ;;  Input: 
-;;  Output: a random piece
+;;  Output: 
 ;;  Modified: 
 ;;
 sys_behaviour_update_one_entity::
@@ -203,7 +203,7 @@ sys_behaviour_blob::
 ;;
 ;;  Excutes the beahviour of an entity
 ;;  Input: 
-;;  Output: a random piece
+;;  Output: 
 ;;  Modified: 
 ;;
 sys_behaviour_update::

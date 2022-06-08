@@ -61,7 +61,7 @@ DefineComponentArrayStructure_Size foes, MAX_FOES, sizeof_o
 ;;
 ;;  Initializes a fight
 ;;  Input: 
-;;  Output: a random piece
+;;  Output: 
 ;;  Modified: 
 ;;
 man_foe_init::
@@ -102,7 +102,7 @@ man_foe_create::
 ;;
 ;;  Initializes a fight
 ;;  Input: 
-;;  Output: a random piece
+;;  Output: 
 ;;  Modified: 
 ;;
 man_foe_remove::
@@ -114,7 +114,7 @@ man_foe_remove::
 ;;
 ;;  return the number of remaining foes
 ;;  Input: 
-;;  Output: a random piece
+;;  Output: 
 ;;  Modified: 
 ;;
 man_foe_number_of_foes::
