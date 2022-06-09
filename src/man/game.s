@@ -27,6 +27,7 @@
 .include "man/player.h.s"
 .include "man/oponent.h.s"
 .include "man/deck.h.s"
+.include "man/array.h.s"
 
 
 
@@ -38,6 +39,9 @@
 ;;
 .area _DATA
 _add_card_string: .asciz "ADD A CARD TO YOUR DECK"      ;;
+card01: .dw #0000
+card02: .dw #0000
+card03: .dw #0000
 
 blob_template::
 DefineOponent 1, ^/BLOB           /, _s_blob_0, 60, 60, S_BLOB_WIDTH, S_BLOB_HEIGHT, 20, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, #sys_behaviour_blob, 0
@@ -74,7 +78,7 @@ man_game_init::
 ;;  Output: 
 ;;  Modified: AF, BC, DE, HL
 ;;
-man_fight_add_new_card::
+man_game_add_new_card::
     m_screenPtr_backbuffer 8, 10           ;; Calculates backbuffer address
     ld c, #64
     ld b, #180
@@ -85,6 +89,31 @@ man_fight_add_new_card::
     m_screenPtr_backbuffer 18, 14                           ;; Calculates backbuffer address
     ld c, #0
     call sys_text_draw_string
+
+    ld ix, #model_deck
+    ld a, #2
+    call man_array_get_random_element
+    push hl
+    pop ix
+    ld bc, #0x2014
+    call sys_render_card
+
+    ld ix, #model_deck
+    ld a, #2
+    call man_array_get_random_element
+    push hl
+    pop ix
+    ld bc, #0x2024
+    call sys_render_card
+
+    ld ix, #model_deck
+    ld a, #2
+    call man_array_get_random_element
+    push hl
+    pop ix
+    ld bc, #0x2034
+    call sys_render_card
+
 
     call sys_render_switch_buffers
     call sys_input_wait4anykey
@@ -101,11 +130,11 @@ man_fight_add_new_card::
 ;;  Modified: AF, BC, DE, HL
 ;;
 man_game_update::
-    call man_fight_add_new_card
+    call man_game_add_new_card
 
     call man_fight_update
 
-    call man_fight_add_new_card
+    call man_game_add_new_card
     
     call man_fight_init
     ret

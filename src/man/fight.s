@@ -165,6 +165,7 @@ _initial_set_of_cards:
 
 _mfdc_get_card:
     ld ix, #fight_deck                  ;; working with fight_deck
+    xor a                               ;; a = offset = 0
     call man_array_get_random_element   ;; gen a random element form fight_deck
     ld (mfdc_ELEMENT_TO_ERASE),a        ;; store the element to be erased later
     ld ix, #hand                        ;; working with hand

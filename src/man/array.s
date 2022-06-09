@@ -207,26 +207,35 @@ _g_e_sum_loop:                  ;;
 ;;
 ;;  Retrieves in hl the element in a random position and in a the position
 ;;  Input:  ix: array structure
+;;          a: offset
 ;;  Output: hl: element
 ;;          a : number of element.
 ;;  Modified: AF, BC, DE, HL
 ;;
 man_array_get_random_element::
+    ld (SUB_OFFSET), a
+    ld (ADD_OFFSET), a
     push ix                         ;; load in hl the beginning of the array
     pop hl                          ;;
     ld de, #a_array 
     add hl, de                      ;; move hl to the beginning of the array
     push hl                         ;; save hl (array address)
 
-    ld a, a_count(ix)
+    ld a, a_count(ix)               ;; load max number in a
+    SUB_OFFSET = . +1
+    sub #0x00
     call sys_util_get_random_number
+    ADD_OFFSET = . +1
+    add #0x00
     ld (_r_e_output), a             ;; store the random number in the output variable
     pop hl                          ;; restore hl (array address)
     or a                            ;; check if we have to retrieve the first card
     jp z, _g_r_e_return             ;; jump if we wnat to get the first card
 
     ld b, a
-    ld de, #sizeof_e                ;; copy the size of a card in de
+    ;;ld de, #sizeof_e                ;; copy the size of a card in de
+    ld e, a_component_size(ix)
+    ld d, #0
 _g_r_e_sum_loop:                    ;;
     add hl, de                      ;;  add de to hl until we reach the card
     djnz _g_r_e_sum_loop            ;;

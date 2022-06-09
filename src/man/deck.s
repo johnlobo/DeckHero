@@ -47,6 +47,12 @@ DefineComponentArrayStructure_Size deck, MAX_DECK_CARDS, sizeof_c
 ;; Definition of model deck
 ;;
 model_deck::
+model_deck_count: .db #0x05
+model_deck_delta: .db #0x00
+model_deck_component_size: .db #(sizeof_c)
+model_deck_pend: .dw #0x0000
+model_deck_selected: .db #0x00
+model_deck_array:
 ;;         _status,        _class  _sprite     _name              _rarity   _type   _energy  _description,                    _damage _block, _vulnerable _weak   _strengh    _exhaust    _add_card _execute_routine
 model_hit:
 DefineCard e_type_card_in_hand, 1, _s_cards_0, ^/HIT            /, 1,      1,      1,      ^/SINGLE ATTACK - 6DM           /,  6,      0,      0,          0,      0,          0,          0,       #man_deck_execute_hit
@@ -59,6 +65,9 @@ DefineCard e_type_card_in_hand, 2, _s_cards_3, ^/UNBREAKABLE    /, 1,      1,   
 model_ignore:
 DefineCard e_type_card_in_hand, 2, _s_cards_4, ^/IGNORE         /, 1,      1,      1,      ^/GOOD BLOCK - 8BK+1C           /,  0,      3,      0,          0,      0,          0,          0,       #man_deck_dummy_routine
 
+pe_struct:
+    pe_status: .db #e_type_invalid
+    pe_pointer: .dw #0
 
 ;;
 ;; Start of _CODE area
@@ -211,7 +220,14 @@ _l_a_loop:
     
     ret
 
-pe_struct:
-    pe_status: .db #e_type_invalid
-    pe_pointer: .dw #0
-
+;;-----------------------------------------------------------------
+;;
+;; man_deck_get_random_element
+;;
+;;  Returns a random element form the deck
+;;  Input:
+;;  Output: HL: points to a random card of deck 
+;;  Modified: 
+;;
+man_deck_get_random_element::
+    ret
