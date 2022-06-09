@@ -24,6 +24,8 @@
 .globl add_card_action
 .globl add_card_selected
 .globl add_card_previous
+.globl add_card_max
+.globl add_card_moved
 
 ;;===============================================================================
 ;; PUBLIC METHODS

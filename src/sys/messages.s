@@ -134,6 +134,7 @@ sys_messages_draw_window::
     ld d, w_address+1(iy)               ;; 
     ld c, w_w(iy)
     ld b, w_h(iy)
+    
     ld a,#0xff                          ;; Patern of solid box
     call cpct_drawSolidBox_asm
 
@@ -160,7 +161,7 @@ sys_messages_draw_window::
     dec b                           ;;
     dec b                           ;;
     
-    ld a,#0x00                     ;; Patern of solid box
+    ld a, #0x00                     ;; Patern of solid box
     call cpct_drawSolidBox_asm
 
     ret
@@ -306,25 +307,33 @@ wait_for_key:
 
 ;;-----------------------------------------------------------------
 ;;
-;; draw_box
+;; sys_messages_draw_box
 ;;
 ;;  draws an empty box
 ;;  Input:  (2B DE) memory	Video memory pointer to the upper left box corner byte
 ;;          (1B A ) colour_pattern	1-byte colour pattern (in screen pixel format) to fill the box with
 ;;          (1B C ) WIDTH	Box width in bytes [1-64] (Beware!  not in pixels!)
 ;;          (1B B ) HEIGHT	Box height in bytes (>0)
+;;                  L : Fill or Empty
 ;;  Output:
 ;;  Modified: af, hl, de, bc
 ;;
 ;; Implementation partly copied form cpctelera drawSolidBox
 ;;
 sys_messages_draw_box::
-    ;; Draw Back window
-    cpctm_push de, bc, af
-    ld a,#0x00                          ;; Patern of solid box
-    call cpct_drawSolidBox_asm
-    cpctm_pop af, bc, de
+    push af
+    ld a, l                             ;;
+    or a                                ;; Check if box is empty
+    jr z, smdb_empty                    ;;
 
+    ;; Draw Back window
+    cpctm_push de, bc
+    ld a,#0x00                          ;; Patern of solid box
+    call cpct_drawSolidBox_asm          ;;
+    cpctm_pop bc, de
+
+smdb_empty:
+    pop af
     ld (#draw_border+1), a
     ld (#draw_border2+1), a
     ld (#draw_line+1), a

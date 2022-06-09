@@ -214,6 +214,8 @@ sys_input_ac_selected_left::
     ld (add_card_previous), a           ;; store current value in previous variable
     dec a                               ;; update a
     ld (add_card_selected), a           ;; store new value in a
+    ld a, #1
+    ld (add_card_moved), a
     ret
 ;;-----------------------------------------------------------------
 ;;
@@ -224,12 +226,17 @@ sys_input_ac_selected_left::
 ;;  Modified: 
 ;;
 sys_input_ac_selected_right::
+    ld a, (add_card_max)
+    dec a
+    ld b,a
     ld a, (add_card_selected)           ;; check if we are not in the first card
-    or a                                ;;
+    cp b                                ;;
     ret z                               ;;
     ld (add_card_previous), a           ;; store current value in previous variable
-    dec a                               ;; update a
+    inc a                               ;; update a
     ld (add_card_selected), a           ;; store new value in a
+    ld a, #1
+    ld (add_card_moved), a
     ret
 ;;-----------------------------------------------------------------
 ;;

@@ -368,6 +368,7 @@ sys_render_erase_hand::
 ;;  Renders a specific card
 ;;  Input:  b: y coord
 ;;          c: x coord
+;;          de: screen buffer
 ;;          ix: points to card
 ;;  Output: 
 ;;  Modified: AF, BC, DE, HL
@@ -375,7 +376,7 @@ sys_render_erase_hand::
 sys_render_card::
     ;; Get screen address of the card
        
-    ld_de_backbuffer
+    ;;ld_de_backbuffer
     
     call cpct_getScreenPtr_asm      ;; Calculate video memory location and return it in HL
 
@@ -461,6 +462,7 @@ _hand_render_not_selected:
     push iy                                                     ;; move iy to ix for render card
     pop ix                                                      ;;
     
+    ld_de_backbuffer
     call  sys_render_card                                       ;; render card
 
     pop ix                      ;; Move ix to the next card
@@ -499,6 +501,7 @@ sys_render_show_array::
     m_screenPtr_backbuffer 5, 10           ;; Calculates backbuffer address
     ld c, #70
     ld b, #180
+    ld l, #0x00                             ;; empty box
     ld a, #0xff
     call sys_messages_draw_box
 
@@ -565,6 +568,7 @@ SELECTED_CARD = . +1
 
     
 _a_render_not_selected_show:
+    ld_de_backbuffer
     call  sys_render_card
     pop hl                      ;; retrive hl value for the loop
     pop bc                      ;; retrive b value for the loop
