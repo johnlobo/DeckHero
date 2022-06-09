@@ -26,6 +26,7 @@
 .include "man/fight.h.s"
 .include "man/deck.h.s"
 .include "man/array.h.s"
+.include "man/game.h.s"
 .include "comp/component.h.s"
 
 ;;
@@ -43,6 +44,21 @@ sys_input_debug_key_actions::
     .dw Key_P,      sys_input_selected_right
     .dw Key_D,      sys_input_show_deck
     .dw Key_Space,  sys_input_action
+    ;;.dw Key_Q,      sys_input_add_card
+    ;;.dw Key_A,      sys_input_remove_card
+    ;;.dw Key_Esc,    _score_cancel_entry
+    ;;.dw Joy0_Left,  _score_move_left
+    ;;.dw Joy0_Right, _score_move_right
+    ;;.dw Joy0_Up,    _score_move_up
+    ;;.dw Joy0_Down,  _score_move_down
+    ;;.dw Joy0_Fire1, _score_fire
+    .dw 0
+
+sys_input_add_card_key_actions::
+    .dw Key_O,      sys_input_ac_selected_left
+    .dw Key_P,      sys_input_ac_selected_right
+    .dw Key_Esc,    sys_input_ac_cancel
+    .dw Key_Space,  sys_input_ac_action
     ;;.dw Key_Q,      sys_input_add_card
     ;;.dw Key_A,      sys_input_remove_card
     ;;.dw Key_Esc,    _score_cancel_entry
@@ -185,6 +201,63 @@ sys_input_init::
 
 ;;-----------------------------------------------------------------
 ;;
+;;  sys_input_ac_selected_left
+;;
+;;  
+;;  Output:
+;;  Modified: 
+;;
+sys_input_ac_selected_left::
+    ld a, (add_card_selected)           ;; check if we are not in the first card
+    or a                                ;;
+    ret z                               ;;
+    ld (add_card_previous), a           ;; store current value in previous variable
+    dec a                               ;; update a
+    ld (add_card_selected), a           ;; store new value in a
+    ret
+;;-----------------------------------------------------------------
+;;
+;;  sys_input_ac_selected_right
+;;
+;;  
+;;  Output:
+;;  Modified: 
+;;
+sys_input_ac_selected_right::
+    ld a, (add_card_selected)           ;; check if we are not in the first card
+    or a                                ;;
+    ret z                               ;;
+    ld (add_card_previous), a           ;; store current value in previous variable
+    dec a                               ;; update a
+    ld (add_card_selected), a           ;; store new value in a
+    ret
+;;-----------------------------------------------------------------
+;;
+;;  sys_input_ac_cancel
+;;
+;;  
+;;  Output:
+;;  Modified: 
+;;
+sys_input_ac_cancel::
+    ld a, #255
+    ld (add_card_action), a
+    ret
+;;-----------------------------------------------------------------
+;;
+;;  sys_input_ac_action
+;;
+;;  
+;;  Output:
+;;  Modified: 
+;;
+sys_input_ac_action::
+    ld a, #1
+    ld (add_card_action), a
+    ret
+
+;;-----------------------------------------------------------------
+;;
 ;;  sys_input_action
 ;;
 ;;  Shows deck on scree
@@ -302,9 +375,21 @@ first_key:
 ;;  Modified: iy, bc
 ;;
 sys_input_debug_update::
-	;;call cpct_scanKeyboard_if_asm
-    ;;ld ix, #score_marker                     ;; get player1 struct
     ld iy, #sys_input_debug_key_actions
+    call sys_input_generic_update
+    ret
+
+;;-----------------------------------------------------------------
+;;
+;; sys_input_add_card_update
+;;
+;;   Initializes input
+;;  Input: 
+;;  Output:
+;;  Modified: iy, bc
+;;
+sys_input_add_card_update::
+    ld iy, #sys_input_add_card_key_actions
     call sys_input_generic_update
     ret
 

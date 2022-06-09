@@ -31,6 +31,7 @@
 .globl sys_input_getKeyPressed
 
 .globl sys_input_debug_update
+.globl sys_input_add_card_update
 
 ;;.globl sys_input_main_screen_keys
 ;;.globl sys_input_update

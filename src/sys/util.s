@@ -37,6 +37,8 @@ string_buffer:: .asciz "          "
 .area _CODE
 
 ;;-----------------------------------------------------------------;; 
+;;  sys_util_h_times_e
+;;
 ;; Inputs:
 ;;   H and E
 ;; Outputs:
