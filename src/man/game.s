@@ -29,6 +29,7 @@
 .include "man/oponent.h.s"
 .include "man/deck.h.s"
 .include "man/array.h.s"
+.include "man/map.h.s"
 .include "cpctelera.h.s"
 
 
@@ -76,6 +77,10 @@ DefineOponent 1, ^/FOE   1        /, _s_blob_0, 60, 60, S_BLOB_WIDTH, S_BLOB_HEI
 man_game_init::
     call man_player_init    ;; Initialize player
     call man_deck_init      ;; Initialize deck
+
+    call man_map_init
+    call man_map_render
+
     call man_game_add_new_card
     call man_fight_init     ;; Initialize fight
     ret

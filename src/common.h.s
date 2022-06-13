@@ -23,9 +23,7 @@
 ;; SPRITES
 ;;===============================================================================
 .globl _g_palette0
-.globl _g_palette1
 .globl _s_font_0
-.globl _s_font_1
 .globl _s_cards_0
 .globl _s_cards_1
 .globl _s_cards_2
@@ -72,6 +70,11 @@
 .globl _s_explotion_1
 .globl _s_explotion_2
 .globl _s_explotion_3
+.globl _s_nodes_0
+.globl _s_nodes_1
+.globl _s_nodes_2
+.globl _s_nodes_3
+.globl _s_nodes_4
 
 ;;===============================================================================
 ;; PUBLIC VARIBLES
@@ -153,6 +156,9 @@ S_ICONS_HEIGHT = 17
 S_STATUS_WIDTH = 5
 S_STATUS_HEIGHT = 12
 
+S_NODES_WIDTH = 6
+S_NODES_HEIGHT = 12
+
 ;; GAME CONSTANTS
 MAX_FOES = 4
 
@@ -192,6 +198,11 @@ HAND_Y_2 = 125
 DESC_X = 1
 DESC_Y_1 = 180
 DESC_Y_2 = 190
+
+MAP_X_START = 16
+MAP_Y_START = 178
+MAP_WIDTH = 8
+MAP_HEIGHT = 7
 
 
 ;;===============================================================================

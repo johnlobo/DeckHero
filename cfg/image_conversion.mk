@@ -61,10 +61,8 @@ $(eval $(call IMG2SP, CONVERT         , assets/coin.png , 8, 10, s_coin, ,))
 $(eval $(call IMG2SP, CONVERT         , assets/icons.png , 12, 17, s_icons, ,))
 $(eval $(call IMG2SP, CONVERT         , assets/status.png , 10, 12, s_status, ,))
 $(eval $(call IMG2SP, CONVERT         , assets/explotion.png , 16, 16, s_explotion, ,))
-$(eval $(call IMG2SP, SET_PALETTE_FW  , $(PALETTE1)         ))
-$(eval $(call IMG2SP, CONVERT_PALETTE , $(PALETTE1), g_palette1 ))
-$(eval $(call IMG2SP, SET_MODE        , 1                  ))
-$(eval $(call IMG2SP, CONVERT         , assets/font_chars_1.png , 4, 387, s_font_1, ,))
+$(eval $(call IMG2SP, CONVERT         , assets/nodes.png , 12, 12, s_nodes, ,))
+$(eval $(call IMG2SP, CONVERT         , assets/pipes.png , 12, 12, s_pipes, ,))
 
 ##
 ## OLD MACROS (For compatibility)
