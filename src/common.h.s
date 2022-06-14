@@ -75,6 +75,13 @@
 .globl _s_nodes_2
 .globl _s_nodes_3
 .globl _s_nodes_4
+.globl _s_pipes_0
+.globl _s_pipes_1
+.globl _s_pipes_2
+.globl _s_pipes_3
+.globl _s_pipes_4
+.globl _s_pipes_5
+.globl _s_pipes_6
 
 ;;===============================================================================
 ;; PUBLIC VARIBLES
@@ -201,7 +208,8 @@ DESC_Y_2 = 190
 
 MAP_X_START = 16
 MAP_Y_START = 178
-MAP_WIDTH = 8
+;;MAP_WIDTH = 8
+MAP_WIDTH = 4
 MAP_HEIGHT = 7
 
 
