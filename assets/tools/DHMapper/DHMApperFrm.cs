@@ -66,14 +66,19 @@ namespace DHMapper
         private void Form1_Load(object sender, EventArgs e)
         {
             csPictureBox[,] tiles = new csPictureBox[8, 14];
+            int count = 0;
             for (int i = 0; i < 14; i++)
             {
                 for (int j = 0; j < 8; j++)
                 {
+                    count++;
                     tiles[j, i] = new csPictureBox();
                     tiles[j, i].MouseClick += new MouseEventHandler(ClickOnTableLayoutPanel);
-                    tiles[j, i].TileID = 0xf;
-                    tiles[j, i].TileType = "Empty";
+                    tiles[j, i].node.Type = 0xf;
+                    tiles[j, i].node.X = j;
+                    tiles[j, i].node.Y = i;
+                    tiles[j, i].node.Id = count;
+                    tiles[j, i].node.Ancestors = 0;
                     tiles[j, i].Padding = new Padding(0, 0, 0, 0);
                     tiles[j, i].Margin = new Padding(1, 1, 1, 1);
                     tableLayoutPanel1.Controls.Add(tiles[j, i], j, i);
@@ -95,8 +100,7 @@ namespace DHMapper
                 blocks[index] = new csPictureBox();
                 blocks[index].Image = nodesImg[index];
                 blocks[index].MouseClick += new MouseEventHandler(ClickOnTableLayoutPanel2);
-                blocks[index].TileID = index;
-                blocks[index].TileType = "node";
+                blocks[index].node.Type = index;
                 px = index % 6;
                 py = index / 6;
                 tableLayoutPanel2.Controls.Add(blocks[index], px, py);
@@ -111,8 +115,7 @@ namespace DHMapper
                 blocks[index] = new csPictureBox();
                 blocks[index].Image = nodesImg[index];
                 blocks[index].MouseClick += new MouseEventHandler(ClickOnTableLayoutPanel2);
-                blocks[index].TileID = index;
-                blocks[index].TileType = "pipe";
+                blocks[index].node.Type = index;
                 px = index % 6;
                 py = index / 6;
                 tableLayoutPanel2.Controls.Add(blocks[index], px, py);
@@ -131,8 +134,8 @@ namespace DHMapper
                 csPictureBox p_destiny = new csPictureBox();
                 p_destiny = (csPictureBox)tableLayoutPanel1.GetControlFromPosition(Map_x, Map_y);
                 p_destiny.Image = p_origin.Image;
-                p_destiny.TileID = p_origin.TileID;
-                p_destiny.TileType = p_origin.TileType;
+                p_destiny.node.Type = p_origin.node.Type;
+                p_destiny.node.Ancestors = p_origin.node.Ancestors;
                 if (Map_x < 7)
                     Map_x++;
                 else
@@ -151,8 +154,8 @@ namespace DHMapper
             {
                 e.Graphics.FillRectangle(Brushes.Red, e.CellBounds);
                 csPictureBox cell = (csPictureBox)tableLayoutPanel1.GetControlFromPosition(Map_x, Map_y);
-                typeLbl.Text = cell.TileType;
-                idLbl.Text = Convert.ToString(cell.TileID);
+                typeLbl.Text = Convert.ToString(cell.node.Ancestors);
+                idLbl.Text = Convert.ToString(cell.node.Type);
             }
             else
                 e.Graphics.FillRectangle(Brushes.White, e.CellBounds);
@@ -163,8 +166,8 @@ namespace DHMapper
             Map_x = tableLayoutPanel1.GetColumn((Control)sender);
             Map_y = tableLayoutPanel1.GetRow((Control)sender);
             csPictureBox cell = (csPictureBox)tableLayoutPanel1.GetControlFromPosition(Map_x, Map_y);
-            typeLbl.Text = cell.TileType;
-            idLbl.Text = Convert.ToString(cell.TileID);
+            typeLbl.Text = Convert.ToString(cell.node.Ancestors);
+            idLbl.Text = Convert.ToString(cell.node.Type);
             tableLayoutPanel1.Refresh();
         }
 
@@ -181,8 +184,8 @@ namespace DHMapper
                 csPictureBox p_destiny = new csPictureBox();
                 p_destiny = (csPictureBox)tableLayoutPanel1.GetControlFromPosition(Map_x, Map_y);
                 p_destiny.Image = p_origin.Image;
-                p_destiny.TileID = p_origin.TileID;
-                p_destiny.TileType = p_origin.TileType;
+                p_destiny.node.Type = p_origin.node.Type;
+                p_destiny.node.Ancestors = p_origin.node.Ancestors;
                 if (Map_x < 7)
                     Map_x++;
                 else
@@ -209,8 +212,8 @@ namespace DHMapper
         {
             csPictureBox p_destiny = (csPictureBox)tableLayoutPanel1.GetControlFromPosition(Map_x, Map_y);
             p_destiny.Image = null;
-            p_destiny.TileID = 0xf;
-            p_destiny.TileType = "empty";
+            p_destiny.node.Type = 0xf;
+            p_destiny.node.Ancestors = 0;
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -227,7 +230,7 @@ namespace DHMapper
                 {
                     csPictureBox cell1 = (csPictureBox)tableLayoutPanel1.GetControlFromPosition(i, j);
                     csPictureBox cell2 = (csPictureBox)tableLayoutPanel1.GetControlFromPosition(i + 1, j);
-                    int byteResult = (cell1.TileID << 4) | (cell2.TileID & 15);
+                    int byteResult = (cell1.node.Type << 4) | (cell2.node.Type & 15);
                     text.AppendText("#0b" + Convert.ToString(byteResult, 2).PadLeft(8, '0'));
                     if (i < 7)
                         text.AppendText(", ");
@@ -278,7 +281,7 @@ namespace DHMapper
                     for (int i = 0; i < 8; i = i + 1)
                     {
                         csPictureBox cell = (csPictureBox)tableLayoutPanel1.GetControlFromPosition(i, j);
-                        outputFile.WriteLine(cell.TileID.ToString());
+                        outputFile.WriteLine(cell.node.Type.ToString());
                     }
 
                 }
@@ -309,10 +312,10 @@ namespace DHMapper
                     {
                         csPictureBox cell = (csPictureBox)tableLayoutPanel1.GetControlFromPosition(i, j);
                         string inputCell = inputFile.ReadLine();
-                        cell.TileID = Convert.ToInt32(inputCell);
+                        cell.node.Type = Convert.ToInt32(inputCell);
                         foreach (csPictureBox cc in tableLayoutPanel2.Controls)
                         {
-                            if (cc.TileID == cell.TileID)
+                            if (cc.node.Type == cell.node.Type)
                             {
                                 cell.Image = cc.Image;
                                 break;
@@ -338,8 +341,8 @@ namespace DHMapper
                     for (int j = 0; j < 8; j++)
                     {
                         csPictureBox cell = (csPictureBox)tableLayoutPanel1.GetControlFromPosition(j, i);
-                        cell.TileID = 0xf;
-                        cell.TileType = "empty";
+                        cell.node.Type = 0xf;
+                        cell.node.Ancestors = 0;
                         cell.Image = null;
                     }
                 }

@@ -41,11 +41,11 @@
             this.button6 = new System.Windows.Forms.Button();
             this.label2 = new System.Windows.Forms.Label();
             this.xyLbl = new System.Windows.Forms.Label();
-            this.typeLbl = new System.Windows.Forms.Label();
-            this.label4 = new System.Windows.Forms.Label();
             this.idLbl = new System.Windows.Forms.Label();
             this.label6 = new System.Windows.Forms.Label();
             this.btnBorrarMapa = new System.Windows.Forms.Button();
+            this.typeLbl = new System.Windows.Forms.Label();
+            this.label4 = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // addImageBtn
@@ -61,6 +61,7 @@
             // 
             // tableLayoutPanel1
             // 
+            this.tableLayoutPanel1.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.tableLayoutPanel1.AutoSize = true;
             this.tableLayoutPanel1.CellBorderStyle = System.Windows.Forms.TableLayoutPanelCellBorderStyle.Single;
             this.tableLayoutPanel1.ColumnCount = 8;
@@ -221,28 +222,10 @@
             this.xyLbl.TabIndex = 23;
             this.xyLbl.Text = "label3";
             // 
-            // typeLbl
-            // 
-            this.typeLbl.AutoSize = true;
-            this.typeLbl.Location = new System.Drawing.Point(511, 189);
-            this.typeLbl.Name = "typeLbl";
-            this.typeLbl.Size = new System.Drawing.Size(38, 15);
-            this.typeLbl.TabIndex = 25;
-            this.typeLbl.Text = "label3";
-            // 
-            // label4
-            // 
-            this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(450, 189);
-            this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(34, 15);
-            this.label4.TabIndex = 24;
-            this.label4.Text = "Type:";
-            // 
             // idLbl
             // 
             this.idLbl.AutoSize = true;
-            this.idLbl.Location = new System.Drawing.Point(511, 204);
+            this.idLbl.Location = new System.Drawing.Point(511, 189);
             this.idLbl.Name = "idLbl";
             this.idLbl.Size = new System.Drawing.Size(38, 15);
             this.idLbl.TabIndex = 27;
@@ -251,7 +234,7 @@
             // label6
             // 
             this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(450, 204);
+            this.label6.Location = new System.Drawing.Point(450, 189);
             this.label6.Name = "label6";
             this.label6.Size = new System.Drawing.Size(24, 15);
             this.label6.TabIndex = 26;
@@ -270,16 +253,34 @@
             this.btnBorrarMapa.UseVisualStyleBackColor = false;
             this.btnBorrarMapa.Click += new System.EventHandler(this.btnBorrarMapa_Click);
             // 
+            // typeLbl
+            // 
+            this.typeLbl.AutoSize = true;
+            this.typeLbl.Location = new System.Drawing.Point(511, 204);
+            this.typeLbl.Name = "typeLbl";
+            this.typeLbl.Size = new System.Drawing.Size(38, 15);
+            this.typeLbl.TabIndex = 30;
+            this.typeLbl.Text = "label3";
+            // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Location = new System.Drawing.Point(450, 204);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(62, 15);
+            this.label4.TabIndex = 29;
+            this.label4.Text = "Ancestors:";
+            // 
             // DecHeroMapper
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(752, 714);
+            this.Controls.Add(this.typeLbl);
+            this.Controls.Add(this.label4);
             this.Controls.Add(this.btnBorrarMapa);
             this.Controls.Add(this.idLbl);
             this.Controls.Add(this.label6);
-            this.Controls.Add(this.typeLbl);
-            this.Controls.Add(this.label4);
             this.Controls.Add(this.xyLbl);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.button6);
@@ -316,10 +317,10 @@
         private Button button6;
         private Label label2;
         private Label xyLbl;
-        private Label typeLbl;
-        private Label label4;
         private Label idLbl;
         private Label label6;
         private Button btnBorrarMapa;
+        private Label typeLbl;
+        private Label label4;
     }
 }

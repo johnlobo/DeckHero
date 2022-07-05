@@ -48,10 +48,27 @@ map::
 .db #0b01111001, #0b01111010, #0b00010011, #0b00001100
 .db #0b01111001, #0b01111010, #0b00010011, #0b00001100
 
+;;
+;;Node map
+;;
+node_map:
+.db #0b00001111, #0b00001111, #0b00001111, #0b00001111 
+.db #0b01010111, #0b01101111, #0b01011010, #0b01011010 
+.db #0b11110010, #0b11111111, #0b11110100, #0b11110001 
+.db #0b10010110, #0b11111111, #0b10011011, #0b10000110 
+.db #0b00001111, #0b11111111, #0b00001111, #0b11111111 
+.db #0b01011010, #0b11111001, #0b10110111, #0b10001010 
+.db #0b11110010, #0b11110000, #0b11110011, #0b11110010 
+.db #0b10010110, #0b10010110, #0b10010110, #0b10010110 
+.db #0b00001111, #0b00001111, #0b00001111, #0b00001111 
+.db #0b01010111, #0b10111000, #0b10110111, #0b01101111 
+.db #0b11110011, #0b11111111, #0b11110011, #0b11111111 
+.db #0b11110101, #0b10000111, #0b10000110, #0b11111111 
+.db #0b11111111, #0b11110001, #0b11111111, #0b11111111 
+.db #0b11111111, #0b11111111, #0b11111111, #0b11111111
+
 line_buffer:: .db #0x00, #0x02, #0x01, #0x04, #0x06, #0x02, #0x01, #0xff
 indent:: .db #0x00
-
-
 
 ;;
 ;; Start of _CODE area
@@ -92,7 +109,7 @@ map_line_buffer_init::
 
 ;;-----------------------------------------------------------------
 ;;
-;; man_map_render_pipeline
+;; man_map_build_buffer_line
 ;;
 ;;  Initializes the map
 ;;  Input:  b: row
@@ -370,6 +387,118 @@ mmr_next_line:
     ;; new line
 
     call sys_input_wait4anykey          ;; wait for any key
+
+    ret
+
+
+;;-----------------------------------------------------------------
+;;
+;; man_map_render::
+;;
+;;  Initializes the map
+;;  Input: 
+;;  Output: 
+;;  Modified: 
+;;
+man_map_draw_node:
+
+    ret
+
+;;-----------------------------------------------------------------
+;;
+;; man_map_render::
+;;
+;;  Initializes the map
+;;  Input: 
+;;  Output: 
+;;  Modified: 
+;;
+man_map_draw_map:
+
+MAP_X_COORD = 0
+MAP_Y_COORD = 200 - S_NODES_HEIGHT
+MAP_MAX_LINE = 14
+MAP_MAX_COL = 8
+
+x_pos: .db #0
+y_pos: .db #(MAP_MAX_LINE)
+
+
+line_loop:
+    xor a                       ;; initialize col index
+    ld (x_pos), a
+col_loop:
+    ld a, (x_pos)               ;; calculate x coord based in x_pos
+    ld h, a                     ;;
+    ld e, #(S_NODES_WIDTH*2)       ;; node_width*2 because there are two nodes per byte
+    call sys_util_h_times_e     ;;
+    ld a, #MAP_X_COORD           ;; add the x coord to the x starting coord
+    add l                       ;;
+    ld (X_COORD_CALC), a        ;; store the result for later use
+
+    ld a, (y_pos)               ;; calculate y coord based in y_pos
+    ld h, a                     ;;
+    ld e, #S_NODES_HEIGHT       ;;
+    call sys_util_h_times_e     ;;
+    ld a, #MAP_Y_COORD           ;; add the x coord to the x starting coord
+    dec l                       ;;
+    ld (Y_COORD_CALC), a        ;; store the result for later use
+
+    ;; Calc address screen          
+X_COORD_CALC = . +1             ;; X coord self modifying code 
+    ld c, #00                   ;;
+Y_COORD_CALC = . +1             ;; Y coord self modifying code 
+    ld b, #00                   ;;
+    ld_de_frontbuffer               
+    call cpct_getScreenPtr_asm  ;; Calculate video memory location and return it in HL
+    push hl                     ;; save screen address in stack
+
+    ;; draw node sprite
+    ld a, (y_pos)                       ;; calculate y_pos * 4 (number of bytes per line)
+    ld e, a                             ;;
+    sla e                               ;;
+    sla e                               ;;
+    ld a, (x_pos)                       ;; add x_pos to previous calculus
+    add a, e                            ;;
+    
+    ld a, l                             ;; move hl to the correct position in the node map
+    ld hl, #node_map                    ;;
+    add_hl_a                            ;;
+    
+    ld a, (hl)                          ;; get node data
+    ld (SECOND_NODE), a                 ;; save node data for second node
+    sra a                               ;; get data for first node
+    sra a                               ;;
+    sra a                               ;;
+    sra a                               ;;
+    pop de                              ;; retrieve screen address form stack
+    push de                             ;; save screen address in stack for later use
+    call man_map_draw_node              ;; draw node
+
+SECOND_NODE = . +1    
+    ld a, #00                           ;; self modifying code
+    and #0b00001111                      ;; get data for second node
+    ld bc, #S_NODES_WIDTH                  ;; load bc with the width of a node
+    pop hl                              ;; retrieve screen address from stack
+    add hl, bc                          ;; add width on node to screen address
+    ex de, hl                           ;; store result in de 
+    call man_map_draw_node              ;; draw node
+
+    ;; new col
+    ld a, (x_pos)
+    inc a
+    ld (x_pos), a
+    cp #8
+    jr nz, col_loop
+
+    ;; new line
+    ld a, (y_pos)               ;; decrement line and check if we have reached the top of the map
+    dec a                       ;;
+    ld (y_pos), a 
+    or a                        ;;
+    jr nz, line_loop            ;;
+    
+exit_line_loop:
 
     ret
 

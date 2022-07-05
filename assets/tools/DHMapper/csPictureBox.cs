@@ -12,18 +12,19 @@ namespace DHMapper
 {
     public partial class csPictureBox : PictureBox
     {
-        string tileType;
-        int tileID;
+        public nodeClass node;
 
         public csPictureBox()
         {
             InitializeComponent();
-            TileType = "";
-            TileID = 0;
+            node = new nodeClass(0, 0, 0, 0, 0);
         }
-
-        public string TileType { get => tileType; set => tileType = value; }
-        public int TileID { get => tileID; set => tileID = value; }
+        public csPictureBox(nodeClass n)
+        {
+            InitializeComponent();
+            node = n;
+            
+        }
 
         protected override void OnPaint(PaintEventArgs pe)
         {
