@@ -23,6 +23,8 @@
 .include "man/oponent.h.s"
 .include "man/foe.h.s"
 .include "man/fight.h.s"
+.include "man/effects.h.s"
+.include "sys/animation.h.s"
 
 
 ;;-----------------------------------------------------------------
@@ -176,6 +178,11 @@ sys_behaviour_damage_oponent::
     xor a                       ;; set life to 0
 sbdp_exit:
     ld o_life(ix), a            ;; updates players life
+    ;; Create hit effect
+    ld hl, #anim_explotion      ;; animation of the hit
+    ld c, o_sprite_x(ix)         ;; hit pos x
+    ld b, o_sprite_y(ix)         ;; hit pox y
+    call man_effects_create     ;; Create effect
     ret                         
 
 sbdp_shield_enough:

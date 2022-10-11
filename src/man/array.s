@@ -281,3 +281,35 @@ THIRD_ARRAY = .+2
     or a
     jr nz, _move_loop
     ret
+
+;;-----------------------------------------------------------------
+;;
+;; man_array_execute_each
+;;
+;;  executes the routine pointed in HL for each element in the array pointed in IX
+;;  Input:  hl: routine to execute on each
+;;          ix: array to loop
+;;  Output: 
+;;  Modified: AF, BC, DE, HL
+;;
+man_array_execute_each::
+    ld a, l                 ;;
+    ld (routine), a         ;; store routine in memory
+    ld a, h                 ;;
+    ld (routine+1), a       ;;
+
+    push ix                 ;; load start of array in hl
+    pop hl                  ;;
+    ld de, #a_array         ;;
+    add hl, de              ;;
+    
+    push hl                 ;;
+    pop ix                  ;;  load ix with the first element
+
+    ld a, (routine)         ;; Move routine to hl
+    ld l, a                 ;;
+    ld a, (routine+1)       ;;
+    ld h, a                 ;;
+
+    ret
+routine: .dw #0000

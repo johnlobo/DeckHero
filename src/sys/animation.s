@@ -22,11 +22,11 @@
 .include "common.h.s"
 .include "cpctelera.h.s"
 
-anim_hero::
+anim_player::
     .dw _s_player_0
     .dw _s_player_1
     .dw null_ptr
-    .dw anim_hero
+    .dw anim_player
     
 anim_explotion::
     .dw _s_explotion_0
@@ -40,6 +40,17 @@ anim_explotion::
 ;; Animation system is inspired in animtor from the great 
 ;; "The abduction of Oscar Z"
 ;;-----------------------------------------------------------------
+
+;;-----------------------------------------------------------------
+;;
+;; sys_animation_create
+;;
+;;  creates an element in the array of animations
+;;  Input: ix: 
+;;  Output: 
+;;
+;;  Modified: af, bc, hl
+;;
 
 ;;-----------------------------------------------------------------
 ;;

@@ -15,49 +15,46 @@
 ;;  You should have received a copy of the GNU Lesser General Public License
 ;;  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;-------------------------------------------------------------------------------
-.module array_manager
 
 .include "common.h.s"
+
+.module effects_manager
+
+;;===============================================================================
+;; PUBLIC CONSTANTS
+;;===============================================================================
+MAX_EFFECTS = 4
 
 ;;===============================================================================
 ;; PUBLIC VARIABLES
 ;;===============================================================================
-
+.globl effects
 
 ;;===============================================================================
 ;; PUBLIC METHODS
 ;;===============================================================================
-.globl man_array_init
-.globl man_array_create_element
-.globl man_array_remove_element
-.globl man_array_get_element
-.globl man_array_get_random_element
-.globl man_array_move_all_elements
-.globl man_array_execute_each
+.globl man_effects_create
+.globl man_effects_update
+
 
 ;;===============================================================================
-;; COMPONENT DEFINITION MACRO
+;; ANIMATION DEFINITION MACRO
 ;;===============================================================================
-
-
-.macro DefineComponentArrayStructure_Size _Tname, _N, _ComponentSize
-      _Tname'_count::               .db 0
-      _Tname'_delta::               .db 0
-      _Tname'_component_size::      .db _ComponentSize
-      _Tname'_pend::                .dw _Tname'_array 
-      _Tname'_selected::            .db 0
-      _Tname'_array::
-            .ds _N * _ComponentSize
+.macro DefineEffect _status, _animation, _sprite, _x, _y
+    .db _status                         ;; 00: inactive, 01: active
+    .dw _animation                      ;; animation step
+    .dw _sprite                         ;; sprite to show
+    .db _x                              ;; pos x
+    .db _y                              ;; pos y
 .endm
 
 ;;===============================================================================
-;; DATA ARRAY STRUCTURE CREATION
+;; ANIMATION SCTRUCTURE CREATION
 ;;===============================================================================
-BeginStruct a
-Field a, count , 1
-Field a, delta , 1
-Field a, component_size , 1
-Field a, pend , 2
-Field a, selected , 1
-Field a, array , 1
-EndStruct a
+BeginStruct eff
+Field eff, status , 1
+Field eff, animation , 2 
+Field eff, sprite , 2 
+Field eff, x , 1
+Field eff, y , 1
+EndStruct eff
