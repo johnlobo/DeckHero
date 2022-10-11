@@ -22,15 +22,7 @@
 .include "cpctelera.h.s"
 .include "sys/system.h.s"
 .include "sys/render.h.s"
-;;.include "sys/board.h.s"
-;;.include "sys/input.h.s"
-;;.include "sys/text.h.s"
 .include "sys/messages.h.s"
-;;.include "man/entity.h.s"
-;;.include "man/game.h.s"
-;;.include "sys/audio.h.s"
-;;.include "sys/score.h.s"
-;;.include "sys/files.h.s"
 .include "man/game.h.s"
 
 .module main
