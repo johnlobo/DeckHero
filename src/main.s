@@ -75,6 +75,7 @@ main_init::
    ;;call sys_render_clear_back_buffer
      
    ret
+   
 ;;-----------------------------------------------------------------
 ;;
 ;; MAIN function. This is the entry point of the application.
