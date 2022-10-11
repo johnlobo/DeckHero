@@ -15,48 +15,65 @@
 ;;  You should have received a copy of the GNU Lesser General Public License
 ;;  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;-------------------------------------------------------------------------------
-.module array_manager
 
 .include "common.h.s"
+
+.module animation_system
+
+;;===============================================================================
+;; PUBLIC CONSTANTS
+;;===============================================================================
+.globl anim_hero
+.globl anim_explotion
 
 ;;===============================================================================
 ;; PUBLIC VARIABLES
 ;;===============================================================================
 
-
 ;;===============================================================================
 ;; PUBLIC METHODS
 ;;===============================================================================
-.globl man_array_init
-.globl man_array_create_element
-.globl man_array_remove_element
-.globl man_array_get_element
-.globl man_array_get_random_element
-.globl man_array_move_all_elements
 
 ;;===============================================================================
-;; COMPONENT DEFINITION MACRO
+;; ANIMATION DEFINITION MACRO
 ;;===============================================================================
-
-
-.macro DefineComponentArrayStructure_Size _Tname, _N, _ComponentSize
-      _Tname'_count::               .db 0
-      _Tname'_delta::               .db 0
-      _Tname'_component_size::      .db _ComponentSize
-      _Tname'_pend::                .dw _Tname'_array 
-      _Tname'_selected::            .db 0
-      _Tname'_array::
-            .ds _N * _ComponentSize
+.macro DefineAnim _status, _class, _sprite, _name, _rarity, _type, _energy, _description, _damage, _block, _vulnerable, _weak, _strengh, _exhaust, _add_card, _execute_routine
+    .db _status
+    .db _class
+    .dw _sprite
+    .asciz "_name"
+    .db _rarity
+    .db _type
+    .db _energy
+    .asciz "_description"
+    .db _damage
+    .db _block
+    .db _vulnerable
+    .db _weak
+    .db _strengh
+    .db _exhaust
+    .db _add_card
+    .dw _execute_routine
 .endm
 
 ;;===============================================================================
-;; DATA ARRAY STRUCTURE CREATION
+;; ANIMATION SCTRUCTURE CREATION
 ;;===============================================================================
-BeginStruct a
-Field a, count , 1
-Field a, delta , 1
-Field a, component_size , 1
-Field a, pend , 2
-Field a, selected , 1
-Field a, array , 1
-EndStruct a
+BeginStruct anim
+Field anim, status , 1
+Field anim, class , 1
+Field anim, sprite , 2
+Field anim, name , 16
+Field anim, rarity , 1
+Field anim, type , 1
+Field anim, energy , 1
+Field anim, description , 31
+Field anim, damage , 1
+Field anim, block , 1
+Field anim, vulnerable , 1
+Field anim, weak , 1
+Field anim, strengh , 1
+Field anim, exhaust , 1
+Field anim, add_card , 1
+Field anim, execute_routine, 2
+EndStruct anim

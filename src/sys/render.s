@@ -29,7 +29,7 @@
 .include "sys/behaviour.h.s"
 .include "cpctelera.h.s"
 .include "common.h.s"
-.include "comp/component.h.s"
+.include "man/array.h.s"
 
 
 ;;

@@ -20,7 +20,6 @@
 .include "man/deck.h.s"
 .include "cpctelera.h.s"
 .include "common.h.s"
-.include "comp/component.h.s"
 .include "sys/util.h.s"
 .include "sys/render.h.s"
 .include "sys/behaviour.h.s"

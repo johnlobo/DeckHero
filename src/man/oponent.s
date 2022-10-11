@@ -25,7 +25,6 @@
 .include "man/array.h.s"
 ;;.include "sys/input.h.s"
 ;;.include "sys/render.h.s"
-.include "comp/component.h.s"
 .include "cpctelera.h.s"
 
 ;;

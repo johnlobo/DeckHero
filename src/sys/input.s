@@ -27,7 +27,6 @@
 .include "man/deck.h.s"
 .include "man/array.h.s"
 .include "man/game.h.s"
-.include "comp/component.h.s"
 
 ;;
 ;; Start of _DATA area 

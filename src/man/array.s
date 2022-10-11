@@ -20,7 +20,6 @@
 .include "man/array.h.s"
 .include "cpctelera.h.s"
 .include "common.h.s"
-.include "comp/component.h.s"
 .include "man/deck.h.s"
 .include "sys/util.h.s"
 

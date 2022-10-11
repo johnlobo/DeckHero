@@ -27,7 +27,6 @@
 .include "sys/input.h.s"
 .include "sys/render.h.s"
 .include "sys/behaviour.h.s"
-.include "comp/component.h.s"
 .include "cpctelera.h.s"
 
 
