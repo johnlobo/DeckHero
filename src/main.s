@@ -36,7 +36,7 @@
 ;;
 .area _DATA
 
-_game_loaded_string: .asciz " GAME LOADED "      ;;27 chars, 54 bytes
+_game_loaded_string: .asciz " GAME LOADED - V.011"      ;;27 chars, 54 bytes
 
 
 ;;
@@ -59,7 +59,7 @@ main_init::
 ;;
    call sys_render_init
 
-   ld e, #10                           ;; x
+   ld e, #5                           ;; x
    ld d, #78                           ;; y
    ld b, #44                           ;; h
    ld c, #60                           ;; w
