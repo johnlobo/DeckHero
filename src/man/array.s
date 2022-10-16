@@ -113,11 +113,11 @@ ret
 ;;
 man_array_remove_element::
 
-    ld b, a                     ;; copy card to erase to b
-    ld a, a_count(ix)           ;; check if we have to erase the last card
+    ld b, a                     ;; copy element to erase to b
+    ld a, a_count(ix)           ;; check if we have to erase the last element
     dec a                       ;;
     cp b                        ;;
-    jr z, _last_card            ;;  jump if we have to erase the last card
+    jr z, _last_card            ;;  jump if we have to erase the last element
 
     push ix                     ;; hl to the start of the array    
     pop hl                      ;;
@@ -293,11 +293,17 @@ THIRD_ARRAY = .+2
 ;;  Modified: AF, BC, DE, HL
 ;;
 man_array_execute_each::
-    ld a, l                 ;;
-    ld (routine), a         ;; store routine in memory
-    ld a, h                 ;;
-    ld (routine+1), a       ;;
+    ld a, a_count(ix)       ;; retrieve number of elements in the array
+    or a                    ;; If no elements in arrary return
+    ret z 
 
+    ld b, a                 ;; move the number of elements to b for indexing djnz
+
+    ld (routine), hl        ;; store routine in memory
+
+    ld a, a_component_size(ix)  ;; store component_size in memory
+    ld (comp_size), a       ;;    
+    
     push ix                 ;; load start of array in hl
     pop hl                  ;;
     ld de, #a_array         ;;
@@ -306,10 +312,24 @@ man_array_execute_each::
     push hl                 ;;
     pop ix                  ;;  load ix with the first element
 
-    ld a, (routine)         ;; Move routine to hl
-    ld l, a                 ;;
-    ld a, (routine+1)       ;;
-    ld h, a                 ;;
+loop_each:
+    push bc                 ;; save index in stack
+    ld hl, #return_point    ;;
+    push hl                 ;; set the return point in the stack
+
+    ld hl, (routine)        ;; Move routine to hl
+    jp (hl)                 ;; jump to the routine
+
+return_point:
+    ld d, #0                ;; retrieve component_size
+    ld a, (comp_size)       ;;
+    ld e, a                 ;;
+
+    add ix, de              ;; move ix to the next element
+
+    pop bc                  ;; restore index
+    djnz loop_each
 
     ret
 routine: .dw #0000
+comp_size: .db #0
