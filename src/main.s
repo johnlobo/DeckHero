@@ -36,7 +36,7 @@
 ;;
 .area _DATA
 
-_game_loaded_string: .asciz " GAME LOADED - V.011"      ;;27 chars, 54 bytes
+_game_loaded_string: .asciz " GAME LOADED - V.015"      ;;27 chars, 54 bytes
 
 
 ;;

@@ -21,6 +21,8 @@
 .include "cpctelera.h.s"
 .include "common.h.s"
 .include "man/array.h.s"
+.include "man/oponent.h.s"
+.include "sys/render.h.s"
 
 
 ;;
@@ -38,6 +40,12 @@ DefineComponentArrayStructure_Size effects, MAX_EFFECTS, sizeof_eff
 effect_template: 
 ;;          status, animation, sprote, x, y 
 DefineEffect 01, null_ptr, null_ptr, 0, 0 
+
+
+;;
+;; Start of _CODE area
+;; 
+.area _CODE
 
 ;;-----------------------------------------------------------------
 ;;
@@ -102,4 +110,82 @@ updated_elements: .db #00
 ;;  Modified: af, bc, hl
 ;;
 man_effects_update_one::
+    ret
+
+;;-----------------------------------------------------------------
+;;
+;; man_effects_animate
+;;
+;;  creates an element in the array of effects
+;;  Input:  hl: icon
+;;          ix: oponent
+;;  Output:
+;;
+;;  Modified: af, bc, hl
+;;
+man_effects_animate::
+    
+    xor a                           ;; initilizes the index
+mea_anim_loop:
+    push af                         ;; store index in the stack
+    push hl                         ;; store sprite address in the stack
+
+    ;; Calculate screen address
+
+    sla a                           ;; multiply index by two and save it in b
+    ld b, a
+
+    ld a, o_sprite_h(ix)
+    sra a
+    sub a, b
+    ld b, o_sprite_y(ix)
+    add a, b
+    ld b, a
+
+    ;;ld c, o_sprite_w(ix)            ;; load width of sprite in c
+    ;;sra c                           ;; divide width by 2
+    ;;ld a, o_sprite_x(ix)            ;; load x coord of sprite in e
+    ;;add a, c                        ;; x+(width/2)
+    ;;ld c, a                         ;; c = xcoord
+
+    ld a, o_sprite_x(ix)
+    ld c, #S_SMALL_ICONS_WIDTH+2
+    sub a, c
+    ld c, a
+
+    ld_de_backbuffer                ;;
+
+    call cpct_getScreenPtr_asm      ;; Calculate video memory location and return it in HL
+    
+    ld (mea_restore_back+1), hl     ;; store the last screen adress to restore back ground
+
+    ;; Draw sprite
+    ex de, hl
+    
+    pop hl                          ;; retrieve sprite address form the stack
+    push hl                         ;; store sprite address in the stack for later use
+    ld c, #S_SMALL_ICONS_WIDTH
+    ld b, #S_SMALL_ICONS_HEIGHT
+    call cpct_drawSprite_asm
+
+    call sys_render_switch_buffers
+    
+    ld b, #20                       ;; delay 
+    call cpct_waitHalts_asm
+
+mea_restore_back:
+    ld de, #0000
+    xor a
+    ld c, #S_SMALL_ICONS_WIDTH
+    ld b, #S_SMALL_ICONS_HEIGHT
+    call cpct_drawSolidBox_asm
+
+    pop hl                          ;; retrieve sprite address form the stack
+    pop af
+    inc a
+    cp #4
+    jr nz, mea_anim_loop
+
+    call cpct_waitVSYNC_asm
+
     ret

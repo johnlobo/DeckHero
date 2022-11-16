@@ -56,7 +56,7 @@ $(eval $(call IMG2SP, CONVERT         , assets/font_chars_0.png , 4, 423, s_font
 $(eval $(call IMG2SP, CONVERT         , assets/small_numbers.png , 4, 5, s_small_numbers, ,))
 $(eval $(call IMG2SP, CONVERT         , assets/player.png , 16, 40, s_player, ,))
 $(eval $(call IMG2SP, CONVERT         , assets/blob.png , 32, 25, s_blob, ,))
-$(eval $(call IMG2SP, CONVERT         , assets/small-icons.png , 8, 10, s_small_icons, ,))
+$(eval $(call IMG2SP, CONVERT         , assets/small-icons.png , 8, 12, s_small_icons, ,))
 $(eval $(call IMG2SP, CONVERT         , assets/coin.png , 8, 10, s_coin, ,))
 $(eval $(call IMG2SP, CONVERT         , assets/icons.png , 12, 17, s_icons, ,))
 $(eval $(call IMG2SP, CONVERT         , assets/status.png , 10, 12, s_status, ,))

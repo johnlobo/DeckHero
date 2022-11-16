@@ -49,6 +49,7 @@
 .globl _s_small_icons_07
 .globl _s_small_icons_08
 .globl _s_small_icons_09
+.globl _s_small_icons_10
 .globl _s_coin
 .globl _s_small_numbers_00
 .globl _s_small_numbers_01
@@ -151,7 +152,7 @@ S_BLOB_WIDTH = 16
 S_BLOB_HEIGHT = 25
 
 S_SMALL_ICONS_WIDTH = 4
-S_SMALL_ICONS_HEIGHT = 10
+S_SMALL_ICONS_HEIGHT = 12
 S_SMALL_ICONS_SIZE = S_SMALL_ICONS_WIDTH * S_SMALL_ICONS_HEIGHT
 
 S_COIN_WIDTH = 4

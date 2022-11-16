@@ -27,6 +27,7 @@
 .include "man/fight.h.s"
 .include "man/oponent.h.s"
 .include "man/foe.h.s"
+.include "man/effects.h.s"
 
 
 
@@ -112,10 +113,19 @@ man_deck_remove_card_from_hand::
 ;; man_deck_execute_hit
 ;;
 ;;  Dummy execute routine to initialize a card
+;;
+;;  Input: ix: card 
+;; 
+
 man_deck_execute_hit::
-    push ix
-    ld c, c_damage(ix)                        ;; make samage
-    ld ix, #foes_array
+    push ix                                 ;; store card address
+    ld ix, #foes_array                      ;;
+    ld hl, #_s_small_icons_10                ;;
+    call man_effects_animate                ;;
+    pop ix                                  ;; restore card address
+    push ix                                 ;;
+    ld c, c_damage(ix)                      ;; make damage
+    ld ix, #foes_array                      ;;
     call sys_behaviour_damage_oponent
     m_updated_foe_effects
     pop ix
