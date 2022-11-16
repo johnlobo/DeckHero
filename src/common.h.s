@@ -83,6 +83,10 @@
 .globl _s_pipes_4
 .globl _s_pipes_5
 .globl _s_pipes_6
+.globl _s_effect_0
+.globl _s_effect_1
+.globl _s_effect_2
+.globl _s_effect_3
 
 ;;===============================================================================
 ;; PUBLIC VARIBLES
@@ -166,6 +170,9 @@ S_STATUS_HEIGHT = 12
 
 S_NODES_WIDTH = 6
 S_NODES_HEIGHT = 12
+
+S_EFFECT_WIDTH = 8
+S_EFFECT_HEIGHT = 18
 
 ;; GAME CONSTANTS
 MAX_FOES = 4
