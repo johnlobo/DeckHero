@@ -117,7 +117,7 @@ man_effects_update_one::
 ;; man_effects_animate
 ;;
 ;;  creates an element in the array of effects
-;;  Input:  hl: icon
+;;  Input:  hl: animation
 ;;          ix: oponent
 ;;  Output:
 ;;
@@ -125,72 +125,7 @@ man_effects_update_one::
 ;;
 man_effects_animate::
 
-;;    
-;;    xor a                           ;; initilizes the index
-;;mea_anim_loop:
-;;    push af                         ;; store index in the stack
-;;    push hl                         ;; store sprite address in the stack
-;;
-;;    ;; Calculate screen address
-;;
-;;    sla a                           ;; multiply index by two and save it in b
-;;    ld b, a
-;;
-;;    ld a, o_sprite_h(ix)
-;;    sra a
-;;    sub a, b
-;;    ld b, o_sprite_y(ix)
-;;    add a, b
-;;    ld b, a
-;;
-;;    ;;ld c, o_sprite_w(ix)            ;; load width of sprite in c
-;;    ;;sra c                           ;; divide width by 2
-;;    ;;ld a, o_sprite_x(ix)            ;; load x coord of sprite in e
-;;    ;;add a, c                        ;; x+(width/2)
-;;    ;;ld c, a                         ;; c = xcoord
-;;
-;;    ld a, o_sprite_x(ix)
-;;    ld c, #S_SMALL_ICONS_WIDTH+2
-;;    sub a, c
-;;    ld c, a
-;;
-;;    ld_de_backbuffer                ;;
-;;
-;;    call cpct_getScreenPtr_asm      ;; Calculate video memory location and return it in HL
-;;    
-;;    ld (mea_restore_back+1), hl     ;; store the last screen adress to restore back ground
-;;
-;;    ;; Draw sprite
-;;    ex de, hl
-;;    
-;;    pop hl                          ;; retrieve sprite address form the stack
-;;    push hl                         ;; store sprite address in the stack for later use
-;;    ld c, #S_SMALL_ICONS_WIDTH
-;;    ld b, #S_SMALL_ICONS_HEIGHT
-;;    call cpct_drawSprite_asm
-;;
-;;    call sys_render_switch_buffers
-;;    
-;;    ld b, #20                       ;; delay 
-;;    call cpct_waitHalts_asm
-;;
-;;mea_restore_back:
-;;    ld de, #0000
-;;    xor a
-;;    ld c, #S_SMALL_ICONS_WIDTH
-;;    ld b, #S_SMALL_ICONS_HEIGHT
-;;    call cpct_drawSolidBox_asm
-;;
-;;    pop hl                          ;; retrieve sprite address form the stack
-;;    pop af
-;;    inc a
-;;    cp #4
-;;    jr nz, mea_anim_loop
-;;
-;;    call cpct_waitVSYNC_asm
-;;
-;;    ret
-;;
+    ld (effect_animation), hl
 
     ld a, o_sprite_h(ix)
     sra a
@@ -219,50 +154,57 @@ man_effects_animate::
     ld b, #S_EFFECT_HEIGHT
     call cpct_getScreenToSprite_asm
 
-    ld b, #0
+    ld b, #0                                    ;; initialize animation step
 mea_anim_loop:
-    push bc
+    push bc                                     ;; store animation step in the stack
 
     ;; Draw sprite
     ;; calculate sprite address                 ;;
-    ld hl, #_s_effect_0                         ;;
-    ld de, #(S_EFFECT_WIDTH*S_EFFECT_HEIGHT)    ;;            
-    ld a, b                                     ;;
-mea_prep_de:            
-    or a            
-    jr z, mea_prep_de_exit          
-    add hl, de          
-    dec a           
-    jr mea_prep_de          
-mea_prep_de_exit:           
-    ex de, hl                                   ;; move result to de
-    ld hl, (#effect_address)
-    ex de, hl                                   ;; hl stores sprite address, and de screen address
-    ld c, #S_EFFECT_WIDTH
-    ld b, #S_EFFECT_HEIGHT
-    call cpct_drawSprite_asm
+    ld hl, (effect_animation)                   ;; load in hl the animation to show
+    ld a, b                                     ;; load in a the step of the animation
+    sla a                                       ;; multiply by two step (address is 2 bytes)
+    add_hl_a                                    ;; add it to starting animation
+    ld__hl__hl_with_a                           ;; retrieve the address of the sprite in hl
+
+                                                ;; (2B BC) psprite	Source Sprite Pointer
+                                                ;; (2B DE) pvideomem	Destination video memory pointer
+                                                ;; (1B IXL) width	Sprite Width in bytes (>0) (Beware, not in pixels!)
+                                                ;; (1B IXH) height	Sprite Height in bytes (>0)
+                                                ;; (2B HL) pmasktable0	Pointer to an Aligned Mask Table for transparencies with palette index 0
+
+    push hl                                     ;; move sprite pointer to bc
+    pop bc                                      ;;
+    ld hl, (#effect_address)                    ;; move screen address to de
+    ex de, hl                                   ;;
+    ld__ixl S_EFFECT_WIDTH
+    ld__ixh S_EFFECT_HEIGHT                         
+    ld hl, #transparency_table
+
+    call cpct_drawSpriteMaskedAlignedTable_asm
+
 
     ;; delay
-    ld b, #20                    
+    ld b, #50                    
     call cpct_waitHalts_asm
 
     ;; restore background
     ld hl, (#effect_address)
     ex de, hl
-    ld hl, (#effect_buffer)
+    ld hl, #effect_buffer
     ld c, #S_EFFECT_WIDTH
     ld b, #S_EFFECT_HEIGHT
     call cpct_drawSprite_asm
  
-    pop bc                                      ;; endo of loop
+    ;; End of loop
+    pop bc                                      ;; end of loop
     inc b                                       ;;
-    push bc
     ld a, b                                     ;;
     cp #4                                       ;;
     jr nz, mea_anim_loop                        ;;
-    pop bc 
     
     ret
 
-    effect_buffer: .ds #144
+
+    effect_buffer: .ds (#S_EFFECT_WIDTH*#S_EFFECT_HEIGHT)
     effect_address: .dw #0000
+    effect_animation: .dw #0000

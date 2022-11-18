@@ -29,6 +29,9 @@
 ;;===============================================================================
 .globl anim_player
 .globl anim_explotion
+.globl anim_effect
+.globl anim_hit
+.globl anim_shield
 
 ;;===============================================================================
 ;; PUBLIC METHODS

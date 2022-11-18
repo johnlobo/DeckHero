@@ -83,10 +83,19 @@
 .globl _s_pipes_4
 .globl _s_pipes_5
 .globl _s_pipes_6
-.globl _s_effect_0
-.globl _s_effect_1
-.globl _s_effect_2
-.globl _s_effect_3
+.globl _s_effect_00
+.globl _s_effect_01
+.globl _s_effect_02
+.globl _s_effect_03
+.globl _s_effect_04
+.globl _s_effect_05
+.globl _s_effect_06
+.globl _s_effect_07
+.globl _s_effect_08
+.globl _s_effect_09
+.globl _s_effect_10
+.globl _s_effect_11
+
 
 ;;===============================================================================
 ;; PUBLIC VARIBLES
@@ -116,6 +125,7 @@
 .globl cpct_getScreenToSprite_asm
 .globl cpct_setVideoMemoryPage_asm
 .globl cpct_waitVSYNCStart_asm
+.globl cpct_drawSpriteMaskedAlignedTable_asm
 
 ;;===============================================================================
 ;; DEFINED CONSTANTS
@@ -172,7 +182,7 @@ S_NODES_WIDTH = 6
 S_NODES_HEIGHT = 12
 
 S_EFFECT_WIDTH = 8
-S_EFFECT_HEIGHT = 18
+S_EFFECT_HEIGHT = 16
 
 ;; GAME CONSTANTS
 MAX_FOES = 4
@@ -240,3 +250,16 @@ MAP_HEIGHT = 7
     sizeof_'struct = struct'_offset
 .endm
 
+.mdelete ld__hl__hl_with_a
+.macro ld__hl__hl_with_a
+    ld a,(hl)
+    inc hl
+    ld h,(hl)
+    ld l,a
+.endm
+
+.mdelete test_hl_0
+.macro test_hl_0
+    ld a, l
+    or h
+.endm

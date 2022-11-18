@@ -38,6 +38,8 @@ sys_render_zone_messages      = 0b10000000
 .globl sys_render_front_buffer
 .globl sys_render_touched_zones
 
+.globl transparency_table
+
 
 ;;===============================================================================
 ;; PUBLIC METHODS

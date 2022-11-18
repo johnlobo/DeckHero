@@ -23,6 +23,7 @@
 .include "sys/util.h.s"
 .include "sys/render.h.s"
 .include "sys/behaviour.h.s"
+.include "sys/animation.h.s"
 .include "man/array.h.s"
 .include "man/fight.h.s"
 .include "man/oponent.h.s"
@@ -120,7 +121,7 @@ man_deck_remove_card_from_hand::
 man_deck_execute_hit::
     push ix                                 ;; store card address
     ld ix, #foes_array                      ;;
-    ld hl, #_s_small_icons_10                ;;
+    ld hl, #anim_hit                        ;;
     call man_effects_animate                ;;
     pop ix                                  ;; restore card address
     push ix                                 ;;
@@ -137,10 +138,12 @@ man_deck_execute_hit::
 ;;
 ;;  Dummy execute routine to initialize a card
 man_deck_execute_defend::
-    ld b, c_block(ix)                      ;; load the block to add
+    ld b, c_block(ix)                           ;; load the block to add
     push ix
     ld ix, #player
-    call man_oponent_add_block                 ;;
+    ld hl, #anim_shield                         ;;
+    call man_effects_animate                    ;;
+    call man_oponent_add_block                  ;;
     pop ix
     ret
 

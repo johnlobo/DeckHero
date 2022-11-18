@@ -36,6 +36,29 @@ anim_explotion::
     .dw null_ptr
     .dw null_ptr
 
+anim_effect::
+    .dw _s_effect_00
+    .dw _s_effect_01
+    .dw _s_effect_02
+    .dw _s_effect_03
+    .dw null_ptr
+
+anim_hit::
+    .dw _s_effect_04
+    .dw _s_effect_05
+    .dw _s_effect_06
+    .dw _s_effect_07
+    .dw null_ptr
+
+anim_shield::
+    .dw _s_effect_08
+    .dw _s_effect_09
+    .dw _s_effect_10
+    .dw _s_effect_11
+    .dw null_ptr
+    
+
+
 ;;-----------------------------------------------------------------
 ;; Animation system is inspired in animtor from the great 
 ;; "The abduction of Oscar Z"

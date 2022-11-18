@@ -3,17 +3,41 @@
 #define _ASSETS_EFFECT_H_
 
 #include <types.h>
-#define S_EFFECT_0_W 8
-#define S_EFFECT_0_H 18
-extern const u8 s_effect_0[8 * 18];
-#define S_EFFECT_1_W 8
-#define S_EFFECT_1_H 18
-extern const u8 s_effect_1[8 * 18];
-#define S_EFFECT_2_W 8
-#define S_EFFECT_2_H 18
-extern const u8 s_effect_2[8 * 18];
-#define S_EFFECT_3_W 8
-#define S_EFFECT_3_H 18
-extern const u8 s_effect_3[8 * 18];
+#define S_EFFECT_00_W 8
+#define S_EFFECT_00_H 16
+extern const u8 s_effect_00[8 * 16];
+#define S_EFFECT_01_W 8
+#define S_EFFECT_01_H 16
+extern const u8 s_effect_01[8 * 16];
+#define S_EFFECT_02_W 8
+#define S_EFFECT_02_H 16
+extern const u8 s_effect_02[8 * 16];
+#define S_EFFECT_03_W 8
+#define S_EFFECT_03_H 16
+extern const u8 s_effect_03[8 * 16];
+#define S_EFFECT_04_W 8
+#define S_EFFECT_04_H 16
+extern const u8 s_effect_04[8 * 16];
+#define S_EFFECT_05_W 8
+#define S_EFFECT_05_H 16
+extern const u8 s_effect_05[8 * 16];
+#define S_EFFECT_06_W 8
+#define S_EFFECT_06_H 16
+extern const u8 s_effect_06[8 * 16];
+#define S_EFFECT_07_W 8
+#define S_EFFECT_07_H 16
+extern const u8 s_effect_07[8 * 16];
+#define S_EFFECT_08_W 8
+#define S_EFFECT_08_H 16
+extern const u8 s_effect_08[8 * 16];
+#define S_EFFECT_09_W 8
+#define S_EFFECT_09_H 16
+extern const u8 s_effect_09[8 * 16];
+#define S_EFFECT_10_W 8
+#define S_EFFECT_10_H 16
+extern const u8 s_effect_10[8 * 16];
+#define S_EFFECT_11_W 8
+#define S_EFFECT_11_H 16
+extern const u8 s_effect_11[8 * 16];
 
 #endif
