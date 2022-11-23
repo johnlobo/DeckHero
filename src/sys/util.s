@@ -81,6 +81,31 @@ sys_util_h_times_e::
   add hl,de
   ret
 
+;;-----------------------------------------------------------------;; 
+;;  sys_util_h_times_e
+;;
+;;Inputs:
+;;     HL is the numerator
+;;     C is the denominator
+;;Outputs:
+;;     A is the remainder
+;;     B is 0
+;;     C is not changed
+;;     DE is not changed
+;;     HL is the quotient
+;;
+sys_util_hl_div_c:
+       ld b,16
+       xor a
+         add hl,hl
+         rla
+         cp c
+         jr c,.+4
+           inc l
+           sub c
+         djnz .-7
+       ret
+
 ;;-----------------------------------------------------------------
 ;;
 ;; sys_util_BCD_GetEnd

@@ -26,6 +26,7 @@
 ;; PUBLIC METHODS
 ;;===============================================================================
 .globl sys_util_h_times_e
+.globl sys_util_hl_div_c
 .globl sys_util_BCD_GetEnd
 .globl sys_util_BCD_Add
 .globl sys_util_BCD_Compare
