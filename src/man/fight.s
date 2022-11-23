@@ -87,7 +87,7 @@ ended_fight:: .db 0
 man_fight_init::
 
     call sys_render_clear_front_buffer
-    call sys_render_clear_back_buffer
+    ;;call sys_render_clear_back_buffer
 
     ld e, #10                           ;; x
     ld d, #78                           ;; y
@@ -97,12 +97,8 @@ man_fight_init::
     ld a, #2                            ;; don't wait for a key
     call sys_messages_show
     
-    ld b, #200                          ;; delay 1 sec.
-_mfi_delay:
-    push bc
-    call cpct_waitVSYNC_asm
-    pop bc
-    djnz _mfi_delay
+    ld b, #100                          ;; delay 1 sec.
+    call cpct_waitHalts_asm
 
     ld ix, #fight_deck                  ;; initialize fight_deck
     call man_array_init                 ;;
@@ -125,8 +121,8 @@ _mfi_delay:
     call man_foe_create
 
     call sys_render_full_fight_screen   ;; renders the fight screen
-    call sys_render_switch_buffers
-    call sys_render_full_fight_screen   ;; renders the fight screen
+    ;;call sys_render_switch_buffers
+    ;;call sys_render_full_fight_screen   ;; renders the fight screen
 
     ld a, (hand_max)
     ld b, a

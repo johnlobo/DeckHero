@@ -23,6 +23,7 @@
 .include "man/array.h.s"
 .include "man/oponent.h.s"
 .include "sys/render.h.s"
+.include "sys/text.h.s"
 
 
 ;;
@@ -116,17 +117,21 @@ man_effects_update_one::
 ;;
 ;; man_effects_animate
 ;;
-;;  creates an element in the array of effects
+;;  
 ;;  Input:  hl: animation
+;;          c: damage
 ;;          ix: oponent
 ;;  Output:
 ;;
 ;;  Modified: af, bc, hl
 ;;
 man_effects_animate::
-
+    ;; save parameters
     ld (effect_animation), hl
+    ld a, c
+    ld (effect_damage), a
 
+    ;; calculate video memory address for effect
     ld a, o_sprite_h(ix)
     sra a
     ld b, o_sprite_y(ix)
@@ -145,9 +150,9 @@ man_effects_animate::
 
     call cpct_getScreenPtr_asm      ;; Calculate video memory location and return it in HL  
 
-    ld (#effect_address), hl          ;; save screen address for later use
+    ld (#effect_memory_address), hl          ;; save screen address for later use
     
-    ;; save background
+    ;; save background for effect
     ;; hl already loaded
     ld de, #effect_buffer
     ld c, #S_EFFECT_WIDTH
@@ -157,9 +162,26 @@ man_effects_animate::
     ld b, #0                                    ;; initialize animation step
 mea_anim_loop:
     push bc                                     ;; store animation step in the stack
+    
+    ;; store damage background
+    ld a, b                                     ;; a = loop index + 1
+    ;;inc a                                       ;;
+    ;sla a                                       ;; a*4
+    sla a                                       ;;
+    
+    ;;  get damage background
+    ld hl, (#effect_memory_address)             ;;
+    add_hl_a                                    ;; hl holds number memory address
+    ld (#effect_damage_memory_address), hl      ;; save damage memory address for later use
+    ld de, #effect_damage_buffer                
+    ld c, #10
+    ld b, #5
+    call cpct_getScreenToSprite_asm
 
     ;; Draw sprite
     ;; calculate sprite address                 ;;
+    pop bc
+    push bc
     ld hl, (effect_animation)                   ;; load in hl the animation to show
     ld a, b                                     ;; load in a the step of the animation
     sla a                                       ;; multiply by two step (address is 2 bytes)
@@ -174,7 +196,7 @@ mea_anim_loop:
 
     push hl                                     ;; move sprite pointer to bc
     pop bc                                      ;;
-    ld hl, (#effect_address)                    ;; move screen address to de
+    ld hl, (#effect_memory_address)                    ;; move screen address to de
     ex de, hl                                   ;;
     ld__ixl S_EFFECT_WIDTH
     ld__ixh S_EFFECT_HEIGHT                         
@@ -183,16 +205,30 @@ mea_anim_loop:
     call cpct_drawSpriteMaskedAlignedTable_asm
 
 
+    ;; Draw damage
+    ld hl, (#effect_damage_memory_address)
+    ex de, hl
+    ld hl, (#effect_damage)
+    call sys_text_draw_small_number
+
     ;; delay
     ld b, #50                    
     call cpct_waitHalts_asm
 
-    ;; restore background
-    ld hl, (#effect_address)
+    ;; restore effect background
+    ld hl, (#effect_memory_address)
     ex de, hl
     ld hl, #effect_buffer
     ld c, #S_EFFECT_WIDTH
     ld b, #S_EFFECT_HEIGHT
+    call cpct_drawSprite_asm
+
+    ;; restore damage background
+    ld hl, (#effect_damage_memory_address)
+    ex de, hl
+    ld hl, #effect_damage_buffer
+    ld c, #10
+    ld b, #5
     call cpct_drawSprite_asm
  
     ;; End of loop
@@ -206,5 +242,8 @@ mea_anim_loop:
 
 
     effect_buffer: .ds (#S_EFFECT_WIDTH*#S_EFFECT_HEIGHT)
-    effect_address: .dw #0000
+    effect_memory_address: .dw #0000
     effect_animation: .dw #0000
+    effect_damage: .db #00
+    effect_damage_buffer: .ds #50
+    effect_damage_memory_address: .dw #000

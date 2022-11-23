@@ -306,8 +306,8 @@ ac_action:
     call man_array_create_element
 
 ac_cancel:
-    call sys_render_switch_buffers
-    call sys_render_full_fight_screen   ;; renders the fight screen
+    ;;call sys_render_switch_buffers
+    ;;call sys_render_full_fight_screen   ;; renders the fight screen
 
     ret
 

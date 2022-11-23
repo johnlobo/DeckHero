@@ -70,9 +70,6 @@ main_init::
    ;; set random seed using hl form message show
 
    call cpct_setSeed_mxor_asm
-
-   ;;call sys_render_clear_front_buffer
-   ;;call sys_render_clear_back_buffer
      
    ret
    

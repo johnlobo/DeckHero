@@ -164,6 +164,13 @@ sys_behaviour_add2Effect::
 ;;  Modified: af, bc
 ;;
 sys_behaviour_damage_oponent::
+    ;; Create hit effect
+    push bc
+    ld hl, #anim_hit            ;;  
+    call man_effects_animate    ;;
+    pop bc
+    
+    ;; Substract damage
     ld a, o_shield(ix)          ;; check if shield is enought to get the damage
     sub c                       ;;
     jp p, sbdp_shield_enough
@@ -178,11 +185,6 @@ sys_behaviour_damage_oponent::
     xor a                       ;; set life to 0
 sbdp_exit:
     ld o_life(ix), a            ;; updates players life
-    ;; Create hit effect
-    ld hl, #anim_explotion      ;; animation of the hit
-    ld c, o_sprite_x(ix)         ;; hit pos x
-    ld b, o_sprite_y(ix)         ;; hit pox y
-    call man_effects_create     ;; Create effect
     ret                         
 
 sbdp_shield_enough:

@@ -284,7 +284,7 @@ sys_input_action:
 ;;
 sys_input_show_deck:
     ld ix, #fight_deck
-    call sys_render_show_array
+    call sys_render_show_deck
 
     call sys_input_wait4anykey
     

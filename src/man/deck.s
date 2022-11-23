@@ -120,15 +120,17 @@ man_deck_remove_card_from_hand::
 
 man_deck_execute_hit::
     push ix                                 ;; store card address
+    ld a, c_damage(ix)                      ;; get damage from card
+    ld (mdeh_damage+1), a                   ;; smc for later use of damage
+
     ld ix, #foes_array                      ;;
-    ld hl, #anim_hit                        ;;
-    call man_effects_animate                ;;
-    pop ix                                  ;; restore card address
-    push ix                                 ;;
-    ld c, c_damage(ix)                      ;; make damage
-    ld ix, #foes_array                      ;;
-    call sys_behaviour_damage_oponent
-    m_updated_foe_effects
+    ;;ld c, a                                 ;; c = damage damage
+    ;;ld hl, #anim_hit                        ;;
+    ;;call man_effects_animate                ;;
+mdeh_damage:
+    ld c, #00                               ;; make damage
+    call sys_behaviour_damage_oponent       ;;
+    m_updated_foe_effects                   ;; update effects
     pop ix
     ret
 
@@ -136,13 +138,19 @@ man_deck_execute_hit::
 ;;
 ;; man_deck_execute_defend
 ;;
-;;  Dummy execute routine to initialize a card
+;;  Executes a shield increasement
+;;
+;;
 man_deck_execute_defend::
-    ld b, c_block(ix)                           ;; load the block to add
+    ld a, c_block(ix)                           ;; load the block to add
+    ld (mded_add_block+1), a
     push ix
-    ld ix, #player
+    ld ix, #player                              ;;
     ld hl, #anim_shield                         ;;
+    ld c, a                                     ;; block to add
     call man_effects_animate                    ;;
+mded_add_block:
+    ld b, #00                                   ;; add block
     call man_oponent_add_block                  ;;
     pop ix
     ret

@@ -45,11 +45,7 @@ sys_render_zone_messages      = 0b10000000
 ;; PUBLIC METHODS
 ;;===============================================================================
 .globl sys_render_init
-.globl sys_render_card
 .globl sys_render_update_fight
-.globl sys_render_erase_hand
-.globl sys_render_hand
-.globl sys_render_show_array
 .globl sys_render_erase_oponent
 .globl sys_render_full_fight_screen
 .globl sys_render_energy
@@ -61,6 +57,11 @@ sys_render_zone_messages      = 0b10000000
 .globl sys_render_switch_buffers
 .globl sys_render_clear_front_buffer
 .globl sys_render_clear_back_buffer
+
+.globl sys_render_card
+.globl sys_render_erase_hand
+.globl sys_render_hand
+.globl sys_render_show_deck
 
 ;;===============================================================================
 ;; MACRO
@@ -108,10 +109,6 @@ sys_render_zone_messages      = 0b10000000
 .macro m_draw_blank_small_number
    push de
    push hl
-   ;;ld hl, #sys_render_blank_sprite4x5
-   ;;ld c, #4
-   ;;ld b, #5
-   ;;call cpct_drawSprite_asm
    ld c, #5
    ld b, #5
    ld a, #0                         ;; Patern of solid box
