@@ -94,8 +94,8 @@ sys_util_h_times_e::
 ;;     DE is not changed
 ;;     HL is the quotient
 ;;
-sys_util_hl_div_c:
-       ld b,16
+sys_util_hl_div_c::
+       ld b,#16
        xor a
          add hl,hl
          rla

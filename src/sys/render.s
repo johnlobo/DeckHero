@@ -317,7 +317,7 @@ sys_render_update_fight::
     or a                                        ;;
     ret z                                       ;; return if no update is necessary
 
-    
+    call cpct_waitVSYNC_asm
     call sys_render_update_hand                 ;;
     call sys_render_update_foe_effects          ;;  render zones back buffer
     call sys_render_update_player_effects       ;;
@@ -328,11 +328,11 @@ sys_render_update_fight::
 
     ;;call sys_render_switch_buffers              ;; switch buffers
     
-    call sys_render_update_hand                 ;;
-    call sys_render_update_foe_effects          ;;  render zones front buffer
-    call sys_render_update_player_effects       ;;
-    call sys_render_update_icon_numbers         ;;
-    call sys_render_current_behaviour
+    ;;call sys_render_update_hand                 ;;
+    ;;call sys_render_update_foe_effects          ;;  render zones front buffer
+    ;;call sys_render_update_player_effects       ;;
+    ;;call sys_render_update_icon_numbers         ;;
+    ;;call sys_render_current_behaviour
 
     xor a                                       ;; initilizes player updates
     ld (player_updates), a                      ;;
@@ -918,6 +918,64 @@ sys_render_full_fight_screen::
     
     call sys_render_hand
 
+    ret
+
+
+;;-----------------------------------------------------------------
+;;
+;;  sys_render_getNextLine
+;;
+;;  Shows the the entire fight screen
+;;  Input: hl : screen address 
+;;  Output: hl : screen address below
+;;  Modified: AF, DE, HL
+;;
+sys_render_getNextLine::
+    ld     a, #0x8          ;; [2] / HL = DE = DE + 0x800
+    add    h                ;; 
+    ld     h, a             ;; [1] | Adding 0x800 makes HL point to the start of the next line
+    ;; We check if we have crossed video memory boundaries (which will happen every 8 lines). 
+    ;; ... If that happens, bits 13,12 and 11 of destination pointer will be 0
+    and   #0x38             ;; [2] leave out only bits 13,12 and 11 from new memory address (00xxx000 00000000)
+    jp    nz, srg_exit          ;; [3] If any bit from {13,12,11} is not 0, we are still inside 
+                            ;; ... video memory boundaries, so proceed with next line
+    ;; Every 8 lines, we cross the 16K video memory boundaries and have to
+    ;; reposition destination pointer. That means our next line is 16K-0x50 bytes back
+    ;; which is the same as advancing 48K+0x50 = 0xC050 bytes, as memory is 64K 
+    ;; and our 16bit pointers cycle over it
+    ld    de, #0xC050       ;; [3] We advance destination pointer to next line
+    add   hl, de            ;; [3] HL = DE + 0xC050
+srg_exit:
+    ret
+
+;;-----------------------------------------------------------------
+;;
+;;  sys_render_getPreviousLine
+;;
+;;  Shows the the entire fight screen
+;;  Input: hl : screen address 
+;;  Output: hl : screen address below
+;;  Modified: AF, DE, HL
+;;
+sys_render_getPreviousLine::
+    ld a, h
+    ld h, #0x8
+    sub    h                ;; 
+    ld     h, a             ;; [1] | Adding 0x800 makes HL point to the start of the next line
+    ;; We check if we have crossed video memory boundaries (which will happen every 8 lines). 
+    ;; ... If that happens, bits 13,12 and 11 of destination pointer will be 0
+    or   #0x3F             ;; [2] leave out only bits 13,12 and 11 from new memory address (00xxx000 00000000)
+    cp #0xff
+    jp z, srp_exit          ;; [3] If any bit from {13,12,11} is not 0, we are still inside 
+                            ;; ... video memory boundaries, so proceed with next line
+    ;; Every 8 lines, we cross the 16K video memory boundaries and have to
+    ;; reposition destination pointer. That means our next line is 16K-0x50 bytes back
+    ;; which is the same as advancing 48K+0x50 = 0xC050 bytes, as memory is 64K 
+    ;; and our 16bit pointers cycle over it
+    ld    de, #0xC050       ;; [3] We advance destination pointer to next line
+    or a				;; reset carry flag
+    sbc   hl, de            ;; [3] HL = DE + 0xC050
+srp_exit:
     ret
 
     
