@@ -215,10 +215,19 @@ mea_anim_loop:
     ld hl, (#effect_damage_memory_address)
     ex de, hl
     ld hl, (#effect_damage)
+    ld b, #3                                ;; small number color = 15 
     call sys_text_draw_small_number
 
     ;; delay
-    ld b, #75                    
+    pop af                                  ;; retrieve index look
+    push af                                 ;; store index loop
+    cp #1                                   ;; check if we are in the second loop to wait longer
+    jr z, mea_second_loop                   ;; jump if second loop
+    ld b, #75 
+    jr mea_delay           
+mea_second_loop:
+    ld b, #150        
+mea_delay:
     call cpct_waitHalts_asm
 
     ;; restore effect background
@@ -242,7 +251,7 @@ mea_anim_loop:
     inc b                                       ;;
     ld a, b                                     ;;
     cp #4                                       ;;
-    jr nz, mea_anim_loop                        ;;
+    jp nz, mea_anim_loop                        ;;
     
     ret
 

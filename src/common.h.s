@@ -126,6 +126,8 @@
 .globl cpct_setVideoMemoryPage_asm
 .globl cpct_waitVSYNCStart_asm
 .globl cpct_drawSpriteMaskedAlignedTable_asm
+.globl cpct_drawSpriteColorizeM0_asm
+.globl cpct_pens2pixelPatternPairM0_asm
 
 ;;===============================================================================
 ;; DEFINED CONSTANTS

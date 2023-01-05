@@ -339,6 +339,7 @@ _ns8_Num2:
 ;; Input:
 ;;  a : number to draw
 ;;  de : screen address
+;;  b : color
 ;;  
 ;; Returns: 
 ;;  Nothing
@@ -347,7 +348,8 @@ _ns8_Num2:
 ;;      
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 sys_text_draw_small_char_number::
-    push de                             ;; save de for later
+    push de                             ;; store video memory address in stack
+    
     ld h, #10                           ;; calculate the offset from the first char
     ld e, a                             ;;
     call sys_util_h_times_e             ;; l = 20 * number
@@ -355,10 +357,20 @@ sys_text_draw_small_char_number::
     ld c, l                             ;;
     ld hl, #_s_small_numbers_00         ;; point hl to the start of the numbers
     add hl, bc                          ;; address of the number to show
-    pop de                              ;; retreive de
-    ld c, #S_SMALL_NUMBERS_WIDTH
+    push hl                             ;; store sprite address in stack
+
+    ld d, #15                               ;; Calculate in DE the replacement patern
+    ld e, #4                                ;;
+    call cpct_pens2pixelPatternPairM0_asm   ;;
+    ex de, hl                               ;; move replacement patern to hl
+    
+    pop af                                  ;; retrieve sprite address
+    pop de                                  ;; retrieve video memory address
+    
+    ld c, #S_SMALL_NUMBERS_WIDTH            
     ld b, #S_SMALL_NUMBERS_HEIGHT
-    call cpct_drawSprite_asm            ;; draw the number
+
+    call cpct_drawSpriteColorizeM0_asm  ;; draw the number in color b
     ret
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -367,6 +379,7 @@ sys_text_draw_small_char_number::
 ;; Input:
 ;;  hl : number to convert
 ;;  de : screen address
+;;  b  : color (0-15)
 ;;  
 ;; Returns: 
 ;;  Nothing
@@ -377,6 +390,8 @@ sys_text_draw_small_char_number::
 ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 sys_text_draw_small_number::
+    ld a, b
+    ld (_small_number_color), a
     ld a, l
     ld (_original_number), a
     ld	bc, #-100
@@ -396,6 +411,8 @@ _dsn_Num2:
 	sbc	hl,bc
 
     cpctm_push de, hl, bc
+    ld a, (_small_number_color)
+    ld b, a
     call sys_text_draw_small_char_number
     cpctm_pop bc, hl, de
 
@@ -404,4 +421,5 @@ _dsn_Num2:
     
     ret
 
-_original_number: .db #0    
+_original_number: .db #0
+_small_number_color: .db #0

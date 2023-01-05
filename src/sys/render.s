@@ -402,8 +402,8 @@ _srcb_add_effect_endloop:
     pop bc                              ;; retrieve behaviour and amount from stack
     ld h, #0
     ld l, c
-    
-    call sys_text_draw_small_number ;; draws number
+    ld b, #15                           ;; small number color = 15 
+    call sys_text_draw_small_number     ;; draws number
 
     pop ix
     ret
@@ -500,6 +500,7 @@ _Y_COORD_HEART_EFFECT = .+1
     ld h, #0
     ld l, o_life(ix)
     
+    ld b, #15                       ;; small number color = 15 
     call sys_text_draw_small_number ;; draws number
 
 
@@ -593,7 +594,9 @@ _Y_COORD_EFFECT = .+1
     inc de
 _draw_effect_number:
     ld h, #0
-    ld l, a    
+    ld l, a
+
+    ld b, #15                       ;; small number color = 15 
     call sys_text_draw_small_number
 
 
@@ -751,6 +754,7 @@ sys_render_topbar::
 
     ld h, #0
     ld l, o_force(ix)
+    ld b, #15                           ;; small number color
     call sys_text_draw_small_number
 
     ret
@@ -776,6 +780,7 @@ sys_render_energy::
  ;;   ld h, #0
  ;;   ld l, a
     ld hl, (#player_energy)
+    ld b, #15                           ;; small number color
     call sys_text_draw_small_number
     ret
 
@@ -797,6 +802,7 @@ sys_render_sacrifice::
 
     ld h, #0
     ld l, a_count(ix)
+    ld b, #15                           ;; small number color
     call sys_text_draw_small_number
     ret
 
@@ -819,6 +825,7 @@ sys_render_deck::
 
     ld h, #0
     ld l, a_count(ix)
+    ld b, #15                           ;; small number color
     call sys_text_draw_small_number
     ret
 
@@ -840,6 +847,7 @@ sys_render_cemetery::
 
     ld h, #0
     ld l, a_count(ix)
+    ld b, #15                           ;; small number color
     call sys_text_draw_small_number
     ret
 
