@@ -174,6 +174,10 @@ mea_anim_loop:
     call sys_render_getPreviousLine
     call sys_render_getPreviousLine
     call sys_render_getPreviousLine
+    call sys_render_getPreviousLine
+    call sys_render_getPreviousLine
+    call sys_render_getPreviousLine
+    call sys_render_getPreviousLine
     ld (#effect_damage_memory_address), hl      ;; save damage memory address for later use
     ld de, #effect_damage_buffer                
     ld c, #(S_SMALL_NUMBERS_WIDTH*2)
@@ -214,7 +218,7 @@ mea_anim_loop:
     call sys_text_draw_small_number
 
     ;; delay
-    ld b, #50                    
+    ld b, #75                    
     call cpct_waitHalts_asm
 
     ;; restore effect background
@@ -246,6 +250,6 @@ mea_anim_loop:
     effect_buffer:: .ds (#S_EFFECT_WIDTH*#S_EFFECT_HEIGHT)
     effect_memory_address:: .dw #0000
     effect_animation:: .dw #0000
-    effect_damage:: .db #00
+    effect_damage:: .dw #0000
     effect_damage_buffer:: .ds #50
     effect_damage_memory_address:: .dw #000
