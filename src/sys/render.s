@@ -776,10 +776,10 @@ sys_render_energy::
     
     m_draw_blank_small_number       ;; erases previous number
 
- ;;   ld a, (player_energy)
- ;;   ld h, #0
- ;;   ld l, a
-    ld hl, (#player_energy)
+    ld a, (player_energy)
+    ld h, #0
+    ld l, a
+    ;;ld hl, (#player_energy)
     ld b, #15                           ;; small number color
     call sys_text_draw_small_number
     ret

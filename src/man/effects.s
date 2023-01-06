@@ -215,7 +215,7 @@ mea_anim_loop:
     ld hl, (#effect_damage_memory_address)
     ex de, hl
     ld hl, (#effect_damage)
-    ld b, #3                                ;; small number color = 15 
+    ld b, #4                                ;; small number color = 15 
     call sys_text_draw_small_number
 
     ;; delay

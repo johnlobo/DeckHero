@@ -353,6 +353,10 @@ sys_text_draw_small_char_number::
     ld h, #10                           ;; calculate the offset from the first char
     ld e, a                             ;;
     call sys_util_h_times_e             ;; l = 20 * number
+
+    ld a, b
+    ld (COLOR_REP), a                ;; self modifying code to pass color
+
     ld b, #0                            ;;
     ld c, l                             ;;
     ld hl, #_s_small_numbers_00         ;; point hl to the start of the numbers
@@ -360,7 +364,8 @@ sys_text_draw_small_char_number::
     push hl                             ;; store sprite address in stack
 
     ld d, #15                               ;; Calculate in DE the replacement patern
-    ld e, #4                                ;;
+COLOR_REP = . +1
+    ld e, #0                                ;;
     call cpct_pens2pixelPatternPairM0_asm   ;;
     ex de, hl                               ;; move replacement patern to hl
     
@@ -369,8 +374,9 @@ sys_text_draw_small_char_number::
     
     ld c, #S_SMALL_NUMBERS_WIDTH            
     ld b, #S_SMALL_NUMBERS_HEIGHT
-
+    push ix
     call cpct_drawSpriteColorizeM0_asm  ;; draw the number in color b
+    pop ix
     ret
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -410,15 +416,15 @@ _dsn_Num2:
 	jr	c,_dsn_Num2
 	sbc	hl,bc
 
-    cpctm_push de, hl, bc
+    cpctm_push de, hl, bc, af
     ld a, (_small_number_color)
     ld b, a
+    pop af
     call sys_text_draw_small_char_number
     cpctm_pop bc, hl, de
 
     inc de                      ;; go to the next screen address
     inc de                      ;;
-    
     ret
 
 _original_number: .db #0
