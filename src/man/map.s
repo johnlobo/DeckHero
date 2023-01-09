@@ -49,6 +49,19 @@ map::
 .db #0b01111001, #0b01111010, #0b00010011, #0b00001100
 
 ;;
+;; New map
+;;
+;; Each node has 4 bits for type of node and another 4 bits for ancestors
+node_map2:
+.db #0b00010000, #0b00010000, #0b00010000, #0b00010000
+.db #0b00011000, #0b00010100, #0b00010000, #0b00011010 
+.db #0b00011000, #0b00010100, #0b00010000, #0b00011010 
+.db #0b00011000, #0b00010100, #0b00010000, #0b00011010 
+.db #0b00011000, #0b00010100, #0b00010000, #0b00011010 
+.db #0b00011000, #0b00010100, #0b00010000, #0b00011010 
+.db #0b00011000, #0b00010100, #0b00010000, #0b00011010 
+
+;;
 ;;Node map
 ;;
 node_map:
@@ -343,21 +356,23 @@ mmrn_loop_exit:
 
     ret
 
-
+x_coord_odd: .db #((S_NODES_WIDTH*1)+MAP_X_START), #((S_NODES_WIDTH*3)+MAP_X_START), #((S_NODES_WIDTH*5)+MAP_X_START), #((S_NODES_WIDTH*7)+MAP_X_START)
+x_coord_even: .db #((S_NODES_WIDTH*0)+MAP_X_START), #((S_NODES_WIDTH*2)+MAP_X_START), #((S_NODES_WIDTH*4)+MAP_X_START), #((S_NODES_WIDTH*6)+MAP_X_START)
 
 
 ;;-----------------------------------------------------------------
 ;;
 ;; man_map_render::
 ;;
-;;  Initializes the map
+;;  renders the map
 ;;  Input: 
 ;;  Output: 
 ;;  Modified: 
 ;;
 man_map_render::
-    ld c, #0                            ;; Initialize bc
-    ld b, #0                            ;;
+    ;ld c, #0                            ;; Initialize bc
+    ;ld b, #0                            ;;
+    ld bc, #0000
     ld hl, #map                         ;; initialize hl
 mmr_main_loop:
     ld a, c                             ;; check if col = MAP_WIDTH
@@ -406,7 +421,7 @@ man_map_draw_node:
 
 ;;-----------------------------------------------------------------
 ;;
-;; man_map_render::
+;; man_map_draw_map::
 ;;
 ;;  Initializes the map
 ;;  Input: 
@@ -499,6 +514,47 @@ SECOND_NODE = . +1
     jr nz, line_loop            ;;
     
 exit_line_loop:
-
     ret
 
+;;-----------------------------------------------------------------
+;;
+;; man_map_render2::
+;;
+;;  renders the map
+;;  Input: 
+;;  Output: 
+;;  Modified: 
+;;
+man_map_render2::
+    ld bc, #0000
+    ld hl, #node_map2                   ;; initialize hl
+mmr2_main_loop:
+    ld a, c                             ;; check if col = MAP_WIDTH
+    cp #MAP_WIDTH                       ;;
+    jr z, mmr2_next_line                 ;; if so -> next line
+    ld a, (hl)                          ;; get node value
+    or a                                ;;
+    cpctm_push bc, hl                   ;; save bc and hl
+    call nz, man_map_render_node        ;; if node value is not zero -> render node
+    cpctm_pop hl, bc                    ;; restore bc and hl
+    inc c                               ;; inc col
+    inc hl                              ;; inc map pointer
+    jr mmr2_main_loop                    ;; loop
+mmr2_next_line:
+    push bc                             ;; save bc
+    push hl                             ;; save hl
+    ld a, b                             ;; check if row != 0
+    or a                                ;;
+    call nz, man_map_render_pipeline    ;; render pipeline if row != 0
+    pop hl                              ;; restore hl
+    pop bc                              ;; restore bc
+    ld c, #0                            ;; init col
+    inc b                               ;; inc row
+    ld a, b                             ;; check if row = MAP_HEIGHT
+    cp #MAP_HEIGHT                      ;;
+    jr nz, mmr2_main_loop                ;; if not -> loop
+    ;; new line
+
+    call sys_input_wait4anykey          ;; wait for any key
+
+    ret
