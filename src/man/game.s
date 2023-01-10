@@ -79,7 +79,7 @@ man_game_init::
     call man_deck_init      ;; Initialize deck
 
     call man_map_init
-    call man_map_render
+    call man_map_render2    ;; New map Render routine
     
     call man_game_add_new_card
     call man_fight_init     ;; Initialize fight

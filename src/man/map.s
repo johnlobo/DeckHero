@@ -310,6 +310,14 @@ mmrp_loop_exit:
 ;;
 man_map_render_node::
     push af
+    
+    ld (MMRN_render_line+3), a       ;; save node data for later
+
+    ld a, b                         ;; save Y coord to decide if we have to render lines
+    ld (MMRN_check_line), a       ;;
+
+    ld (MMRN_render_line), bc
+
     ;; Calc x coord
     sla c                       ;; node positon * 2
     bit 0, b                    ;;
@@ -338,7 +346,8 @@ mmrn_skip_indent:
     
     ;; draw node sprite
     pop af
-    ld c, #0b00000111
+    ;;ld c, #0b00000111             old mask
+    ld c, #0b00001111
     and c
     dec a                           ;; adjust 1 = 0
     ld hl, #_s_nodes_0
@@ -354,11 +363,17 @@ mmrn_loop_exit:
     ld b, #S_NODES_HEIGHT
     call cpct_drawSprite_asm
 
+MMRN_check_line = . +1              ;; check if we are in line 0 to avoid render lines
+    ld a, #0                        ;;
+    or a                            ;;
+    ret z                           ;; return if line=0
+
+MMRN_render_line = . +1
+    ld bc, #0000
+    ld a, #0
+    call nz, man_map_render_lines   ;; render lines out of node
+
     ret
-
-x_coord_odd: .db #((S_NODES_WIDTH*1)+MAP_X_START), #((S_NODES_WIDTH*3)+MAP_X_START), #((S_NODES_WIDTH*5)+MAP_X_START), #((S_NODES_WIDTH*7)+MAP_X_START)
-x_coord_even: .db #((S_NODES_WIDTH*0)+MAP_X_START), #((S_NODES_WIDTH*2)+MAP_X_START), #((S_NODES_WIDTH*4)+MAP_X_START), #((S_NODES_WIDTH*6)+MAP_X_START)
-
 
 ;;-----------------------------------------------------------------
 ;;
@@ -541,20 +556,165 @@ mmr2_main_loop:
     inc hl                              ;; inc map pointer
     jr mmr2_main_loop                    ;; loop
 mmr2_next_line:
-    push bc                             ;; save bc
-    push hl                             ;; save hl
-    ld a, b                             ;; check if row != 0
-    or a                                ;;
-    call nz, man_map_render_pipeline    ;; render pipeline if row != 0
-    pop hl                              ;; restore hl
-    pop bc                              ;; restore bc
     ld c, #0                            ;; init col
     inc b                               ;; inc row
     ld a, b                             ;; check if row = MAP_HEIGHT
     cp #MAP_HEIGHT                      ;;
     jr nz, mmr2_main_loop                ;; if not -> loop
-    ;; new line
 
     call sys_input_wait4anykey          ;; wait for any key
 
     ret
+
+;;-----------------------------------------------------------------
+;;
+;; man_map_render_lines
+;;
+;;  Renders the lines of a node
+;;  Input:  a: node
+;;          b: row
+;;          c: col
+;;  Output: 
+;;  Modified: 
+;;
+man_map_render_lines::
+    and #0b00001111             ;; extract the descendants information
+    ld (lines_data), a          ;; store it in memory
+    
+    ld a, b                     ;; Select line to work with odd, even
+    and #0b00000001             ;;
+    jr z, mmrl_even_line        ;;
+    ld hl, #x_coord_odd         ;;
+    ld (x_coord_per_line_1), hl ;;
+    ld hl, #x_coord_even        ;;
+    ld (x_coord_per_line_2), hl ;;
+    jr mmrl_draw_lines          ;;
+mmrl_even_line:                 ;;
+    ld hl, #x_coord_even        ;;
+    ld (x_coord_per_line_1), hl ;;
+    ld hl, #x_coord_odd         ;;
+    ld (x_coord_per_line_2), hl ;;
+
+mmrl_draw_lines:
+
+    ld hl, (x_coord_per_line_1) ;; x1
+    ld a, c                     ;;
+    add l                       ;;
+    ld l, a                     ;;
+    ld a, (hl)                  ;;
+    ld h, #0                    ;;
+    ld l, a                     ;;
+    ld (x1_node_coord), hl      ;; store x1 for later use
+
+    ld hl, #y_coord             ;; y1
+    ld a, b                     ;;
+    add l                       ;;
+    ld l,a                      ;;
+    ld a, (hl)                  ;;
+    ld h, #0                    ;;
+    ld l, a                     ;;
+    ld (y1_node_coord), hl      ;; store y1 for later use
+
+
+
+    ld a, b                     ;; y2
+    dec a                       ;; take previous line
+    ld hl, #y_coord             ;;
+    add l                       ;;
+    ld l,a                      ;;
+    ld a, (hl)                  ;;
+    ld h, #0                    ;;
+    ld l, a                     ;;
+    ld (y2_node_coord), hl      ;; store y2 for later use
+
+
+mmrl_bit0:
+    ld a, (lines_data)
+    bit 3,a
+    jr z, mmrl_bit1
+    ld hl, (x1_node_coord)          ;; x1
+    push hl                         ;;
+    ld hl, (y1_node_coord)          ;; y1
+    push hl                         ;;
+    ld hl, (x_coord_per_line_2)     ;; x2
+    ld a, (hl)                      ;;
+    ld h, #0                        ;;
+    ld l, a                         ;;
+    push hl                         ;;
+    ld hl, (y2_node_coord)          ;; y2
+    push hl                         ;;
+    call sys_render_draw_line       ;; draw_line           
+    
+mmrl_bit1:
+    ld a, (lines_data)
+    bit 2,a
+    jr z, mmrl_bit2
+    ld hl, (x1_node_coord)          ;; x1
+    push hl                         ;;
+    ld hl, (y1_node_coord)          ;; y1
+    push hl                         ;;
+    ld hl, (x_coord_per_line_2)     ;; x2
+    inc hl                          ;;
+    ld a, (hl)                      ;;
+    ld h, #0                        ;;
+    ld l, a                         ;;
+    push hl                         ;;
+    ld hl, (y2_node_coord)          ;; y2
+    push hl                         ;;
+    call sys_render_draw_line       ;; draw_line
+
+mmrl_bit2:
+    ld a, (lines_data)
+    bit 1,a
+    jr z, mmrl_bit3
+    ld hl, (x1_node_coord)          ;; x1
+    push hl                         ;;
+    ld hl, (y1_node_coord)          ;; y1
+    push hl                         ;;
+    ld hl, (x_coord_per_line_2)     ;; x2
+    inc hl                          ;;
+    inc hl                          ;;
+    ld a, (hl)                      ;;
+    ld h, #0                        ;;
+    ld l, a                         ;;
+    push hl                         ;;
+    ld hl, (y2_node_coord)          ;; y2
+    push hl                         ;;
+    call sys_render_draw_line       ;; draw_line
+
+mmrl_bit3:
+    ld a, (lines_data)
+    bit 0,a
+    jr z, mmrl_exit
+    ld hl, (x1_node_coord)          ;; x1
+    push hl                         ;;
+    ld hl, (y1_node_coord)          ;; y1
+    push hl                         ;;
+    ld hl, (x_coord_per_line_2)     ;; x2
+    inc hl                          ;;
+    inc hl                          ;;
+    inc hl                          ;;
+    ld a, (hl)                      ;;
+    ld h, #0                        ;;
+    ld l, a                         ;;
+    push hl                         ;;
+    ld hl, (y2_node_coord)          ;; y2
+    push hl                         ;;
+    call sys_render_draw_line       ;; draw_line
+mmrl_exit:
+    ret
+x1_node_coord:: .dw #0000
+y1_node_coord:: .dw #0000
+y2_node_coord:: .dw #0000
+lines_data:: .db #0
+x_coord_per_line_1:: .dw #0000
+x_coord_per_line_2:: .dw #0000
+
+x_coord_odd::   .db #((S_NODES_WIDTH*1)+MAP_X_START), #((S_NODES_WIDTH*3)+MAP_X_START) 
+                .db #((S_NODES_WIDTH*5)+MAP_X_START), #((S_NODES_WIDTH*7)+MAP_X_START)
+x_coord_even::  .db #((S_NODES_WIDTH*0)+MAP_X_START), #((S_NODES_WIDTH*2)+MAP_X_START) 
+                .db #((S_NODES_WIDTH*4)+MAP_X_START), #((S_NODES_WIDTH*6)+MAP_X_START)
+y_coord::   .db #((S_NODES_HEIGHT*2*6)+MAP_Y_START), #((S_NODES_HEIGHT*2*5)+MAP_Y_START)
+            .db #((S_NODES_HEIGHT*2*4)+MAP_Y_START), #((S_NODES_HEIGHT*2*3)+MAP_Y_START)
+            .db #((S_NODES_HEIGHT*2*2)+MAP_Y_START), #((S_NODES_HEIGHT*2*1)+MAP_Y_START)
+            .db #((S_NODES_HEIGHT*2*0)+MAP_Y_START)

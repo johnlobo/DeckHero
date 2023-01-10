@@ -999,25 +999,23 @@ sys_render_draw_line::
 CMASK = #0xB6A3 ;EQU &B338  change address for colormask in 464
  
     di
-    ld (exith+1),sp  ; save SP to restore at exit..
-    ld ix, #0000
-    add ix, sp
-   
- 
-    ld l,8(ix)
-    ld h,9(ix)
+    pop bc              ;; save return address for later
+
+     
+    pop hl
     ld (x1+1),hl  ;x1
  
-    ld e,6(ix)
-    ld d,7(ix)
+    pop de
     ld (y1+1),de  ;y1
  
-    ld l,4(ix)
-    ld h,5(ix)
+    pop hl
     ld (x2+1),hl  ;x2
  
-    ld l,2(ix)
-    ld h,3(ix)
+    pop hl
+
+    push bc             ;; Insert thhe return address again
+    ld (exith+1), sp  ; save SP to restore at exit..
+
     ld (y2+1),hl  ;y2
     ;   x1, y1 start point   0<x<159
     ;   x2, y2  end point    0<y<199
@@ -1194,7 +1192,7 @@ nex3:
     JP DRLOOP
  
 exith:
-    ld sp, #0
+    ld sp, #0000
     ei
     ret  ; finished OK
 
