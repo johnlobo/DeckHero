@@ -53,8 +53,8 @@ map::
 ;;
 ;; Each node has 4 bits for type of node and another 4 bits for ancestors
 node_map2:
-.db #0b00010000, #0b00010000, #0b00010000, #0b00010000
-.db #0b00011000, #0b00010100, #0b00010000, #0b00011010 
+.db #0b00010000, #0b00100000, #0b00110000, #0b01000000
+.db #0b01011000, #0b00010100, #0b00100000, #0b00111010 
 .db #0b00011000, #0b00010100, #0b00010000, #0b00011010 
 .db #0b00011000, #0b00010100, #0b00010000, #0b00011010 
 .db #0b00011000, #0b00010100, #0b00010000, #0b00011010 
@@ -347,8 +347,12 @@ mmrn_skip_indent:
     ;; draw node sprite
     pop af
     ;;ld c, #0b00000111             old mask
-    ld c, #0b00001111
-    and c
+    ;;ld c, #0b00001111
+    ;;and c
+    sra a                       ;; shift right 4 times
+    sra a                       ;;
+    sra a                       ;;
+    sra a                       ;;
     dec a                           ;; adjust 1 = 0
     ld hl, #_s_nodes_0
     ld bc, #(S_NODES_WIDTH*S_NODES_HEIGHT)
@@ -597,15 +601,6 @@ mmrl_even_line:                 ;;
 
 mmrl_draw_lines:
 
-    ld hl, (x_coord_per_line_1) ;; x1
-    ld a, c                     ;;
-    add l                       ;;
-    ld l, a                     ;;
-    ld a, (hl)                  ;;
-    ld h, #0                    ;;
-    ld l, a                     ;;
-    ld (x1_node_coord), hl      ;; store x1 for later use
-
     ld hl, #y_coord             ;; y1
     ld a, b                     ;;
     add l                       ;;
@@ -632,16 +627,20 @@ mmrl_bit0:
     ld a, (lines_data)
     bit 3,a
     jr z, mmrl_bit1
-    ld hl, (x1_node_coord)          ;; x1
-    push hl                         ;;
-    ld hl, (y1_node_coord)          ;; y1
+    ld hl, (y2_node_coord)          ;; y2
     push hl                         ;;
     ld hl, (x_coord_per_line_2)     ;; x2
     ld a, (hl)                      ;;
     ld h, #0                        ;;
     ld l, a                         ;;
     push hl                         ;;
-    ld hl, (y2_node_coord)          ;; y2
+    ld hl, (y1_node_coord)          ;; y1
+    push hl                         ;;
+    ld hl, (x_coord_per_line_1)     ;; x1
+    ld__hl__hl_with_a               ;;
+    ld a, (hl)                      ;;
+    ld h, #0                        ;;
+    ld l, a                         ;;
     push hl                         ;;
     call sys_render_draw_line       ;; draw_line           
     
@@ -649,9 +648,7 @@ mmrl_bit1:
     ld a, (lines_data)
     bit 2,a
     jr z, mmrl_bit2
-    ld hl, (x1_node_coord)          ;; x1
-    push hl                         ;;
-    ld hl, (y1_node_coord)          ;; y1
+    ld hl, (y2_node_coord)          ;; y2
     push hl                         ;;
     ld hl, (x_coord_per_line_2)     ;; x2
     inc hl                          ;;
@@ -659,7 +656,14 @@ mmrl_bit1:
     ld h, #0                        ;;
     ld l, a                         ;;
     push hl                         ;;
-    ld hl, (y2_node_coord)          ;; y2
+    ld hl, (y1_node_coord)          ;; y1
+    push hl                         ;;
+    ld hl, (x_coord_per_line_1)     ;; x1
+    ld__hl__hl_with_a               ;;
+    inc hl                          ;;
+    ld a, (hl)                      ;;
+    ld h, #0                        ;;
+    ld l, a                         ;;
     push hl                         ;;
     call sys_render_draw_line       ;; draw_line
 
@@ -667,9 +671,7 @@ mmrl_bit2:
     ld a, (lines_data)
     bit 1,a
     jr z, mmrl_bit3
-    ld hl, (x1_node_coord)          ;; x1
-    push hl                         ;;
-    ld hl, (y1_node_coord)          ;; y1
+    ld hl, (y2_node_coord)          ;; y2
     push hl                         ;;
     ld hl, (x_coord_per_line_2)     ;; x2
     inc hl                          ;;
@@ -678,7 +680,15 @@ mmrl_bit2:
     ld h, #0                        ;;
     ld l, a                         ;;
     push hl                         ;;
-    ld hl, (y2_node_coord)          ;; y2
+    ld hl, (y1_node_coord)          ;; y1
+    push hl                         ;;
+    ld hl, (x_coord_per_line_1)     ;; x1
+    ld__hl__hl_with_a               ;;
+    inc hl                          ;;
+    inc hl                          ;;
+    ld a, (hl)                      ;;
+    ld h, #0                        ;;
+    ld l, a                         ;;
     push hl                         ;;
     call sys_render_draw_line       ;; draw_line
 
@@ -686,9 +696,7 @@ mmrl_bit3:
     ld a, (lines_data)
     bit 0,a
     jr z, mmrl_exit
-    ld hl, (x1_node_coord)          ;; x1
-    push hl                         ;;
-    ld hl, (y1_node_coord)          ;; y1
+    ld hl, (y2_node_coord)          ;; y2
     push hl                         ;;
     ld hl, (x_coord_per_line_2)     ;; x2
     inc hl                          ;;
@@ -698,7 +706,16 @@ mmrl_bit3:
     ld h, #0                        ;;
     ld l, a                         ;;
     push hl                         ;;
-    ld hl, (y2_node_coord)          ;; y2
+    ld hl, (y1_node_coord)          ;; y1
+    push hl                         ;;
+    ld hl, (x_coord_per_line_1)     ;; x1
+    ld__hl__hl_with_a               ;;
+    inc hl                          ;;
+    inc hl                          ;;
+    inc hl                          ;;
+    ld a, (hl)                      ;;
+    ld h, #0                        ;;
+    ld l, a                         ;;
     push hl                         ;;
     call sys_render_draw_line       ;; draw_line
 mmrl_exit:
@@ -714,7 +731,7 @@ x_coord_odd::   .db #((S_NODES_WIDTH*1)+MAP_X_START), #((S_NODES_WIDTH*3)+MAP_X_
                 .db #((S_NODES_WIDTH*5)+MAP_X_START), #((S_NODES_WIDTH*7)+MAP_X_START)
 x_coord_even::  .db #((S_NODES_WIDTH*0)+MAP_X_START), #((S_NODES_WIDTH*2)+MAP_X_START) 
                 .db #((S_NODES_WIDTH*4)+MAP_X_START), #((S_NODES_WIDTH*6)+MAP_X_START)
-y_coord::   .db #((S_NODES_HEIGHT*2*6)+MAP_Y_START), #((S_NODES_HEIGHT*2*5)+MAP_Y_START)
-            .db #((S_NODES_HEIGHT*2*4)+MAP_Y_START), #((S_NODES_HEIGHT*2*3)+MAP_Y_START)
-            .db #((S_NODES_HEIGHT*2*2)+MAP_Y_START), #((S_NODES_HEIGHT*2*1)+MAP_Y_START)
-            .db #((S_NODES_HEIGHT*2*0)+MAP_Y_START)
+y_coord::   .db #(MAP_Y_START - (S_NODES_HEIGHT*2*0)), #(MAP_Y_START-(S_NODES_HEIGHT*2*1)) ;;(12*2*6)+178
+            .db #(MAP_Y_START - (S_NODES_HEIGHT*2*2)), #(MAP_Y_START-(S_NODES_HEIGHT*2*3))
+            .db #(MAP_Y_START - (S_NODES_HEIGHT*2*4)), #(MAP_Y_START-(S_NODES_HEIGHT*2*5))
+            .db #(MAP_Y_START - (S_NODES_HEIGHT*2*6))
