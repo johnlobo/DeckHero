@@ -83,6 +83,22 @@ node_map:
 line_buffer:: .db #0x00, #0x02, #0x01, #0x04, #0x06, #0x02, #0x01, #0xff
 indent:: .db #0x00
 
+x1_node_coord:: .dw #0000
+y1_node_coord:: .dw #0000
+y2_node_coord:: .dw #0000
+lines_data:: .db #0
+x_coord_per_line_1:: .dw #0000
+x_coord_per_line_2:: .dw #0000
+
+x_coord_even::  .db #(((0*2)*S_NODES_WIDTH)+MAP_X_START),  (((1*2)*S_NODES_WIDTH)+MAP_X_START)
+                .db #(((2*2)*S_NODES_WIDTH)+MAP_X_START),  (((3*2)*S_NODES_WIDTH)+MAP_X_START)
+x_coord_odd::   .db #((((0*2)+1)*S_NODES_WIDTH)+MAP_X_START), ((((1*2)+1)*S_NODES_WIDTH)+MAP_X_START)
+                .db #((((2*2)+1)*S_NODES_WIDTH)+MAP_X_START), ((((3*2)+1)*S_NODES_WIDTH)+MAP_X_START)
+y_coord::   .db #(MAP_Y_START - (S_NODES_HEIGHT*2*0)), #(MAP_Y_START-(S_NODES_HEIGHT*2*1)) ;;(12*2*6)+178
+            .db #(MAP_Y_START - (S_NODES_HEIGHT*2*2)), #(MAP_Y_START-(S_NODES_HEIGHT*2*3))
+            .db #(MAP_Y_START - (S_NODES_HEIGHT*2*4)), #(MAP_Y_START-(S_NODES_HEIGHT*2*5))
+            .db #(MAP_Y_START - (S_NODES_HEIGHT*2*6))
+
 ;;
 ;; Start of _CODE area
 ;; 
@@ -297,87 +313,7 @@ mmrp_loop_exit:
     pop bc
     ret
 
-;;-----------------------------------------------------------------
-;;
-;; man_map_render_node
-;;
-;;  Initializes the map
-;;  Input:  a: node data
-;;          c: x coord
-;;          b: y coord
-;;  Output: 
-;;  Modified: 
-;;
-man_map_render_node::
-    push af
-    
-    ld (MMRN_render_line+3), a       ;; save node data for later
 
-    ld a, b                         ;; save Y coord to decide if we have to render lines
-    ld (MMRN_check_line), a       ;;
-
-    ld (MMRN_render_line), bc
-
-    ;; Calc x coord
-    sla c                       ;; node positon * 2
-    bit 0, b                    ;;
-    jr z, mmrn_skip_indent      ;; if line is odd indent node
-    inc c                       ;;
-mmrn_skip_indent:
-    ld h, c                     ;;
-    ld e, #S_NODES_WIDTH        ;;
-    call sys_util_h_times_e     ;; calc (x*NODE_WIDTH) + MAP_X_START
-    ld a, #MAP_X_START          ;;
-    add l                       ;;
-    ld c, a                     ;;
-    
-    ;; calc y coord
-    ld h, b                     ;;
-    ld e, #(S_NODES_HEIGHT*2)   ;;
-    call sys_util_h_times_e     ;; calc (y*NODE_HEIGTH) + MAP_Y_START
-    ld a, #MAP_Y_START          ;;
-    sub l                       ;;
-    ld b, a                     ;;
-
-    ;; Calc address screen
-    ld_de_frontbuffer    
-    call cpct_getScreenPtr_asm      ;; Calculate video memory location and return it in HL
-    ex de, hl                       ;; move screen address to de
-    
-    ;; draw node sprite
-    pop af
-    ;;ld c, #0b00000111             old mask
-    ;;ld c, #0b00001111
-    ;;and c
-    sra a                       ;; shift right 4 times
-    sra a                       ;;
-    sra a                       ;;
-    sra a                       ;;
-    dec a                           ;; adjust 1 = 0
-    ld hl, #_s_nodes_0
-    ld bc, #(S_NODES_WIDTH*S_NODES_HEIGHT)
-mmrn_loop:
-    or a
-    jr z, mmrn_loop_exit
-    add hl, bc
-    dec a
-    jr mmrn_loop
-mmrn_loop_exit:
-    ld c, #S_NODES_WIDTH
-    ld b, #S_NODES_HEIGHT
-    call cpct_drawSprite_asm
-
-MMRN_check_line = . +1              ;; check if we are in line 0 to avoid render lines
-    ld a, #0                        ;;
-    or a                            ;;
-    ret z                           ;; return if line=0
-
-MMRN_render_line = . +1
-    ld bc, #0000
-    ld a, #0
-    call nz, man_map_render_lines   ;; render lines out of node
-
-    ret
 
 ;;-----------------------------------------------------------------
 ;;
@@ -535,40 +471,7 @@ SECOND_NODE = . +1
 exit_line_loop:
     ret
 
-;;-----------------------------------------------------------------
-;;
-;; man_map_render2::
-;;
-;;  renders the map
-;;  Input: 
-;;  Output: 
-;;  Modified: 
-;;
-man_map_render2::
-    ld bc, #0000
-    ld hl, #node_map2                   ;; initialize hl
-mmr2_main_loop:
-    ld a, c                             ;; check if col = MAP_WIDTH
-    cp #MAP_WIDTH                       ;;
-    jr z, mmr2_next_line                 ;; if so -> next line
-    ld a, (hl)                          ;; get node value
-    or a                                ;;
-    cpctm_push bc, hl                   ;; save bc and hl
-    call nz, man_map_render_node        ;; if node value is not zero -> render node
-    cpctm_pop hl, bc                    ;; restore bc and hl
-    inc c                               ;; inc col
-    inc hl                              ;; inc map pointer
-    jr mmr2_main_loop                    ;; loop
-mmr2_next_line:
-    ld c, #0                            ;; init col
-    inc b                               ;; inc row
-    ld a, b                             ;; check if row = MAP_HEIGHT
-    cp #MAP_HEIGHT                      ;;
-    jr nz, mmr2_main_loop                ;; if not -> loop
 
-    call sys_input_wait4anykey          ;; wait for any key
-
-    ret
 
 ;;-----------------------------------------------------------------
 ;;
@@ -600,6 +503,15 @@ mmrl_even_line:                 ;;
     ld (x_coord_per_line_2), hl ;;
 
 mmrl_draw_lines:
+    
+    ld hl, (x_coord_per_line_1) ;; x1
+    ld a, c                     ;;
+    add l                       ;;
+    ld l, a                     ;;
+    ld a, (hl)                  ;;
+    ld h, #0                    ;;
+    ld l, a                     ;;
+    ld (x1_node_coord), hl      ;; store x1 for later use
 
     ld hl, #y_coord             ;; y1
     ld a, b                     ;;
@@ -636,11 +548,7 @@ mmrl_bit0:
     push hl                         ;;
     ld hl, (y1_node_coord)          ;; y1
     push hl                         ;;
-    ld hl, (x_coord_per_line_1)     ;; x1
-    ld__hl__hl_with_a               ;;
-    ld a, (hl)                      ;;
-    ld h, #0                        ;;
-    ld l, a                         ;;
+    ld hl, (x1_node_coord)          ;; x1
     push hl                         ;;
     call sys_render_draw_line       ;; draw_line           
     
@@ -658,12 +566,7 @@ mmrl_bit1:
     push hl                         ;;
     ld hl, (y1_node_coord)          ;; y1
     push hl                         ;;
-    ld hl, (x_coord_per_line_1)     ;; x1
-    ld__hl__hl_with_a               ;;
-    inc hl                          ;;
-    ld a, (hl)                      ;;
-    ld h, #0                        ;;
-    ld l, a                         ;;
+    ld hl, (x1_node_coord)          ;; x1
     push hl                         ;;
     call sys_render_draw_line       ;; draw_line
 
@@ -682,13 +585,7 @@ mmrl_bit2:
     push hl                         ;;
     ld hl, (y1_node_coord)          ;; y1
     push hl                         ;;
-    ld hl, (x_coord_per_line_1)     ;; x1
-    ld__hl__hl_with_a               ;;
-    inc hl                          ;;
-    inc hl                          ;;
-    ld a, (hl)                      ;;
-    ld h, #0                        ;;
-    ld l, a                         ;;
+    ld hl, (x1_node_coord)          ;; x1
     push hl                         ;;
     call sys_render_draw_line       ;; draw_line
 
@@ -708,30 +605,126 @@ mmrl_bit3:
     push hl                         ;;
     ld hl, (y1_node_coord)          ;; y1
     push hl                         ;;
-    ld hl, (x_coord_per_line_1)     ;; x1
-    ld__hl__hl_with_a               ;;
-    inc hl                          ;;
-    inc hl                          ;;
-    inc hl                          ;;
-    ld a, (hl)                      ;;
-    ld h, #0                        ;;
-    ld l, a                         ;;
+    ld hl, (x1_node_coord)          ;; x1
     push hl                         ;;
     call sys_render_draw_line       ;; draw_line
 mmrl_exit:
+    call sys_input_waitKeyPressed
     ret
-x1_node_coord:: .dw #0000
-y1_node_coord:: .dw #0000
-y2_node_coord:: .dw #0000
-lines_data:: .db #0
-x_coord_per_line_1:: .dw #0000
-x_coord_per_line_2:: .dw #0000
 
-x_coord_odd::   .db #((S_NODES_WIDTH*1)+MAP_X_START), #((S_NODES_WIDTH*3)+MAP_X_START) 
-                .db #((S_NODES_WIDTH*5)+MAP_X_START), #((S_NODES_WIDTH*7)+MAP_X_START)
-x_coord_even::  .db #((S_NODES_WIDTH*0)+MAP_X_START), #((S_NODES_WIDTH*2)+MAP_X_START) 
-                .db #((S_NODES_WIDTH*4)+MAP_X_START), #((S_NODES_WIDTH*6)+MAP_X_START)
-y_coord::   .db #(MAP_Y_START - (S_NODES_HEIGHT*2*0)), #(MAP_Y_START-(S_NODES_HEIGHT*2*1)) ;;(12*2*6)+178
-            .db #(MAP_Y_START - (S_NODES_HEIGHT*2*2)), #(MAP_Y_START-(S_NODES_HEIGHT*2*3))
-            .db #(MAP_Y_START - (S_NODES_HEIGHT*2*4)), #(MAP_Y_START-(S_NODES_HEIGHT*2*5))
-            .db #(MAP_Y_START - (S_NODES_HEIGHT*2*6))
+
+
+
+;;-----------------------------------------------------------------
+;;
+;; man_map_render_node
+;;
+;;  Initializes the map
+;;  Input:  a: node data
+;;          c: x coord
+;;          b: y coord
+;;  Output: 
+;;  Modified: 
+;;
+man_map_render_node::
+    push af
+    
+    ld (MMRN_render_line+3), a       ;; save node data for later
+
+    ld a, b                         ;; save Y coord to decide if we have to render lines
+    ld (MMRN_check_line), a       ;;
+
+    ld (MMRN_render_line), bc
+
+    ;; Calc x coord
+    sla c                       ;; node positon * 2
+    bit 0, b                    ;;
+    jr z, mmrn_skip_indent      ;; if line is odd indent node
+    inc c                       ;;
+mmrn_skip_indent:
+    ld h, c                     ;;
+    ld e, #S_NODES_WIDTH        ;;
+    call sys_util_h_times_e     ;; calc (x*NODE_WIDTH) + MAP_X_START
+    ld a, #MAP_X_START          ;;
+    add l                       ;;
+    ld c, a                     ;;
+    
+    ;; calc y coord
+    ld h, b                     ;;
+    ld e, #(S_NODES_HEIGHT*2)   ;;
+    call sys_util_h_times_e     ;; calc (y*NODE_HEIGTH) + MAP_Y_START
+    ld a, #MAP_Y_START          ;;
+    sub l                       ;;
+    ld b, a                     ;;
+
+    ;; Calc address screen
+    ld_de_frontbuffer    
+    call cpct_getScreenPtr_asm      ;; Calculate video memory location and return it in HL
+    ex de, hl                       ;; move screen address to de
+    
+    ;; draw node sprite
+    pop af
+    sra a                       ;; shift right 4 times
+    sra a                       ;;
+    sra a                       ;;
+    sra a                       ;;
+    dec a                           ;; adjust 1 = 0
+    ld hl, #_s_nodes_0
+    ld bc, #(S_NODES_WIDTH*S_NODES_HEIGHT)
+mmrn_loop:
+    or a
+    jr z, mmrn_loop_exit
+    add hl, bc
+    dec a
+    jr mmrn_loop
+mmrn_loop_exit:
+    ld c, #S_NODES_WIDTH
+    ld b, #S_NODES_HEIGHT
+    call cpct_drawSprite_asm
+
+MMRN_check_line = . +1              ;; check if we are in line 0 to avoid render lines
+    ld a, #0                        ;;
+    or a                            ;;
+    ret z                           ;; return if line=0
+
+MMRN_render_line = . +1
+    ld bc, #0000
+    ld a, #0
+    call nz, man_map_render_lines   ;; render lines out of node
+
+    ret
+
+;;-----------------------------------------------------------------
+;;
+;; man_map_render2::
+;;
+;;  renders the map
+;;  Input: 
+;;  Output: 
+;;  Modified: 
+;;
+man_map_render2::
+    ld bc, #0000
+    ld hl, #node_map2                   ;; initialize hl
+mmr2_main_loop:
+    ld a, c                             ;; check if col = MAP_WIDTH
+    cp #MAP_WIDTH                       ;;
+    jr z, mmr2_next_line                 ;; if so -> next line
+    ld a, (hl)                          ;; get node value
+    or a                                ;;
+    cpctm_push bc, hl                   ;; save bc and hl
+    call nz, man_map_render_node        ;; if node value is not zero -> render node
+    cpctm_pop hl, bc                    ;; restore bc and hl
+    inc c                               ;; inc col
+    inc hl                              ;; inc map pointer
+    jr mmr2_main_loop                    ;; loop
+mmr2_next_line:
+    ld c, #0                            ;; init col
+    inc b                               ;; inc row
+    ld a, b                             ;; check if row = MAP_HEIGHT
+    cp #MAP_HEIGHT                      ;;
+    jr nz, mmr2_main_loop                ;; if not -> loop
+
+    call sys_input_wait4anykey          ;; wait for any key
+
+    ret

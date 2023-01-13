@@ -1003,12 +1003,14 @@ CMASK = #0xB6A3 ;EQU &B338  change address for colormask in 464
 
      
     pop hl
+    add hl, hl      ;; x coord multiplied by two
     ld (x1+1),hl  ;x1
  
     pop de
     ld (y1+1),de  ;y1
  
     pop hl
+    add hl, hl      ;; x coord multiplied by two
     ld (x2+1),hl  ;x2
  
     pop hl
