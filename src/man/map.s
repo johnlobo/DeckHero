@@ -511,6 +511,8 @@ mmrl_draw_lines:
     ld a, (hl)                  ;;
     ld h, #0                    ;;
     ld l, a                     ;;
+    ld de, #(S_NODES_WIDTH/2)   ;; add node width/2 to x1
+    add hl, de                  ;;
     ld (x1_node_coord), hl      ;; store x1 for later use
 
     ld hl, #y_coord             ;; y1
@@ -520,6 +522,8 @@ mmrl_draw_lines:
     ld a, (hl)                  ;;
     ld h, #0                    ;;
     ld l, a                     ;;
+    ld de, #(S_NODES_HEIGHT+1)  ;; add node width/2 to x1
+    add hl, de                  ;;
     ld (y1_node_coord), hl      ;; store y1 for later use
 
 
@@ -532,6 +536,9 @@ mmrl_draw_lines:
     ld a, (hl)                  ;;
     ld h, #0                    ;;
     ld l, a                     ;;
+    dec hl                      ;; two pixel less
+    dec hl                      ;; 
+    dec hl                      ;; 
     ld (y2_node_coord), hl      ;; store y2 for later use
 
 
@@ -545,6 +552,8 @@ mmrl_bit0:
     ld a, (hl)                      ;;
     ld h, #0                        ;;
     ld l, a                         ;;
+    ld de, #(S_NODES_WIDTH/2)       ;; add node width/2 to x1
+    add hl, de                      ;;
     push hl                         ;;
     ld hl, (y1_node_coord)          ;; y1
     push hl                         ;;
@@ -563,6 +572,8 @@ mmrl_bit1:
     ld a, (hl)                      ;;
     ld h, #0                        ;;
     ld l, a                         ;;
+    ld de, #(S_NODES_WIDTH/2)       ;; add node width/2 to x1
+    add hl, de                      ;;
     push hl                         ;;
     ld hl, (y1_node_coord)          ;; y1
     push hl                         ;;
@@ -582,6 +593,8 @@ mmrl_bit2:
     ld a, (hl)                      ;;
     ld h, #0                        ;;
     ld l, a                         ;;
+    ld de, #(S_NODES_WIDTH/2)       ;; add node width/2 to x1
+    add hl, de                      ;;
     push hl                         ;;
     ld hl, (y1_node_coord)          ;; y1
     push hl                         ;;
@@ -602,6 +615,8 @@ mmrl_bit3:
     ld a, (hl)                      ;;
     ld h, #0                        ;;
     ld l, a                         ;;
+    ld de, #(S_NODES_WIDTH/2)       ;; add node width/2 to x1
+    add hl, de                      ;;
     push hl                         ;;
     ld hl, (y1_node_coord)          ;; y1
     push hl                         ;;
@@ -609,7 +624,6 @@ mmrl_bit3:
     push hl                         ;;
     call sys_render_draw_line       ;; draw_line
 mmrl_exit:
-    call sys_input_waitKeyPressed
     ret
 
 
