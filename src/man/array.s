@@ -106,8 +106,8 @@ ret
 ;;
 ;; man_array_remove_element
 ;;
-;;  Remove a card pointed by a from the hand
-;;  Input: a: number of card to remove
+;;  Remove an element from the array
+;;  Input: a: number of element to remove
 ;;  Output: 
 ;;  Modified: AF, BC, DE, HL
 ;;
@@ -331,5 +331,133 @@ return_point:
     djnz loop_each
 
     ret
+
 routine: .dw #0000
+routine_ix: .dw #0000
+routine_iy: .dw #0000
 comp_size: .db #0
+pattern: .db #0
+
+;;-----------------------------------------------------------------
+;;
+;; man_array_execute_each_ix_matching
+;;
+;;  executes the routine pointed in HL for each element in the array pointed in IX
+;;  Input:  hl: routine to execute on each
+;;          ix: array to loop
+;;          b: pattern to match
+;;  Output: 
+;;  Modified: AF, BC, DE, HL
+;;
+man_array_execute_each_ix_matching::
+    ld a, b                 ;; Save pattern for latter use
+    ld (pattern), a         ;;
+
+    ld a, a_count(ix)       ;; retrieve number of elements in the array
+    or a                    ;; If no elements in arrary return
+    ret z 
+
+    ld b, a                 ;; move the number of elements to b for indexing djnz
+
+    ld (routine_ix), hl        ;; store routine in memory
+
+    ld a, a_component_size(ix)  ;; store component_size in memory
+    ld (comp_size), a       ;;    
+    
+    push ix                 ;; load start of array in hl
+    pop hl                  ;;
+    ld de, #a_array         ;;
+    add hl, de              ;;
+    
+    push hl                 ;;
+    pop ix                  ;;  load ix with the first element
+
+maeeixm_loop_each:
+    push bc                 ;; save index in stack
+
+    ld a, (pattern)
+    ld b, a
+    ld a, x_cmps(ix)
+    and b
+    cp b
+    jr nz, maeeixm_return_point
+
+    ld hl, #maeeixm_return_point    ;;
+    push hl                 ;; set the return point in the stack
+
+    ld hl, (routine_ix)        ;; Move routine to hl
+    jp (hl)                 ;; jump to the routine
+
+maeeixm_return_point:
+    ld d, #0                ;; retrieve component_size
+    ld a, (comp_size)       ;;
+    ld e, a                 ;;
+
+    add ix, de              ;; move ix to the next element
+
+    pop bc                  ;; restore index
+    djnz maeeixm_loop_each
+
+    ret
+
+;;-----------------------------------------------------------------
+;;
+;; man_array_execute_each_iy_matching
+;;
+;;  executes the routine pointed in HL for each element in the array pointed in IY
+;;  Input:  hl: routine to execute on each
+;;          iy: array to loop
+;;          b: pattern to match
+;;  Output: 
+;;  Modified: AF, BC, DE, HL
+;;
+man_array_execute_each_iy_matching::
+    ld a, b                 ;; Save pattern for latter use
+    ld (pattern), a         ;;
+
+    ld a, a_count(iy)       ;; retrieve number of elements in the array
+    or a                    ;; If no elements in arrary return
+    ret z 
+
+    ld b, a                 ;; move the number of elements to b for indexing djnz
+
+    ld (routine_iy), hl        ;; store routine in memory
+
+    ld a, a_component_size(iy)  ;; store component_size in memory
+    ld (comp_size), a       ;;    
+    
+    push iy                 ;; load start of array in hl
+    pop hl                  ;;
+    ld de, #a_array         ;;
+    add hl, de              ;;
+    
+    push hl                 ;;
+    pop iy                  ;;  load ix with the first element
+
+maeeiym_loop_each:
+    push bc                 ;; save index in stack
+
+    ld a, (pattern)
+    ld b, a
+    ld a, x_cmps(iy)
+    and b
+    cp b
+    jr nz, maeeiym_return_point
+
+    ld hl, #maeeiym_return_point    ;;
+    push hl                 ;; set the return point in the stack
+
+    ld hl, (routine_iy)        ;; Move routine to hl
+    jp (hl)                 ;; jump to the routine
+
+maeeiym_return_point:
+    ld d, #0                ;; retrieve component_size
+    ld a, (comp_size)       ;;
+    ld e, a                 ;;
+
+    add iy, de              ;; move ix to the next element
+
+    pop bc                  ;; restore index
+    djnz maeeiym_loop_each
+
+    ret
