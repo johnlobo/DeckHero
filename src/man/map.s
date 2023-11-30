@@ -472,6 +472,32 @@ exit_line_loop:
     ret
 
 
+;;-----------------------------------------------------------------
+;;
+;; man_map_get_ancestors
+;;
+;;  Renders the lines of a node
+;;  Input:  b: row
+;;          c: col
+;;  Output: d: ancestors
+;;  Modified: 
+;;
+man_map_get_ancestors::
+    push bc
+    inc b                       ;; upper row
+    ld e, b                     ;; Position hl in the correct node of map
+    ld h, #4                    ;; hl = node_map2 + row*4
+    call sys_util_h_times_e     ;;
+    ld a, l                     ;;
+    ld hl, #node_map2           ;;
+    add_hl_a                    ;;
+    ld d, #0                    ;; reset result
+    pop bc
+mmga_bit0:
+    ld a, (hl)
+    
+    ret
+
 
 ;;-----------------------------------------------------------------
 ;;
