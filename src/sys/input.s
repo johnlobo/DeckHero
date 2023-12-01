@@ -270,7 +270,7 @@ sys_input_ac_action::
 ;;  Output:
 ;;  Modified: 
 ;;
-sys_input_action:
+sys_input_action::
     call man_fight_execute_card
     ret
 
