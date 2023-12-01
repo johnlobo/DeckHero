@@ -303,6 +303,7 @@ man_fight_execute_card::
     ld ix, #hand
     ld a, a_selected(ix)
     call man_array_get_element      ;; Get pointer to the executed card
+    inc hl                          ;; skip cmps byte
     inc hl                          ;; skip status byte
 
     ld a, (hl)                      ;;

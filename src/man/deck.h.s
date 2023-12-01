@@ -24,7 +24,8 @@
 ;;===============================================================================
 ;; CARD DEFINITION MACRO
 ;;===============================================================================
-.macro DefineCard _status, _class, _sprite, _name, _rarity, _type, _energy, _description, _damage, _block, _vulnerable, _weak, _strengh, _exhaust, _add_card, _execute_routine
+.macro DefineCard _cpms, _status, _class, _sprite, _name, _rarity, _type, _energy, _description, _damage, _block, _vulnerable, _weak, _strengh, _exhaust, _add_card, _execute_routine
+    .db _cpms
     .db _status
     .db _class
     .dw _sprite
@@ -47,6 +48,7 @@
 ;; CARD SCTRUCTURE CREATION
 ;;===============================================================================
 BeginStruct c
+Field c, cpms , 1
 Field c, status , 1
 Field c, class , 1
 Field c, sprite , 2
@@ -69,6 +71,7 @@ EndStruct c
 ;; POINTER TO CARD STRUCTURE CREATION
 ;;===============================================================================
 BeginStruct e
+Field e, cpms , 1
 Field e, status , 1
 Field e, p , 2
 EndStruct e
