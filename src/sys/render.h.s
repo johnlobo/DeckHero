@@ -64,6 +64,7 @@ sys_render_zone_messages      = 0b10000000
 .globl sys_render_erase_hand
 .globl sys_render_hand
 .globl sys_render_show_deck
+.globl sys_render_selected_card
 
 .globl sys_render_draw_line
 

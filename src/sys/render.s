@@ -287,8 +287,9 @@ sys_render_update_hand::
     ld a, (player_updates)
     and #updated_hand                     ;; check if hand has been updated
     ret z                                 ;; return if no update is necessary
-    call sys_render_erase_hand
-    call sys_render_hand
+    ;;call sys_render_erase_hand
+    ;;call sys_render_hand
+    call sys_render_selected_card
     ret
 
 ;;-----------------------------------------------------------------

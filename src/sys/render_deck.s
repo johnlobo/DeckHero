@@ -96,9 +96,7 @@ sys_render_erase_hand::
 ;;
 sys_render_card::
     ;; Get screen address of the card
-       
-    ;;ld_de_backbuffer
-    
+         
     call cpct_getScreenPtr_asm      ;; Calculate video memory location and return it in HL
 
     ex de, hl
@@ -152,17 +150,28 @@ srgcxp_loop:
 ;;  Output: 
 ;;  Modified: AF, BC, DE, HL, IX, IY
 ;;
-sys_render_selected_card::
+sys_render_selected_card:: 
+    push ix
+    ld ix, #hand
     ld a, (hand_selected)
     ld (current_card), a
+
+    ld a, (hand_count)              ;; Check if there is only one card in hand
+    cp #1                           ;;
+    jr z, srsc_show_current_card    ;;
+
+    ld a, (hand_selected)           ;;
     or a                            ;; check if the selected card is the first one
-    jr z, srsc_first_card
+    jr z, srsc_first_card           ;;
+
+    ld a, (hand_selected)
     dec a
     ld (previous_card), a
     jr srsc_erase_previous_card
 
 srsc_first_card:
-    ld a, (hand_count)              ;; a = num cards in hand
+    ld a, (hand_count)              ;; a = num cards in hand - 1
+    dec a                           ;;
     ld (previous_card), a
 
 srsc_erase_previous_card:
@@ -177,15 +186,21 @@ srsc_erase_previous_card:
     ex de, hl                       ;; move screen address to de
     ld c, #S_CARD_WIDTH
     ld b, #5
-    ld a,#0                         ;; Patern of solid box
+    ld a,#3                         ;; Patern of solid box
     call cpct_drawSolidBox_asm
     ;; Render card
-    ld a, (card_x_pos)              ;;
+    push ix                         ;; get card pointer from the array of pointers
+    ld a, (previous_card)           ;;
+    call man_array_get_element      ;;
+    ld__ix_hl                       ;;
+
+    ld a, (card_x_pos)              ;; get x pos
     ld c, a                         ;; c = x coordinate 
+
     ld b, #HAND_Y
     ld_de_frontbuffer
-    ld ix, #hand_array
     call  sys_render_card                                       ;; render card
+    pop ix
 
 srsc_show_current_card:
     ld a, (current_card)
@@ -194,21 +209,27 @@ srsc_show_current_card:
     ld (card_x_pos), a
     ;; Erase lower part of the card
     ld c, a                         ;; C = x coordinate 
-    ld b, # (HAND_Y - 5 - S_CARD_HEIGHT)
+    ld b, #(HAND_Y - 5 + S_CARD_HEIGHT)
     ld de, #CPCT_VMEM_START_ASM     ;; DE = Pointer to start of the screen
     call cpct_getScreenPtr_asm      ;; Calculate video memory location and return it in HL
     ex de, hl                       ;; move screen address to de
     ld c, #S_CARD_WIDTH
     ld b, #5
-    ld a,#0                         ;; Patern of solid box
+    ld a,#3                         ;; Patern of solid box
     call cpct_drawSolidBox_asm
     ;; Render card
+    push ix                         ;; get card pointer from the array of pointers
+    ld a, (current_card)           ;;
+    call man_array_get_element      ;;
+    ld__ix_hl                       ;;
     ld a, (card_x_pos)              ;;
     ld c, a                         ;; c = x coordinate 
     ld b, #HAND_Y - 5
     ld_de_frontbuffer
     ld ix, #hand_array
     call  sys_render_card
+    pop ix
+    pop ix
     ret
 previous_card:: .db #00
 current_card::  .db #00
@@ -241,7 +262,7 @@ _s_r_h_loop0:
     ld l, e_p(ix)                           ;; Load card pointer in hl
     ld h, e_p+1(ix)                         ;;
 
-    ld__iy_hl
+    ld__iy_hl                               ;; move card pointer to iy
 
     ld a, (hand_selected)                                   ;; compare card selected with current card
     cp b                                                    ;;
@@ -254,7 +275,7 @@ _s_r_h_loop0:
     ld de, #c_name                                              ;; load name address in hl
     ld__hl_iy                                                   ;; load card index in hl
     add hl, de                                                  ;; add name offset to hl
-    ;;m_screenPtr_backbuffer DESC_X, DESC_Y_1                     ;; Calculates backbuffer address
+    
     m_screenPtr_frontbuffer DESC_X, DESC_Y_1                     ;; Calculates backbuffer address
 
     ld c, #1                                                    ;; first color
