@@ -53,6 +53,7 @@ model_deck_delta: .db #0x00
 model_deck_component_size: .db #(sizeof_c)
 model_deck_pend: .dw #0x0000
 model_deck_selected: .db #0x00
+model_deck_pselected: .db #0x00
 model_deck_array:
 ;;         _status,        _class  _sprite     _name              _rarity   _type   _energy  _description,                    _damage _block, _vulnerable _weak   _strengh    _exhaust    _add_card _execute_routine
 model_hit:

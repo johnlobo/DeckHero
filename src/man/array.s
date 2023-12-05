@@ -171,6 +171,24 @@ _move_pend:
 
 ret
 
+
+;;-----------------------------------------------------------------
+;;
+;; man_array_get_element
+;;
+;;  Retrieves in hl the element in position a
+;;  Input:  a: number of element to return
+;;          ix: pointer array structure
+;;  Output: hl: pointer to the element
+;;  Modified: AF, BC, DE, HL
+;;
+man_array_get_address_from_pointer::
+    call man_array_get_element          ;; call the function to get in hl the element "a"
+    ld__ix_hl
+    ld l, e_p(ix)
+    ld h, e_p+1(ix)
+    ret
+
 ;;-----------------------------------------------------------------
 ;;
 ;; man_array_get_element
@@ -229,7 +247,7 @@ man_array_get_random_element::
     ld (_r_e_output), a             ;; store the random number in the output variable
     pop hl                          ;; restore hl (array address)
     or a                            ;; check if we have to retrieve the first card
-    jp z, _g_r_e_return             ;; jump if we wnat to get the first card
+    jp z, _g_r_e_return             ;; jump if we want to get the first card
 
     ld b, a
     ;;ld de, #sizeof_e                ;; copy the size of a card in de

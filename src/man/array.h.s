@@ -32,6 +32,7 @@
 .globl man_array_remove_element
 .globl man_array_get_element
 .globl man_array_get_random_element
+.globl man_array_get_address_from_pointer
 .globl man_array_move_all_elements
 .globl man_array_execute_each
 
@@ -46,6 +47,7 @@
       _Tname'_component_size::      .db _ComponentSize
       _Tname'_pend::                .dw _Tname'_array 
       _Tname'_selected::            .db 0
+      _Tname'_pselected::          .db 0
       _Tname'_array::
             .ds _N * _ComponentSize
 .endm
@@ -59,5 +61,6 @@ Field a, delta , 1
 Field a, component_size , 1
 Field a, pend , 2
 Field a, selected , 1
+Field a, pselected , 1
 Field a, array , 1
 EndStruct a

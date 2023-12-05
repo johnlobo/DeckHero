@@ -133,9 +133,10 @@ sys_render_card::
 ;;  Modified: AF, BC
 ;;
 sys_render_get_card_x_pos::
-    ld a, #(S_CARD_WIDTH-2)             ;; Calculate x coord in
-    ld c, a
     call sys_render_get_X_start         ;; retrieve X start position of the deck in a
+    ld c, #(S_CARD_WIDTH-2)             ;; Calculate x coord in
+    sub c                               ;; to fix the first round in djnz loop when b = 0
+    inc B                               ;;
 srgcxp_loop:
     add c
     djnz srgcxp_loop
@@ -153,49 +154,34 @@ srgcxp_loop:
 sys_render_selected_card:: 
     push ix
     ld ix, #hand
-    ld a, (hand_selected)
-    ld (current_card), a
 
     ld a, (hand_count)              ;; Check if there is only one card in hand
     cp #1                           ;;
     jr z, srsc_show_current_card    ;;
 
-    ld a, (hand_selected)           ;;
-    or a                            ;; check if the selected card is the first one
-    jr z, srsc_first_card           ;;
-
-    ld a, (hand_selected)
-    dec a
-    ld (previous_card), a
-    jr srsc_erase_previous_card
-
-srsc_first_card:
-    ld a, (hand_count)              ;; a = num cards in hand - 1
-    dec a                           ;;
-    ld (previous_card), a
-
+    
 srsc_erase_previous_card:
-    ld b, a                                 ;; b = card to restore
+    ld b, a_pselected(ix)                                   ;; b = card to restore
     call sys_render_get_card_x_pos
     ld (card_x_pos), a
     ;; Erase upper part of the card
-    ld c, a                         ;; C = x coordinate 
+    ld c, a                                                 ;; C = x coordinate 
     ld b, #HAND_Y - 5
-    ld de, #CPCT_VMEM_START_ASM     ;; DE = Pointer to start of the screen
-    call cpct_getScreenPtr_asm      ;; Calculate video memory location and return it in HL
-    ex de, hl                       ;; move screen address to de
+    ld de, #CPCT_VMEM_START_ASM                             ;; DE = Pointer to start of the screen
+    call cpct_getScreenPtr_asm                              ;; Calculate video memory location and return it in HL
+    ex de, hl                                               ;; move screen address to de
     ld c, #S_CARD_WIDTH
     ld b, #5
-    ld a,#3                         ;; Patern of solid box
+    ld a,#0                                                 ;; Patern of solid box
     call cpct_drawSolidBox_asm
     ;; Render card
-    push ix                         ;; get card pointer from the array of pointers
-    ld a, (previous_card)           ;;
-    call man_array_get_element      ;;
-    ld__ix_hl                       ;;
+    push ix                                                 ;; get card pointer from the array of pointers
+    ld a, a_pselected(ix)                                   ;;
+    call man_array_get_address_from_pointer                 ;;
+    ld__ix_hl                                               ;;
 
-    ld a, (card_x_pos)              ;; get x pos
-    ld c, a                         ;; c = x coordinate 
+    ld a, (card_x_pos)                                      ;; get x pos
+    ld c, a                                                 ;; c = x coordinate 
 
     ld b, #HAND_Y
     ld_de_frontbuffer
@@ -203,32 +189,76 @@ srsc_erase_previous_card:
     pop ix
 
 srsc_show_current_card:
-    ld a, (current_card)
-    ld b, a                         ;; b = card to restore
+    
+    ld b, a_selected(ix)                                        ;; b = card to restore
     call sys_render_get_card_x_pos
     ld (card_x_pos), a
     ;; Erase lower part of the card
-    ld c, a                         ;; C = x coordinate 
+    ld c, a                                                     ;; C = x coordinate 
     ld b, #(HAND_Y - 5 + S_CARD_HEIGHT)
-    ld de, #CPCT_VMEM_START_ASM     ;; DE = Pointer to start of the screen
-    call cpct_getScreenPtr_asm      ;; Calculate video memory location and return it in HL
-    ex de, hl                       ;; move screen address to de
+    ld de, #CPCT_VMEM_START_ASM                                 ;; DE = Pointer to start of the screen
+    call cpct_getScreenPtr_asm                                  ;; Calculate video memory location and return it in HL
+    ex de, hl                                                   ;; move screen address to de
     ld c, #S_CARD_WIDTH
     ld b, #5
-    ld a,#3                         ;; Patern of solid box
+    ld a,#0                                                     ;; Patern of solid box
     call cpct_drawSolidBox_asm
     ;; Render card
-    push ix                         ;; get card pointer from the array of pointers
-    ld a, (current_card)           ;;
-    call man_array_get_element      ;;
-    ld__ix_hl                       ;;
-    ld a, (card_x_pos)              ;;
-    ld c, a                         ;; c = x coordinate 
+    
+    push ix                                                     ;; get card pointer from the array of pointers
+    ld a, a_selected(ix)                                        ;;
+    call man_array_get_address_from_pointer                     ;;
+
+    ld (srsc_card_pointer01), hl                                ;; save card pointer for text rendering
+    ld (srsc_card_pointer02), hl                                ;; save card pointer for text rendering
+
+    ld__ix_hl                                                   ;; move pointer to card to ix
+    
+    ld a, (card_x_pos)                                          ;;
+    ld c, a                                                     ;; c = x coordinate 
     ld b, #HAND_Y - 5
     ld_de_frontbuffer
-    ld ix, #hand_array
     call  sys_render_card
     pop ix
+
+    ;; Render Texts
+    
+    ;; Erase description
+
+    m_screenPtr_frontbuffer DESC_X,DESC_Y_1      ;; Calculates backbuffer address
+    ld c, #64
+    ld b, #20    
+    ld a, #0
+    call cpct_drawSolidBox_asm
+    
+    cpctm_push AF, BC, DE, HL                                   ;; Save values              
+    ;; Render Card Name
+    ld de, #c_name                                              ;; load name address in hl
+    ;;ld__hl_iy                                                   ;; load card index in hl
+srsc_card_pointer01 = . + 1
+    ld hl, #0000
+    add hl, de                                                  ;; add name offset to hl
+    
+    m_screenPtr_frontbuffer DESC_X, DESC_Y_1                     ;; Calculates backbuffer address
+
+    ld c, #1                                                    ;; first color
+    call sys_text_draw_string                                   ;; draw card name
+    ;; Render Card Description
+    ld de, #c_description                                       ;; load description address in hl
+    ;;ld__hl_iy                                                   ;; load card index in hl
+srsc_card_pointer02 = . + 1
+    ld hl, #0000
+    add hl, de                                                  ;; add name offset to hl
+    
+    m_screenPtr_frontbuffer DESC_X, DESC_Y_2                    ;; Calculates backbuffer address
+
+    ld c, #0                                                    ;; first color
+    call sys_text_draw_string                                   ;; draw card name
+
+    cpctm_pop HL, DE, BC, AF                                    ;; Restore values    
+
+
+
     pop ix
     ret
 previous_card:: .db #00
@@ -270,7 +300,7 @@ _s_r_h_loop0:
     jr nz, _hand_render_not_selected                        ;; jump if current card not selected
     ld b, #HAND_Y - 5
 
-    cpctm_push AF, BC, DE, HL                               ;; Save values              
+    cpctm_push AF, BC, DE, HL                                   ;; Save values              
     ;; Render Card Name
     ld de, #c_name                                              ;; load name address in hl
     ld__hl_iy                                                   ;; load card index in hl

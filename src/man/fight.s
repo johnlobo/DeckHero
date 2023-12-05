@@ -174,7 +174,8 @@ mfdc_ELEMENT_TO_ERASE = . +1
     m_updated_hand
     m_updated_icon_numbers
 
-    call sys_render_update_fight
+    ;;call sys_render_update_fight
+    call sys_render_hand_simple
 
     pop bc                              ;; restore loop index
     djnz _initial_set_of_cards

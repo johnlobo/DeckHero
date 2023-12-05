@@ -238,7 +238,7 @@ mganc_render_loop:
     push hl
     ld a,b                                  ;; index loaded in a
     sla a                                   ;; multiply index by 2
-    ex de, hl                               ;; mode card pointer to de
+    ex de, hl                               ;; mov+e card pointer to de
     ld hl, #card01                          ;; load card01 pointer in hl
     add_hl_a                                ;; hl points to the correct card
     ld a, e                                 ;; move de to (hl)

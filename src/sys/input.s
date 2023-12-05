@@ -304,15 +304,23 @@ sys_input_show_deck:
 ;;
 sys_input_selected_left::
     ld ix, #hand
-    ;;ld a, (hand_selected)
+
+    ld a, a_selected(ix)            ;; update previous selected card
+    ld a_pselected(ix), a           ;;
+    
     ld a, a_selected(ix)
     or a
-    ret z
+    jr nz, sisl_not_first_card
 
+    ld a, a_count(ix)               ;; set selected card to the last card
+    dec a                           ;;
+    ld a_selected(ix), a            ;; 
+    jr sisl_return
+
+sisl_not_first_card:
     dec a_selected(ix)              ;; decrement selected card
-   
-    m_updated_hand                  ;; marks that the hand has been updated
-    
+sisl_return:
+    m_updated_hand                  ;; marks that the hand has been updated    
     ret
 
 ;;-----------------------------------------------------------------
@@ -325,14 +333,22 @@ sys_input_selected_left::
 ;;
 sys_input_selected_right::
     ld ix, #hand
-    ld b, a_count(ix)
-    ld a, a_selected(ix)
-    inc a
-    cp b
-    ret z
-
-    inc a_selected(ix)              ;; increment selected card
     
+    ld a, a_selected(ix)            ;; update previous selected card
+    ld a_pselected(ix), a           ;;
+
+    ld b, a_count(ix)               ;; check if selected card is the last card
+    dec b                           ;;
+    ld a, a_selected(ix)            ;;
+    cp b                            ;; check if selected card is the last card
+    jr nz, sisr_not_last_card
+    
+    ld a_selected(ix), #0           ;; set selected card to the first card
+    jr sisr_return                  ;;
+
+sisr_not_last_card:
+    inc a_selected(ix)              ;; increment selected card
+sisr_return:
     m_updated_hand                  ;; marks that the hand has been updated
 
     ret
@@ -347,7 +363,7 @@ sys_input_selected_right::
 ;;  Output:
 ;;  Modified: iy, bc
 ;;
-sys_input_generic_update:
+sys_input_generic_update::
     jr first_key
 keys_loop:
     ld bc, #4
