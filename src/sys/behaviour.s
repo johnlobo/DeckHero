@@ -25,6 +25,7 @@
 .include "man/fight.h.s"
 .include "man/effects.h.s"
 .include "sys/animation.h.s"
+.include "sys/crtc.h.s"
 
 
 ;;-----------------------------------------------------------------
@@ -97,6 +98,9 @@ sys_behaviour_execute_one::
 sbe_damage_oponent:         
     push ix                             ;; damage oponent always damage player
     ld ix, #player                      ;;
+
+    call temblor
+
     call sys_behaviour_damage_oponent   ;;
     pop ix                              ;;
     m_updated_player_effects            ;; update player effects flag

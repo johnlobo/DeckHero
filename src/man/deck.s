@@ -24,6 +24,7 @@
 .include "sys/render.h.s"
 .include "sys/behaviour.h.s"
 .include "sys/animation.h.s"
+.include "sys/crtc.h.s"
 .include "man/array.h.s"
 .include "man/fight.h.s"
 .include "man/oponent.h.s"
@@ -125,10 +126,10 @@ man_deck_execute_hit::
     ld a, c_damage(ix)                      ;; get damage from card
     ld (mdeh_damage+1), a                   ;; smc for later use of damage
 
+    call temblor
+
     ld ix, #foes_array                      ;;
-    ;;ld c, a                                 ;; c = damage damage
-    ;;ld hl, #anim_hit                        ;;
-    ;;call man_effects_animate                ;;
+
 mdeh_damage:
     ld c, #00                               ;; make damage
     call sys_behaviour_damage_oponent       ;;
@@ -196,20 +197,6 @@ _d_i_hit_loop:
     ld hl, #model_defend
     call man_array_create_element
 
-;;debug
-;;    ld hl, #model_defend
-;;    call man_array_create_element
-;;    ld hl, #model_defend
-;;    call man_array_create_element
-;;    ld hl, #model_defend
-;;    call man_array_create_element
-;;    ld hl, #model_defend
-;;    call man_array_create_element
-;;    ld hl, #model_defend
-;;    call man_array_create_element
-;;    ld hl, #model_defend
-;;    call man_array_create_element
-;;debug
 ret
 
 ;;-----------------------------------------------------------------
@@ -242,14 +229,3 @@ _l_a_loop:
     
     ret
 
-;;-----------------------------------------------------------------
-;;
-;; man_deck_get_random_element
-;;
-;;  Returns a random element form the deck
-;;  Input:
-;;  Output: HL: points to a random card of deck 
-;;  Modified: 
-;;
-man_deck_get_random_element::
-    ret
