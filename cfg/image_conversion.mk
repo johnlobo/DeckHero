@@ -64,6 +64,7 @@ $(eval $(call IMG2SP, CONVERT         , assets/explotion.png , 16, 16, s_exploti
 $(eval $(call IMG2SP, CONVERT         , assets/nodes.png , 12, 12, s_nodes, ,))
 $(eval $(call IMG2SP, CONVERT         , assets/pipes.png , 12, 12, s_pipes, ,))
 $(eval $(call IMG2SP, CONVERT         , assets/effect.png , 16, 16, s_effect, ,))
+$(eval $(call IMG2SP, CONVERT         , assets/maps/tileset.png , 8, 8, s_tileset, ,))
 
 ##
 ## OLD MACROS (For compatibility)
