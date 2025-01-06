@@ -16,8 +16,6 @@
 ;;  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;;-------------------------------------------------------------------------------
 
-.module render_system
-
 .include "sys/render.h.s"
 .include "man/deck.h.s"
 .include "man/oponent.h.s"
@@ -31,6 +29,7 @@
 .include "common.h.s"
 .include "man/array.h.s"
 
+.module render_system
 
 ;;
 ;; Start of _DATA area 
@@ -691,9 +690,9 @@ sys_render_erase_oponent::
 ;;  Modified: AF, BC, DE, HL
 ;;
 sys_render_topbar::
+
     ;; draw life
-    ;;m_screenPtr_backbuffer 0,0      ;; Calculates backbuffer address
-    m_screenPtr_frontbuffer 0,0      ;; Calculates backbuffer address
+    m_screenPtr_frontbuffer 1,3      ;; Calculates backbuffer address
 
     ld hl, #_s_small_icons_00
     ld c, #S_SMALL_ICONS_WIDTH
@@ -701,7 +700,6 @@ sys_render_topbar::
     call cpct_drawSprite_asm
 
     call sys_text_reset_aux_txt
-
 
     ld ix, #player
     ld h, #0
@@ -720,14 +718,14 @@ sys_render_topbar::
     ld (hl), #'0'
     ld hl, #aux_txt
     ;;m_screenPtr_backbuffer 5,1      ;; Calculates backbuffer address
-    m_screenPtr_frontbuffer 5,1      ;; Calculates backbuffer address
+    m_screenPtr_frontbuffer 5,4      ;; Calculates backbuffer address
 
     ld c, #0
     call sys_text_draw_string
 
     ;;draw money
     ;;m_screenPtr_backbuffer 20,0      ;; Calculates backbuffer address
-    m_screenPtr_frontbuffer 20,0      ;; Calculates backbuffer address
+    m_screenPtr_frontbuffer 22,2      ;; Calculates backbuffer address
 
     ld hl, #_s_coin
     ld c, #S_COIN_WIDTH
@@ -743,13 +741,13 @@ sys_render_topbar::
 
     ld hl, #aux_txt
     ;;m_screenPtr_backbuffer 25,1      ;; Calculates backbuffer address
-    m_screenPtr_frontbuffer 25,1      ;; Calculates backbuffer address
+    m_screenPtr_frontbuffer 27,4      ;; Calculates backbuffer address
 
     ld c, #0
     call sys_text_draw_string
 
     ;;m_screenPtr_backbuffer 45,1      ;; Calculates backbuffer address
-    m_screenPtr_frontbuffer 45,1        ;; Calculates backbuffer address
+    m_screenPtr_frontbuffer 47,4        ;; Calculates backbuffer address
 
     m_draw_blank_small_number           ;; erases previous number
 
@@ -772,15 +770,13 @@ sys_render_topbar::
 ;;
 sys_render_energy::
 
-    ;;m_screenPtr_backbuffer 1, 137           ;; Calculates backbuffer address
-    m_screenPtr_frontbuffer 1, 137           ;; Calculates backbuffer address
+    m_screenPtr_frontbuffer 4, 137           ;; Calculates backbuffer address
     
     m_draw_blank_small_number       ;; erases previous number
 
     ld a, (player_energy)
     ld h, #0
     ld l, a
-    ;;ld hl, (#player_energy)
     ld b, #15                           ;; small number color
     call sys_text_draw_small_number
     ret
@@ -796,8 +792,7 @@ sys_render_energy::
 ;;
 sys_render_sacrifice::
     ld ix, #sacrifice
-    ;;m_screenPtr_backbuffer 75, 137           ;; Calculates backbuffer address
-    m_screenPtr_frontbuffer 75, 137           ;; Calculates backbuffer address
+    m_screenPtr_frontbuffer 74, 137           ;; Calculates backbuffer address
     
     m_draw_blank_small_number       ;; erases previous number
 
@@ -818,9 +813,7 @@ sys_render_sacrifice::
 ;;
 sys_render_deck::
     ld ix, #fight_deck
-
-    ;;m_screenPtr_backbuffer 1, 166           ;; Calculates backbuffer address
-    m_screenPtr_frontbuffer 1, 166           ;; Calculates backbuffer address
+    m_screenPtr_frontbuffer 4, 166           ;; Calculates backbuffer address
     
     m_draw_blank_small_number       ;; erases previous number
 
@@ -841,8 +834,7 @@ sys_render_deck::
 ;;
 sys_render_cemetery::
     ld ix, #cemetery
-    ;;m_screenPtr_backbuffer 75, 166  ;; Calculates backbuffer address
-    m_screenPtr_frontbuffer 75, 166  ;; Calculates backbuffer address
+    m_screenPtr_frontbuffer 74, 166  ;; Calculates backbuffer address
 
     m_draw_blank_small_number       ;; erases previous number
 
@@ -863,36 +855,36 @@ sys_render_cemetery::
 ;;
 sys_render_icons::
     ;; energy icon
-    ;;m_screenPtr_backbuffer 0, 119           ;; Calculates backbuffer address
-    m_screenPtr_frontbuffer 0, 119           ;; Calculates backbuffer address
+    m_screenPtr_frontbuffer 2, 120         ;; Calculates address
     ld hl, #_s_icons_2
     ld c, #S_ICONS_WIDTH
     ld b, #S_ICONS_HEIGHT
     call cpct_drawSprite_asm
+    call sys_render_energy                 ;; Energy number
 
     ;; sacrifice icon
-    ;;m_screenPtr_backbuffer 74, 119           ;; Calculates backbuffer address
-    m_screenPtr_frontbuffer 74, 119           ;; Calculates backbuffer address
+    m_screenPtr_frontbuffer 72, 120        ;; Calculates address
     ld hl, #_s_icons_0
     ld c, #S_ICONS_WIDTH
     ld b, #S_ICONS_HEIGHT
     call cpct_drawSprite_asm
+    call sys_render_sacrifice               ;; Sacrifice number
     
     ;; deck
-    ;;m_screenPtr_backbuffer 0, 148           ;; Calculates backbuffer address
-    m_screenPtr_frontbuffer 0, 148           ;; Calculates backbuffer address
+    m_screenPtr_frontbuffer 2, 149          ;; Calculates  address
     ld hl, #_s_icons_3
     ld c, #S_ICONS_WIDTH
     ld b, #S_ICONS_HEIGHT
     call cpct_drawSprite_asm
+    call sys_render_deck                    ;; Deck number
 
     ;; cemetery
-    ;;m_screenPtr_backbuffer 74, 148           ;; Calculates backbuffer address
-    m_screenPtr_frontbuffer 74, 148           ;; Calculates backbuffer address
+    m_screenPtr_frontbuffer 72, 149         ;; Calculates address
     ld hl, #_s_icons_1
     ld c, #S_ICONS_WIDTH
     ld b, #S_ICONS_HEIGHT
     call cpct_drawSprite_asm
+    call sys_render_cemetery                ;; Cemetery number
 
     ret
 
@@ -907,16 +899,11 @@ sys_render_icons::
 ;;
 sys_render_full_fight_screen::
 
-    ;;call sys_render_clear_back_buffer
-    
+    call sys_render_draw_frame
+
     call sys_render_topbar
       
     call sys_render_icons
-    
-    call sys_render_energy              ;; Energy number
-    call sys_render_sacrifice           ;; Sacrifice number
-    call sys_render_deck                ;; Deck number
-    call sys_render_cemetery            ;; Cemetery number
 
     ;; render player
     ld ix, #player
@@ -1199,4 +1186,25 @@ exith:
     ei
     ret  ; finished OK
 
+;;----------------------------------------------------------------
+;; sys_render_draw_frame
+;;
+;; Input:   stack: x1, y1, x2, y2
+;;
+;;
+;; faster version 27.9.2016
+;;----------------------------------------------------------------
+sys_render_draw_frame::
+
+   ld c, #20
+   ld b, #25
+   ld de, #_m_frame_W
+   ld hl, #_g_tileset_00
+   call cpct_etm_setDrawTilemap4x8_ag_asm
+
+   ld hl, #0xC000
+   ld de, #_m_frame
+   call cpct_etm_drawTilemap4x8_ag_asm
+
+    ret
     

@@ -4,19 +4,19 @@
 
 #include <types.h>
 #define S_ICONS_0_W 6
-#define S_ICONS_0_H 17
-extern const u8 s_icons_0[6 * 17];
+#define S_ICONS_0_H 22
+extern const u8 s_icons_0[6 * 22];
 #define S_ICONS_1_W 6
-#define S_ICONS_1_H 17
-extern const u8 s_icons_1[6 * 17];
+#define S_ICONS_1_H 22
+extern const u8 s_icons_1[6 * 22];
 #define S_ICONS_2_W 6
-#define S_ICONS_2_H 17
-extern const u8 s_icons_2[6 * 17];
+#define S_ICONS_2_H 22
+extern const u8 s_icons_2[6 * 22];
 #define S_ICONS_3_W 6
-#define S_ICONS_3_H 17
-extern const u8 s_icons_3[6 * 17];
+#define S_ICONS_3_H 22
+extern const u8 s_icons_3[6 * 22];
 #define S_ICONS_4_W 6
-#define S_ICONS_4_H 17
-extern const u8 s_icons_4[6 * 17];
+#define S_ICONS_4_H 22
+extern const u8 s_icons_4[6 * 22];
 
 #endif

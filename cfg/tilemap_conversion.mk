@@ -39,6 +39,10 @@
 #$(eval $(call TMX2DATA, CONVERT, tmxfile, array )) 
 
 
+$(eval $(call TMX2DATA, SET_FOLDER      , src/assets/maps      )) 
+$(eval $(call TMX2DATA, CONVERT, assets/maps/frame.tmx, m_frame))
+
+
 ##
 ## OLD MACROS (For compatibility)
 ##

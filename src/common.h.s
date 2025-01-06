@@ -116,6 +116,10 @@
 .globl _s_tileset_17
 .globl _s_tileset_18
 
+.globl _m_frame
+.globl _g_palette
+.globl _g_tileset_00
+
 
 ;;===============================================================================
 ;; PUBLIC VARIBLES
@@ -148,6 +152,8 @@
 .globl cpct_drawSpriteMaskedAlignedTable_asm
 .globl cpct_drawSpriteColorizeM0_asm
 .globl cpct_pens2pixelPatternPairM0_asm
+.globl cpct_etm_setDrawTilemap4x8_ag_asm
+.globl cpct_etm_drawTilemap4x8_ag_asm
 
 ;;===============================================================================
 ;; DEFINED CONSTANTS
@@ -188,7 +194,7 @@ S_BLOB_WIDTH = 16
 S_BLOB_HEIGHT = 25
 
 S_SMALL_ICONS_WIDTH = 4
-S_SMALL_ICONS_HEIGHT = 12
+S_SMALL_ICONS_HEIGHT = 10
 S_SMALL_ICONS_SIZE = S_SMALL_ICONS_WIDTH * S_SMALL_ICONS_HEIGHT
 
 S_COIN_WIDTH = 4
@@ -196,7 +202,7 @@ S_COIN_HEIGHT = 10
 S_SMALL_NUMBERS_WIDTH = 2
 S_SMALL_NUMBERS_HEIGHT = 5
 S_ICONS_WIDTH = 6
-S_ICONS_HEIGHT = 17
+S_ICONS_HEIGHT = 22
 S_STATUS_WIDTH = 5
 S_STATUS_HEIGHT = 12
 
@@ -221,7 +227,7 @@ MAX_MODEL_CARD = 4
 
 ;; MAIN SCREEN
 PLAYER_SPRITE_X = 20
-PLAYER_SPRITE_Y = 60
+PLAYER_SPRITE_Y = 40
 PLAYER_SPRITE_WIDTH = 8
 PLAYER_SPRITE_HEIGHT = 40
 
@@ -254,6 +260,11 @@ MAP_HEIGHT = 7
 
 
 x_cmps = 0
+
+
+;; Frame constants
+_m_frame_W  = 20
+_m_frame_H  = 25
 
 ;;===============================================================================
 ;; DEFINED MACROS

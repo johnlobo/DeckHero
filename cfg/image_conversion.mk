@@ -41,7 +41,7 @@
 #$(eval $(call IMG2SP, CONVERT_PALETTE , $(PALETTE), g_palette ))
 #$(eval $(call IMG2SP, CONVERT         , img.png , w, h, array, palette, tileset))
 
-PALETTE0=0 8 13 3 6 15 24 16 9 12 20 14 2 4 1 26
+PALETTE0=0 13 14 6 3 16 15 12 24 9 10 20 11 1 2 26
 PALETTE1=0 26 13 8
 
 $(eval $(call IMG2SP, SET_MODE        , 0                  ))
@@ -56,15 +56,20 @@ $(eval $(call IMG2SP, CONVERT         , assets/font_chars_0.png , 4, 423, s_font
 $(eval $(call IMG2SP, CONVERT         , assets/small_numbers.png , 4, 5, s_small_numbers, ,))
 $(eval $(call IMG2SP, CONVERT         , assets/player.png , 16, 40, s_player, ,))
 $(eval $(call IMG2SP, CONVERT         , assets/blob.png , 32, 25, s_blob, ,))
-$(eval $(call IMG2SP, CONVERT         , assets/small-icons.png , 8, 12, s_small_icons, ,))
+$(eval $(call IMG2SP, CONVERT         , assets/small-icons.png , 8, 10, s_small_icons, ,))
 $(eval $(call IMG2SP, CONVERT         , assets/coin.png , 8, 10, s_coin, ,))
-$(eval $(call IMG2SP, CONVERT         , assets/icons.png , 12, 17, s_icons, ,))
+$(eval $(call IMG2SP, CONVERT         , assets/icons.png , 12, 22, s_icons, ,))
 $(eval $(call IMG2SP, CONVERT         , assets/status.png , 10, 12, s_status, ,))
 $(eval $(call IMG2SP, CONVERT         , assets/explotion.png , 16, 16, s_explotion, ,))
 $(eval $(call IMG2SP, CONVERT         , assets/nodes.png , 12, 12, s_nodes, ,))
 $(eval $(call IMG2SP, CONVERT         , assets/pipes.png , 12, 12, s_pipes, ,))
 $(eval $(call IMG2SP, CONVERT         , assets/effect.png , 16, 16, s_effect, ,))
-$(eval $(call IMG2SP, CONVERT         , assets/maps/tileset.png , 8, 8, s_tileset, ,))
+
+$(eval $(call IMG2SP, SET_FOLDER     , src/assets/maps/))
+$(eval $(call IMG2SP, SET_IMG_FORMAT , zgtiles))
+$(eval $(call IMG2SP, SET_PALETTE_FW , $(PALETTE0)))
+$(eval $(call IMG2SP, CONVERT        , assets/maps/FrameTileset.png, 8, 8, g_tileset, g_palette,))
+
 
 ##
 ## OLD MACROS (For compatibility)
