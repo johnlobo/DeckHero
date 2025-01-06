@@ -71,14 +71,8 @@ sys_render_erase_hand::
     call cpct_drawSolidBox_asm
 
     ;; Erase description
-
     call cpct_waitVSYNC_asm
-    ;;m_screenPtr_backbuffer DESC_X,DESC_Y_1      ;; Calculates backbuffer address
-    m_screenPtr_frontbuffer DESC_X,DESC_Y_1      ;; Calculates backbuffer address
-    ld c, #64
-    ld b, #20    
-    ld a, #0
-    call cpct_drawSolidBox_asm
+    call sys_render_erase_description
 
     ret
 
@@ -224,12 +218,7 @@ srsc_show_current_card:
     ;; Render Texts
     
     ;; Erase description
-
-    m_screenPtr_frontbuffer DESC_X,DESC_Y_1      ;; Calculates backbuffer address
-    ld c, #64
-    ld b, #20    
-    ld a, #0
-    call cpct_drawSolidBox_asm
+    call sys_render_erase_description
     
     cpctm_push AF, BC, DE, HL                                   ;; Save values              
     ;; Render Card Name
@@ -261,6 +250,26 @@ srsc_card_pointer02 = . + 1
 
     pop ix
     ret
+
+;;-----------------------------------------------------------------
+;;
+;; sys_render_erase_description
+;;
+;;  Erase the description of the card
+;;  Input: 
+;;  Output: 
+;;  Modified: AF, BC, DE, HL, IX, IY
+;;
+sys_render_erase_description::
+    ;; Erase description
+
+    m_screenPtr_frontbuffer DESC_X,DESC_Y_1      ;; Calculates backbuffer address
+    ld c, #64
+    ld b, #20    
+    ld a, #0
+    call cpct_drawSolidBox_asm
+    ret
+
 previous_card:: .db #00
 current_card::  .db #00
 card_x_pos:: .db #00
@@ -385,7 +394,7 @@ _s_r_h_s_loop0:
     ld de, #c_name                                              ;; load name address in hl
     ld__hl_iy                                                   ;; load card index in hl
     add hl, de                                                  ;; add name offset to hl
-    m_screenPtr_frontbuffer DESC_X, DESC_Y_1                    ;; Calculates backbuffer address
+    m_screenPtr_frontbuffer DESC_X, DESC_Y_1                    ;; Calculates frontbuffer address
 
     ld c, #1                                                    ;; first color
     call sys_text_draw_string                                   ;; draw card name
@@ -393,7 +402,7 @@ _s_r_h_s_loop0:
     ld de, #c_description                                       ;; load description address in hl
     ld__hl_iy                                                   ;; load card index in hl
     add hl, de                                                  ;; add name offset to hl
-    m_screenPtr_frontbuffer DESC_X, DESC_Y_2           ;; Calculates backbuffer address
+    m_screenPtr_frontbuffer DESC_X, DESC_Y_2                    ;; Calculates frontbuffer address
 
     ld c, #0                                                    ;; first color
     call sys_text_draw_string                                   ;; draw card name
@@ -440,7 +449,6 @@ sys_render_show_deck::
 
     cpctm_clearScreen_asm 0
 
-    ;;m_screenPtr_backbuffer 5, 10           ;; Calculates backbuffer address
     m_screenPtr_frontbuffer 5, 10           ;; Calculates backbuffer address
     ld c, #70
     ld b, #180
@@ -450,7 +458,7 @@ sys_render_show_deck::
 
     ld hl, #_show_deck_string
     ;;m_screenPtr_backbuffer 27, 14                           ;; Calculates backbuffer address
-    m_screenPtr_frontbuffer 27, 14                           ;; Calculates backbuffer address
+    m_screenPtr_frontbuffer 27, 14                           ;; Calculates frontbuffer address
 
     ld c, #0
     call sys_text_draw_string

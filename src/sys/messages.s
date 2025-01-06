@@ -256,8 +256,6 @@ y_coord:
     cp #1                           ;;
     jr  z, wait_for_key             ;;
 
-    ;;call sys_render_switch_buffers
-
     ld a, w_wait_for_key(iy)        ;; check if we have to wait for a key
     cp #2                           ;;
     jr  nz, _sms_exit               ;;
@@ -296,14 +294,10 @@ wait_for_key:
     ld hl, #_press_any_key_string
     call sys_text_draw_string
 
-    ;;call sys_render_switch_buffers
-
     call sys_input_wait4anykey
     push hl                         ;; store number of loops waited
 
     call sys_messages_restore_message_background
-
-    ;;call sys_render_switch_buffers
 
     pop hl                          ;; return number of loops waited
 

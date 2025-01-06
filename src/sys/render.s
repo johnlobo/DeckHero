@@ -139,31 +139,6 @@ sys_render_clear_front_buffer::
     call sys_render_clear_buffer
     ret
 
-
-
-;;====================================================
-;;  sys_render_switch_buffers
-;;  
-;;  Switches screen buffers
-;;  Entrada:
-;;  Salida:
-;;  Destruye: AF, HL
-;;
-;; Code taken form Miss Input 
-;;====================================================
-sys_render_switch_buffers::
-    ld hl, (sys_render_front_buffer)    ;; Inicialmente (80C0)
-    ld a, l                             ;; Carga el front buffer en el back buffer
-    ld (sys_render_back_buffer) , a
-    ld a, h                             ;; Carga el back buffer en el front buffer
-    ld (sys_render_front_buffer), a
-    srl a
-    srl a
-    ld l, a
-    call cpct_waitVSYNC_asm
-    jp cpct_setVideoMemoryPage_asm
-
-
 ;;-----------------------------------------------------------------
 ;;
 ;; sys_render_init
@@ -325,15 +300,6 @@ sys_render_update_fight::
     call sys_render_current_behaviour
     
     call sys_render_update_animations           ;; update animations
-
-    ;;call sys_render_switch_buffers              ;; switch buffers
-    
-    ;;call sys_render_update_hand                 ;;
-    ;;call sys_render_update_foe_effects          ;;  render zones front buffer
-    ;;call sys_render_update_player_effects       ;;
-    ;;call sys_render_update_icon_numbers         ;;
-    ;;call sys_render_current_behaviour
-
     xor a                                       ;; initilizes player updates
     ld (player_updates), a                      ;;
 

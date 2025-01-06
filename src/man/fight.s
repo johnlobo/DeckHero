@@ -121,8 +121,6 @@ man_fight_init::
     call man_foe_create
 
     call sys_render_full_fight_screen   ;; renders the fight screen
-    ;;call sys_render_switch_buffers
-    ;;call sys_render_full_fight_screen   ;; renders the fight screen
 
     ld a, (hand_max)
     ld b, a

@@ -54,7 +54,6 @@ sys_render_zone_messages      = 0b10000000
 .globl sys_render_cemetery
 .globl sys_render_current_behaviour
 .globl sys_render_effects
-.globl sys_render_switch_buffers
 .globl sys_render_clear_front_buffer
 .globl sys_render_clear_back_buffer
 .globl sys_render_getNextLine
