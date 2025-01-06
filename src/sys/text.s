@@ -226,14 +226,24 @@ _continue:
     call cpct_drawSprite_asm
     ret
 _color_ptr: .dw 0x0000
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Important: for the color replacement to work, the shadow color (dark red) must be in the 5th position of the palette
+;; Bright White should be in the position 16 of the palette
+;; Bright Yellow should be in the position 7 of the palette
+;; Orange should be in the position 6 of the palette
+;; Blue should be in the position 5 of the palette
+;; Bright Red should be in the position 5 of the palette
+;; Mauve should be in the position 12 of the palette
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 _swapColors: 
-    .db 0x55, 0xee, 0xdd, 0xff, 0xaa   ;; Bright White 
-    .db 0x14, 0x6c, 0x9c, 0x3c, 0x28   ;; Bright Yellow
-    .db 0x50, 0xe4, 0xd8, 0xf0, 0xa0   ;; Orange
-    .db 0x11, 0x66, 0x99, 0x33, 0x22   ;; Blue
-    .db 0x10, 0x35, 0x3a, 0x30, 0x20   ;; Bright Red
-    .db 0x45, 0xce, 0xcd, 0xcf, 0x84   ;; Mauve
-_char_buffer: .db 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+    .db 0x55, 0xee, 0xdd, 0xff, 0xaa   ;; Bright White position 16 in the palette
+    .db 0x14, 0x6c, 0x9c, 0x3c, 0x28   ;; Bright Yellow position 7 in the palette
+    .db 0x50, 0xe4, 0xd8, 0xF0, 0xA0   ;; Orange position 6 in the palette
+    .db 0x04, 0x4c, 0x8c, 0x0c, 0x08   ;; Blue position 2 in the paletteE
+    .db 0x10, 0x64, 0x98, 0x30, 0x20   ;; Bright Red position 5 in the palette
+    .db 0x45, 0xce, 0xcd, 0xcf, 0x8a   ;; Mauve position 12 in the palette
+_char_buffer:: .db 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; draw_string

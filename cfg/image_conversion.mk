@@ -41,7 +41,7 @@
 #$(eval $(call IMG2SP, CONVERT_PALETTE , $(PALETTE), g_palette ))
 #$(eval $(call IMG2SP, CONVERT         , img.png , w, h, array, palette, tileset))
 
-PALETTE0=0 13 14 6 3 16 15 12 24 9 10 20 11 1 2 26
+PALETTE0=0 13 2 3 6 15 24 12 16 9 10 14 11 20 1 26
 PALETTE1=0 26 13 8
 
 $(eval $(call IMG2SP, SET_MODE        , 0                  ))

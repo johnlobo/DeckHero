@@ -24,6 +24,7 @@
 .include "sys/render.h.s"
 .include "sys/messages.h.s"
 .include "man/game.h.s"
+.include "sys/text.h.s"
 
 .module main
 
@@ -59,7 +60,39 @@ main_init::
 ;;
    call sys_render_init
 
-   ld e, #6                           ;; x
+   ld hl, #_game_loaded_string
+   m_screenPtr_frontbuffer 27,4      ;; Calculates backbuffer address
+   ld c, #0
+   call sys_text_draw_string
+
+   ld hl, #_game_loaded_string
+   m_screenPtr_frontbuffer 27,14      ;; Calculates backbuffer address
+   ld c, #1
+   call sys_text_draw_string
+
+   ld hl, #_game_loaded_string
+   m_screenPtr_frontbuffer 27,24      ;; Calculates backbuffer address
+   ld c, #2
+   call sys_text_draw_string
+
+   ld hl, #_game_loaded_string
+   m_screenPtr_frontbuffer 27,34      ;; Calculates backbuffer address
+   ld c, #3
+   call sys_text_draw_string
+
+   ld hl, #_game_loaded_string
+   m_screenPtr_frontbuffer 27,44      ;; Calculates backbuffer address
+   ld c, #4
+   call sys_text_draw_string
+
+   ld hl, #_game_loaded_string
+   m_screenPtr_frontbuffer 27,54      ;; Calculates backbuffer address
+   ld c, #5
+   call sys_text_draw_string
+
+
+
+   ld e, #6                            ;; x
    ld d, #78                           ;; y
    ld b, #44                           ;; h
    ld c, #60                           ;; w
