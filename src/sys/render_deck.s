@@ -63,11 +63,13 @@ sys_render_erase_hand::
     
     call cpct_waitVSYNC_asm
     ;;m_screenPtr_backbuffer HAND_X, HAND_Y_2      ;; Calculates backbuffer address
-    m_screenPtr_frontbuffer HAND_X, HAND_Y_2      ;; Calculates backbuffer address
+    m_screenPtr_frontbuffer HAND_X+1, HAND_Y_2      ;; Calculates backbuffer address
     
-    ld c, #64
+    ld c, #62
     ld b, #(S_CARD_HEIGHT + 5)
-    ld a, #0
+    ;;ld a, #0
+    CPCTM_PEN2PIXELPATTERN_M0_ASM OldPen, 12 ;// Produces 'OldPen = 0xF0'
+    ld a, #OldPen
     call cpct_drawSolidBox_asm
 
     ;; Erase description

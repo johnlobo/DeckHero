@@ -42,7 +42,10 @@ _window_w: .db #00
 _window_h: .db #00
 _window_message: .dw #0000
 _window_wait_for_key: .db #01
+_window_background_color: .db #00
+
 _press_any_key_string: .asciz "PRESS ANY KEY"
+
 
 ;; Constants to reach window data
 w_address = 0
@@ -52,6 +55,7 @@ w_w = 4
 w_h = 5
 w_message = 6
 w_wait_for_key = 8
+w_b_color = 9
 
 
 ;;
@@ -65,6 +69,7 @@ w_wait_for_key = 8
 ;;
 ;;  Loads the window structure with the data in registers
 ;;  Input:  a : wait for key flag
+;;          a': background color
 ;;          de: x and y coord
 ;;          bc: h and w of the window
 ;;          hl: message to show 
@@ -74,6 +79,9 @@ w_wait_for_key = 8
 
 sys_messages_load_window_data::
     ld iy, #_window_data
+    ex af, af'                      ;;
+    ld w_b_color(iy), a             ;; bring background color froam a'
+    ex af, af'                      ;;
     ld w_message(iy), l
     ld w_message+1(iy), h
     ;;ld w_w(iy), c
@@ -163,7 +171,8 @@ sys_messages_draw_window::
     dec b                           ;;
     dec b                           ;;
     
-    ld a, #0x00                     ;; Patern of solid box
+    ;;ld a, #0x00                     ;; Patern of solid box
+    ld a, w_b_color(iy)               ;; Patern for solid box  
     call cpct_drawSolidBox_asm
 
     ret
@@ -201,6 +210,7 @@ sys_messages_restore_message_background::
 ;;          de: x and y coord
 ;;          bc: h and w of the window
 ;;          hl: message to show 
+;;          af'; window background
 ;;  Output:
 ;;  Modified: af, hl, de, bc
 ;;

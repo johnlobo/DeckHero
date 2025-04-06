@@ -271,7 +271,9 @@ sys_input_ac_action::
 ;;  Modified: 
 ;;
 sys_input_action::
+    push iy
     call man_fight_execute_card
+    pop iy
     ret
 
 ;;-----------------------------------------------------------------
@@ -359,7 +361,7 @@ sisr_return:
 ;;
 ;;  Initializes input
 ;;  Input:  iy: array of key, actions to check
-;;          ix: pointer to the strcut to be used in the actions
+;;          ix: pointer to the struct to be used in the actions
 ;;  Output:
 ;;  Modified: iy, bc
 ;;

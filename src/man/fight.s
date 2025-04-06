@@ -89,6 +89,7 @@ man_fight_init::
     call sys_render_clear_front_buffer
     ;;call sys_render_clear_back_buffer
 
+    m_msg_w_background 0
     ld e, #10                           ;; x
     ld d, #78                           ;; y
     ld b, #44                           ;; h
@@ -366,6 +367,7 @@ man_fight_enemy_turn::
 ;;  Modified: 
 ;;
 man_fight_end_of_turn::
+    m_msg_w_background 2
     ld e, #10                           ;; x
     ld d, #78                           ;; y
     ld b, #44                           ;; h
@@ -410,6 +412,7 @@ man_fight_update::
 _update_main_loop:
 
     ;; Player turn
+    m_msg_w_background 1
     ld e, #10                           ;; x
     ld d, #78                           ;; y
     ld b, #44                           ;; h
@@ -439,6 +442,7 @@ _mfu_player_loop:
     jr nz, _mfu_player_loop
 
     ;; Enemy turn
+    m_msg_w_background 6
     ld e, #10                           ;; x
     ld d, #78                           ;; y
     ld b, #44                           ;; h
@@ -456,6 +460,7 @@ _mfu_player_loop:
     jr _update_main_loop
 
 _update_end_of_fight:
+    m_msg_w_background 2
     ld e, #10                           ;; x
     ld d, #78                           ;; y
     ld b, #44                           ;; h

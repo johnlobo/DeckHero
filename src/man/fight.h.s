@@ -25,9 +25,9 @@
 updated_none            = 0b00000000
 updated_topbar          = 0b00000001
 updated_player_sprite   = 0b00000010
-updated_player_effect   = 0b00000100
+updated_player_effects  = 0b00000100
 updated_foe_sprite      = 0b00001000
-updated_foe_effect      = 0b00010000
+updated_foe_effects     = 0b00010000
 updated_hand            = 0b00100000
 updated_icon_numbers    = 0b01000000
 updated_zone_messages   = 0b10000000
@@ -86,7 +86,7 @@ updated_zone_messages   = 0b10000000
 .mdelete m_updated_player_effects
 .macro m_updated_player_effects
     ld a, (player_updates)
-    or #updated_player_effect    
+    or #updated_player_effects    
     ld (player_updates), a
 .endm
 
@@ -100,7 +100,7 @@ updated_zone_messages   = 0b10000000
 .mdelete m_updated_foe_effects
 .macro m_updated_foe_effects
     ld a, (player_updates)
-    or #updated_foe_effect
+    or #updated_foe_effects
     ld (player_updates), a
 .endm
 

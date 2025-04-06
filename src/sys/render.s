@@ -47,41 +47,9 @@ sys_render_front_buffer: .db 0xc0
 sys_render_back_buffer: .db 0x80
 sys_render_touched_zones: .db 0x00
 
-.area _ABS   (ABS)
-.org 0x100
-transparency_table::
-        .db 0xFF, 0xAA, 0x55, 0x00, 0xAA, 0xAA, 0x00, 0x00
-        .db 0x55, 0x00, 0x55, 0x00, 0x00, 0x00, 0x00, 0x00
-        .db 0xAA, 0xAA, 0x00, 0x00, 0xAA, 0xAA, 0x00, 0x00
-        .db 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
-        .db 0x55, 0x00, 0x55, 0x00, 0x00, 0x00, 0x00, 0x00
-        .db 0x55, 0x00, 0x55, 0x00, 0x00, 0x00, 0x00, 0x00
-        .db 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
-        .db 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
-        .db 0xAA, 0xAA, 0x00, 0x00, 0xAA, 0xAA, 0x00, 0x00
-        .db 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
-        .db 0xAA, 0xAA, 0x00, 0x00, 0xAA, 0xAA, 0x00, 0x00
-        .db 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
-        .db 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
-        .db 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
-        .db 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
-        .db 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
-        .db 0x55, 0x00, 0x55, 0x00, 0x00, 0x00, 0x00, 0x00
-        .db 0x55, 0x00, 0x55, 0x00, 0x00, 0x00, 0x00, 0x00
-        .db 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
-        .db 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
-        .db 0x55, 0x00, 0x55, 0x00, 0x00, 0x00, 0x00, 0x00
-        .db 0x55, 0x00, 0x55, 0x00, 0x00, 0x00, 0x00, 0x00
-        .db 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
-        .db 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
-        .db 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
-        .db 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
-        .db 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
-        .db 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
-        .db 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
-        .db 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
-        .db 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
-        .db 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+_x_coord_base: .db #0
+_y_coord_base: .db #0
+
 
 ;;
 ;; Start of _CODE area
@@ -179,9 +147,6 @@ sys_render_init::
 ;;  Modified: AF, BC, DE, HL
 ;;
 sys_render_update_foe_effects::
-    ld a, (player_updates)
-    and #updated_foe_effect                 ;; check if player effects have been updated
-    ret z                                   ;; return if no update is necessary
     push ix                                 ;; save ix
     ld ix, #foes_array
     call sys_render_effects
@@ -197,10 +162,7 @@ sys_render_update_foe_effects::
 ;;  Output: 
 ;;  Modified: AF, BC, DE, HL
 ;;
-sys_render_update_foe_sprite::
-    ld a, (player_updates)
-    and #updated_foe_sprite                 ;; check if player effects have been updated
-    ret z                                   ;; return if no update is necessary
+sys_render_update_foe_sprite::                                 
     push ix                                 ;; save ix
     ld ix, #foes_array
     call sys_render_erase_oponent
@@ -220,9 +182,6 @@ sys_render_update_foe_sprite::
 ;;  Modified: AF, BC, DE, HL
 ;;
 sys_render_update_player_effects::
-    ld a, (player_updates)
-    and #updated_player_effect              ;; check if player effects have been updated
-    ret z                                   ;; return if no update is necessary
     push ix                                 ;; save ix
     ld ix, #player                          ;; point ix to player struct
     call sys_render_effects
@@ -239,9 +198,6 @@ sys_render_update_player_effects::
 ;;  Modified: AF, BC, DE, HL
 ;;
 sys_render_update_icon_numbers::
-    ld a, (player_updates)
-    and #updated_icon_numbers           ;; check if icons have been updated
-    ret z                               ;; return if no update is necessary
     call sys_render_energy              ;; Energy number
     call sys_render_sacrifice           ;; Sacrifice number
     call sys_render_deck                ;; Deck number
@@ -258,11 +214,8 @@ sys_render_update_icon_numbers::
 ;;  Modified: AF, BC, DE, HL
 ;;
 sys_render_update_hand::
-    ld a, (player_updates)
-    and #updated_hand                     ;; check if hand has been updated
-    ret z                                 ;; return if no update is necessary
-    ;;call sys_render_erase_hand
-    ;;call sys_render_hand
+    call sys_render_erase_hand
+    call sys_render_hand
     call sys_render_selected_card
     ret
 
@@ -293,13 +246,27 @@ sys_render_update_fight::
     ret z                                       ;; return if no update is necessary
 
     call cpct_waitVSYNC_asm
-    call sys_render_update_hand                 ;;
-    call sys_render_update_foe_effects          ;;  render zones back buffer
-    call sys_render_update_player_effects       ;;
-    call sys_render_update_icon_numbers         ;;
-    call sys_render_current_behaviour
+
+    ld a, (player_updates)                      ;;
+    and #updated_foe_effects                    ;; check if foe effects need update  
+    call nz, sys_render_update_foe_effects      ;;  
     
+    ld a, (player_updates)                      ;;
+    and #updated_hand                           ;; check if hand needs update  
+    call nz, sys_render_update_hand             ;;  
+    
+    ld a, (player_updates)                      ;;
+    and #updated_player_effects                 ;; check if hand needs update  
+    call nz, sys_render_update_player_effects   ;;
+
+    ld a, (player_updates)                      ;;
+    and #updated_icon_numbers                   ;; check if icon numbersd needs update  
+    call nz, sys_render_update_icon_numbers     ;;
+    
+    call sys_render_current_behaviour
+
     call sys_render_update_animations           ;; update animations
+    
     xor a                                       ;; initilizes player updates
     ld (player_updates), a                      ;;
 
@@ -376,17 +343,15 @@ _srcb_add_effect_endloop:
 
 ;;-----------------------------------------------------------------
 ;;
-;; sys_render_effects
+;; sys_render_effects_base_coords
 ;;
-;;  Shows the the entire fight screen
+;;  Calculate the base coords for the effects 
 ;;  Input: IX: player structure
 ;;  Output: 
-;;  Modified: AF, BC, DE, HL
+;;  Modified: AF, BC
 ;;
-sys_render_effects::
-
+sys_render_effects_base_coords::
     ;; Calc the screen address to draw the effect
-
     ;; xcoord base
     ld a, o_sprite_w(ix)        ;; a=sprite width 
     sra a                       ;; a = sprite_width/2
@@ -395,32 +360,40 @@ sys_render_effects::
     ld b, o_effects_count(ix)   ;; b = num effects
     inc b                       ;; b = (num effects + 1)
     sla b                       ;; b = (num effects + 1) * 2
-    sub b                       ;; a = sprite_x + (sprite_width/2) - ((num effects + 1) * 2)
-    
+    sub b                       ;; a = sprite_x + (sprite_width/2) - ((num effects + 1) * 2)    
     ld (_x_coord_base), a
-    ld c, a
-    ld (_X_COORD_HEART_EFFECT), a         ;; store in a memory spot for later use
-
 
     ;; ycoord base
     ld a, o_sprite_y(ix)
     add a, o_sprite_h(ix)
     add a, #2                   ;; offset to the sprite pos
     ld (_y_coord_base), a
-    ld b, a
-    ld (_Y_COORD_HEART_EFFECT), a     ;; store in a memory spot for later use
 
-    push bc
+    ret
 
-    ;; Erase previous effects
-    ;;ld_de_backbuffer    
+;;-----------------------------------------------------------------
+;;
+;; sys_render_effects
+;;
+;;  Shows the efects 
+;;  Input: IX: player structure
+;;  Output: 
+;;  Modified: AF, BC, DE, HL
+;;
+sys_render_effects::
+
+    ;; Calc the screen address to draw the effect
+
+    call sys_render_effects_base_coords 
+
+;; Erase previous effects
     ld_de_frontbuffer    
-
     ld a, (_y_coord_base)
     ld b, a
     ld a, (_x_coord_base)
     ld c, a
     call cpct_getScreenPtr_asm      ;; Calculate video memory location and return it in HL
+    push hl                         ;; Keep the screen address for later
     ex de, hl                       ;; move screen address to de
     
     ld c, #20
@@ -428,50 +401,38 @@ sys_render_effects::
     ld a, #0
     call cpct_drawSolidBox_asm
 
-    ;; Get screen address of the oponent
-
-    pop bc
-    
-    ;;ld_de_backbuffer
-    ld_de_frontbuffer
-    
-    call cpct_getScreenPtr_asm      ;; Calculate video memory location and return it in HL
-    ex de, hl
+;; Draw heart sprite
+    ;; Get screen address of the effect
+    pop de                          ;; retrieve screen address
     ;; Draw heart sprite
     ld hl, #_s_small_icons_00
     ld c, #S_SMALL_ICONS_WIDTH
     ld b, #S_SMALL_ICONS_HEIGHT
     call cpct_drawSprite_asm
 
- ;; Draw effect amount
-
+;; Draw Life amount
     ;; Get screen address of the text
-_X_COORD_HEART_EFFECT = .+1
-    ld c, #0
-    ld a, #10
-_Y_COORD_HEART_EFFECT = .+1
-    add a, #0
+    ;; x_coord
+    ld a, (_x_coord_base)
+    ld c, a
+    ;; y_coord
+    ld b, #11
+    ld a, (_y_coord_base)
+    add b
     ld b, a
-    inc b
     
-    ;;ld_de_backbuffer
     ld_de_frontbuffer
-    
     call cpct_getScreenPtr_asm      ;; Calculate video memory location and return it in HL
-    
     ex de, hl
 
     m_draw_blank_small_number       ;; erases previous number
 
     ld h, #0
     ld l, o_life(ix)
-    
     ld b, #15                       ;; small number color = 15 
     call sys_text_draw_small_number ;; draws number
 
-
-
-    ;; Check if effects > 0
+;; Check if effects > 0
 
     ld a, o_effects_count(ix)   ;; Check if effects count > 0
     or a                        ;;
@@ -482,7 +443,7 @@ _Y_COORD_HEART_EFFECT = .+1
     ld a, #o_shield             ;; position hl at the first effect
     add_hl_a                    ;;            
 
-    ld b, #0                     ;;
+    ld b, #0                    ;; index of the loop
 _effects_loop:
     push hl                     ;; Keep the pointer to the effect in the stack
     push bc                     ;; keep index loop in the stack
@@ -576,8 +537,7 @@ _next_effect:
     cp b
     jr nz, _effects_loop
     ret
-_x_coord_base: .db #0
-_y_coord_base: .db #0
+
 
 ;;-----------------------------------------------------------------
 ;;

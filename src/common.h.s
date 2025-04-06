@@ -116,6 +116,8 @@
 .globl _s_tileset_17
 .globl _s_tileset_18
 
+.globl transparency_table
+
 .globl _m_frame
 .globl _g_palette
 .globl _g_tileset_00
@@ -297,4 +299,14 @@ _m_frame_H  = 25
 .macro test_hl_0
     ld a, l
     or h
+.endm
+
+.mdelete m_msg_w_background
+.macro m_msg_w_background bk
+    ld h, #(bk)                         ;;
+    ld l, #(bk)                         ;;
+    call cpct_px2byteM0_asm             ;;
+    ex af, af'                          ;;
+    ld a, l                             ;;
+    ex af, af'                          ;;
 .endm

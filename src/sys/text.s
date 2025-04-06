@@ -220,10 +220,15 @@ _continue:
     ld a,c
     or a
     jr nz, _loop
-    pop bc
+ ;;   pop bc
+ ;;   pop de
+ ;;   ld hl, #_char_buffer
+ ;;   call cpct_drawSprite_asm
+    ld bc, #_char_buffer
+    pop ix
     pop de
-    ld hl, #_char_buffer
-    call cpct_drawSprite_asm
+    ld hl, #transparency_table
+    call cpct_drawSpriteMaskedAlignedTable_asm
     ret
 _color_ptr: .dw 0x0000
 
