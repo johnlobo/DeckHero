@@ -322,16 +322,11 @@ m_f_e_c_exit:
     ld b, c_energy(ix)                      ;; decrease energy
     call man_fight_decrease_energy          ;;
 
-    ;; render oponent
-    ;;ld ix, #foes_array
-    ;;call sys_render_effects
     m_updated_foe_effects
-    ;; render oponent
-    ;;ld ix, #player
-    ;;call sys_render_effects
+
     m_updated_player_effects
 
-    call man_deck_remove_card_from_hand
+    call man_deck_remove_card_from_hand     ;; remove card from hand
     
     ld ix, #hand                            ;; if hand is empty shuffle
     ld a, a_count(ix)                       ;; 

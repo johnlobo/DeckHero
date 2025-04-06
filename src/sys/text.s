@@ -220,10 +220,6 @@ _continue:
     ld a,c
     or a
     jr nz, _loop
- ;;   pop bc
- ;;   pop de
- ;;   ld hl, #_char_buffer
- ;;   call cpct_drawSprite_asm
     ld bc, #_char_buffer
     pop ix
     pop de

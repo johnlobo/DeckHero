@@ -168,10 +168,15 @@ sys_behaviour_add2Effect::
 ;;  Modified: af, bc
 ;;
 sys_behaviour_damage_oponent::
+
+;;cpctm_WINAPE_BRK                    ;; debug
+
     ;; Create hit effect
     push bc
+    push ix
     ld hl, #anim_hit            ;;  
     call man_effects_animate    ;;
+    pop ix
     pop bc
     
     ;; Substract damage

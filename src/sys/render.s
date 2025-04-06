@@ -359,6 +359,7 @@ sys_render_effects_base_coords::
 
     ld b, o_effects_count(ix)   ;; b = num effects
     inc b                       ;; b = (num effects + 1)
+    inc b                       ;; b = (num effects + 1)
     sla b                       ;; b = (num effects + 1) * 2
     sub b                       ;; a = sprite_x + (sprite_width/2) - ((num effects + 1) * 2)    
     ld (_x_coord_base), a
@@ -373,6 +374,34 @@ sys_render_effects_base_coords::
 
 ;;-----------------------------------------------------------------
 ;;
+;; sys_render_effects_clear_icons
+;;
+;;  Shows the efects 
+;;  Input: IX: player structure
+;;  Output: 
+;;  Modified: AF, BC, DE, HL
+;;  pre-requirement : execute sys_render_effects_base_coords
+;;
+sys_render_effects_clear_icons::
+    ;; Erase previous effects
+    ld_de_frontbuffer    
+    ld a, (_y_coord_base)
+    ld b, a
+    ld a, (_x_coord_base)
+    ld c, a
+    call cpct_getScreenPtr_asm      ;; Calculate video memory location and return it in HL
+    ex de, hl                       ;; move screen address to de
+    
+    ld c, #20
+    ld b, #16    
+    ld a, #0
+    call cpct_drawSolidBox_asm
+
+    ret
+
+
+;;-----------------------------------------------------------------
+;;
 ;; sys_render_effects
 ;;
 ;;  Shows the efects 
@@ -381,77 +410,32 @@ sys_render_effects_base_coords::
 ;;  Modified: AF, BC, DE, HL
 ;;
 sys_render_effects::
-
     ;; Calc the screen address to draw the effect
-
     call sys_render_effects_base_coords 
-
-;; Erase previous effects
-    ld_de_frontbuffer    
-    ld a, (_y_coord_base)
-    ld b, a
-    ld a, (_x_coord_base)
-    ld c, a
-    call cpct_getScreenPtr_asm      ;; Calculate video memory location and return it in HL
-    push hl                         ;; Keep the screen address for later
-    ex de, hl                       ;; move screen address to de
-    
-    ld c, #20
-    ld b, #16    
-    ld a, #0
-    call cpct_drawSolidBox_asm
-
-;; Draw heart sprite
-    ;; Get screen address of the effect
-    pop de                          ;; retrieve screen address
-    ;; Draw heart sprite
-    ld hl, #_s_small_icons_00
-    ld c, #S_SMALL_ICONS_WIDTH
-    ld b, #S_SMALL_ICONS_HEIGHT
-    call cpct_drawSprite_asm
-
-;; Draw Life amount
-    ;; Get screen address of the text
-    ;; x_coord
-    ld a, (_x_coord_base)
-    ld c, a
-    ;; y_coord
-    ld b, #11
-    ld a, (_y_coord_base)
-    add b
-    ld b, a
-    
-    ld_de_frontbuffer
-    call cpct_getScreenPtr_asm      ;; Calculate video memory location and return it in HL
-    ex de, hl
-
-    m_draw_blank_small_number       ;; erases previous number
-
-    ld h, #0
-    ld l, o_life(ix)
-    ld b, #15                       ;; small number color = 15 
-    call sys_text_draw_small_number ;; draws number
+    ;; Erase effects icon
+    call sys_render_effects_clear_icons
 
 ;; Check if effects > 0
-
     ld a, o_effects_count(ix)   ;; Check if effects count > 0
     or a                        ;;
-    ret z                       ;;
+    ret z                       ;; return otherwise
 
     ld__hl_ix                   ;; charge hl with ix
-
-    ld a, #o_shield             ;; position hl at the first effect
+    ld a, #o_life               ;; position hl at the first effect
     add_hl_a                    ;;            
 
-    ld b, #0                    ;; index of the loop
+;; cpctm_WINAPE_BRK
+
+    ld b, #0                    ;; reset index of the loop
 _effects_loop:
     push hl                     ;; Keep the pointer to the effect in the stack
     push bc                     ;; keep index loop in the stack
 
-    ld a, (hl)
-    or a 
-    jr z, _next_effect
+    ld a, (hl)                  ;; check if the effect is active
+    or a                        ;;
+    jr z, _next_effect          ;; otherwise jump to the next effect
 
+    ;; x_coord
     ld a, (_x_coord_base)
     ld c, b                         ;; c = current effect
     inc c                           ;; c = current effect + 1
@@ -461,28 +445,28 @@ _effects_loop:
     ld c,a
     ld (_X_COORD_EFFECT), a         ;; store in a memory spot for later use
 
-    ;; ycoord
-    
+    ;; y_coord
     ld a, (_y_coord_base)
     ld b, a
     ld (_Y_COORD_EFFECT), a     ;; store in a memory spot for later use
 
     ;; Get screen address of the oponent
-    
-    ;;ld_de_backbuffer
     ld_de_frontbuffer
-    
     call cpct_getScreenPtr_asm      ;; Calculate video memory location and return it in HL
-    ex de, hl
-    
+    ex de, hl                       ;; move the screen address to de
+ 
     pop bc
     push bc
     ld hl, #0
-_add_effect_loop:
+
+add_effect_loop:
     ld a, #S_SMALL_ICONS_SIZE
-    add_hl_a
     dec b
-    jp p, _add_effect_loop      ;; jump back to the loop if b > 0
+    jp m, _exit_effect_loop
+    add_hl_a
+    jr add_effect_loop
+
+_exit_effect_loop:
 
     ld bc, #_s_small_icons_00
     add hl, bc
@@ -501,12 +485,8 @@ _Y_COORD_EFFECT = .+1
     add a, #0
     ld b, a
     inc b
-        
-    ;;ld_de_backbuffer
     ld_de_frontbuffer
-    
     call cpct_getScreenPtr_asm      ;; Calculate video memory location and return it in HL
-    
     ex de, hl
 
     m_draw_blank_small_number       ;; erases previous number
@@ -522,11 +502,8 @@ _Y_COORD_EFFECT = .+1
 _draw_effect_number:
     ld h, #0
     ld l, a
-
     ld b, #15                       ;; small number color = 15 
     call sys_text_draw_small_number
-
-
 
 _next_effect:
     pop bc                      ;; retrieve index loop form the stack
