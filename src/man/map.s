@@ -768,3 +768,27 @@ mmr2_next_line:
     call sys_input_wait4anykey          ;; wait for any key
 
     ret
+
+;;-----------------------------------------------------------------
+;;
+;; man_map_render3::
+;;
+;;  renders the map based on tilemaps
+;;  Input: 
+;;  Output: 
+;;  Modified: 
+;;
+man_map_render3::
+    ld c, #14
+    ld b, #23
+    ld de, #_m_map_W
+    ld hl, #_g_map_tileset_00
+    call cpct_etm_setDrawTilemap4x8_ag_asm
+ 
+    ld hl, #0xC000
+    ld de, #_m_map
+    call cpct_etm_drawTilemap4x8_ag_asm
+
+    call sys_input_wait4anykey          ;; wait for any key
+
+    ret

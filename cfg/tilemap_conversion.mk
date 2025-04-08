@@ -41,6 +41,7 @@
 
 $(eval $(call TMX2DATA, SET_FOLDER      , src/assets/maps      )) 
 $(eval $(call TMX2DATA, CONVERT, assets/maps/frame.tmx, m_frame))
+$(eval $(call TMX2DATA, CONVERT, assets/maps/map.tmx, m_map))
 
 
 ##

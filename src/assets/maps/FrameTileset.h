@@ -3,8 +3,6 @@
 #define _ASSETS_MAPS_FRAMETILESET_H_
 
 #include <types.h>
-extern const u8 g_palette[16];
-
 #define G_TILESET_00_W 4
 #define G_TILESET_00_H 8
 extern const u8 g_tileset_00[4 * 8];

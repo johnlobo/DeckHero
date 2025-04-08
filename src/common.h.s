@@ -122,6 +122,9 @@
 .globl _g_palette
 .globl _g_tileset_00
 
+.globl _m_map
+.globl _g_map_tileset_00
+
 
 ;;===============================================================================
 ;; PUBLIC VARIBLES
@@ -267,6 +270,10 @@ x_cmps = 0
 ;; Frame constants
 _m_frame_W  = 20
 _m_frame_H  = 25
+
+;; Map constants
+_m_map_W  = 14
+_m_map_H  = 23
 
 ;;===============================================================================
 ;; DEFINED MACROS

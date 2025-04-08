@@ -68,7 +68,8 @@ $(eval $(call IMG2SP, CONVERT         , assets/effect.png , 16, 16, s_effect, ,)
 $(eval $(call IMG2SP, SET_FOLDER     , src/assets/maps/))
 $(eval $(call IMG2SP, SET_IMG_FORMAT , zgtiles))
 $(eval $(call IMG2SP, SET_PALETTE_FW , $(PALETTE0)))
-$(eval $(call IMG2SP, CONVERT        , assets/maps/FrameTileset.png, 8, 8, g_tileset, g_palette,))
+$(eval $(call IMG2SP, CONVERT        , assets/maps/FrameTileset.png, 8, 8, g_tileset, ,))
+$(eval $(call IMG2SP, CONVERT        , assets/maps/MapTileset.png, 8, 8, g_map_tileset, g_palette,))
 
 
 ##
