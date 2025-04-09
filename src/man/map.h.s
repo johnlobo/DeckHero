@@ -28,7 +28,6 @@
 ;;===============================================================================
 .globl man_map_init
 .globl man_map_render
-.globl man_map_render2
-.globl man_map_render3
+
 
 
