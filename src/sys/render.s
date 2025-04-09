@@ -424,7 +424,7 @@ sys_render_effects::
     ld a, #o_life               ;; position hl at the first effect
     add_hl_a                    ;;            
 
-;; cpctm_WINAPE_BRK
+ ;;cpctm_WINAPE_BRK
 
     ld b, #0                    ;; reset index of the loop
 _effects_loop:
