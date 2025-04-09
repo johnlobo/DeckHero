@@ -99,6 +99,14 @@ y_coord::   .db #(MAP_Y_START - (S_NODES_HEIGHT*2*0)), #(MAP_Y_START-(S_NODES_HE
             .db #(MAP_Y_START - (S_NODES_HEIGHT*2*4)), #(MAP_Y_START-(S_NODES_HEIGHT*2*5))
             .db #(MAP_Y_START - (S_NODES_HEIGHT*2*6))
 
+game_map_0:: .db #0, #1, #1, #1, #0
+game_map_1:: .db #0xff, #0xff, #0xff, #0xff, #0xff
+game_map_2:: .db #0xff, #0xff, #0xff, #0, #0xff
+game_map_3:: .db #0xff, #0, #0xff, #0xff, #0xff
+game_map_4:: .db #0xff, #0xff, #0xff, #0xff, #0xff
+game_map_5:: .db #0, #0xff, #0xff, #0, #0xff
+game_map_6:: .db #0xff, #0xff, #0xff, #0xff, #0xff
+
 ;;
 ;; Start of _CODE area
 ;; 
@@ -771,6 +779,98 @@ mmr2_next_line:
 
 ;;-----------------------------------------------------------------
 ;;
+;; man_map_generate_cell
+;;
+;;
+;;  renders the map based on tilemaps
+;;  Input: 
+;;  Output: 
+;;  Modified: AF, BC
+;;
+man_map_generate_cell::
+    ld a, #3                             ;; load max number in a
+    call sys_util_get_random_number     ;;
+    inc a                               ;;
+    ret
+
+;;-----------------------------------------------------------------
+;;
+;; man_map_generate
+;;
+;;
+;;  renders the map based on tilemaps
+;;  Input: 
+;;  Output: 
+;;  Modified: AF, BC
+;;
+man_map_generate::
+;;    cpctm_WINAPE_BRK        ;; debug
+    ld b, #7
+    ld hl, #game_map_0
+_m_m_g_looph:
+    PUSH BC             ; Guardar el contador de filas en la pila
+    LD c, #5             ; Contador del bucle interior (columnas)
+
+_m_m_g_loopv:
+                        ; Aquí va el código para procesar el elemento actual de la matriz
+                        ; El elemento actual está apuntado por HL
+                        ; Ejemplo de "procesamiento": cargar el valor en A (opcional)
+    LD A, (HL)
+    cp #0xff
+    jr nz, _m_m_g_process_exit
+    push hl
+    call man_map_generate_cell
+    pop hl
+    ld (hl), a
+_m_m_g_process_exit:
+    INC HL              ; Mover al siguiente elemento (siguiente columna)
+    DEC C               ; Decrementar el contador de columnas
+    JR NZ, _m_m_g_loopv ; Si no es cero, volver al inicio del bucle de columnas
+
+    POP BC            ; Restaurar el contador de filas
+    DEC B             ; Decrementar el contador de filas
+    JR NZ, _m_m_g_looph  ; Si no es cero, volver al inicio del bucle de filas
+    ret
+
+;;-----------------------------------------------------------------
+;;
+;; man_map_render_cells
+;;
+;;  renders the map based on tilemaps
+;;  Input: 
+;;  Output: 
+;;  Modified: 
+;;
+man_map_render_cells::
+    ld b, #7
+    ld hl, #game_map_0
+_m_m_r_c_looph:
+    PUSH BC             ; Guardar el contador de filas en la pila
+    LD c, #5             ; Contador del bucle interior (columnas)
+
+_m_m_r_c_loopv:
+                        ; Aquí va el código para procesar el elemento actual de la matriz
+                        ; El elemento actual está apuntado por HL
+                        ; Ejemplo de "procesamiento": cargar el valor en A (opcional)
+    LD A, (HL)
+    or a
+    jr z, _m_m_r_c_process_exit
+    push hl
+    
+    pop hl
+    ld (hl), a
+_m_m_r_c_process_exit:
+    INC HL              ; Mover al siguiente elemento (siguiente columna)
+    DEC C               ; Decrementar el contador de columnas
+    JR NZ, _m_m_r_c_loopv ; Si no es cero, volver al inicio del bucle de columnas
+
+    POP BC            ; Restaurar el contador de filas
+    DEC B             ; Decrementar el contador de filas
+    JR NZ, _m_m_r_c_looph  ; Si no es cero, volver al inicio del bucle de filas
+    ret
+
+;;-----------------------------------------------------------------
+;;
 ;; man_map_render3::
 ;;
 ;;  renders the map based on tilemaps
@@ -779,13 +879,19 @@ mmr2_next_line:
 ;;  Modified: 
 ;;
 man_map_render3::
+
+    call man_map_generate
+
+    call man_map_render_cells
+
     ld c, #14
     ld b, #23
     ld de, #_m_map_W
     ld hl, #_g_map_tileset_00
     call cpct_etm_setDrawTilemap4x8_ag_asm
  
-    ld hl, #0xC000
+    m_screenPtr_frontbuffer 12, 8
+    ex de,hl 
     ld de, #_m_map
     call cpct_etm_drawTilemap4x8_ag_asm
 
