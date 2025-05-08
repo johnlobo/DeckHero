@@ -89,7 +89,7 @@ man_fight_init::
     call sys_render_clear_front_buffer
     ;;call sys_render_clear_back_buffer
 
-    m_msg_w_background 0
+    m_msg_w_background 2
     ld e, #10                           ;; x
     ld d, #78                           ;; y
     ld b, #44                           ;; h
@@ -145,8 +145,9 @@ man_fight_init::
 man_fight_deal_hand::
     push ix
     ld ix, #hand
-    xor a                               ;; Selected card=0
-    ld a_selected(ix), a                ;;
+    ;;xor a                               ;; Selected card=0
+    ld a_selected(ix), #0                ;;
+    ld a_pselected(ix), #4              ;;
 
 _initial_set_of_cards:
     push bc                             ;; store loop index
@@ -174,7 +175,7 @@ mfdc_ELEMENT_TO_ERASE = . +1
     m_updated_icon_numbers
 
     ;;call sys_render_update_fight
-    call sys_render_hand_simple
+    ;;call sys_render_hand_simple
 
     pop bc                              ;; restore loop index
     djnz _initial_set_of_cards
@@ -407,7 +408,7 @@ man_fight_update::
 _update_main_loop:
 
     ;; Player turn
-    m_msg_w_background 1
+    m_msg_w_background 9
     ld e, #10                           ;; x
     ld d, #78                           ;; y
     ld b, #44                           ;; h
@@ -437,7 +438,7 @@ _mfu_player_loop:
     jr nz, _mfu_player_loop
 
     ;; Enemy turn
-    m_msg_w_background 6
+    m_msg_w_background 3
     ld e, #10                           ;; x
     ld d, #78                           ;; y
     ld b, #44                           ;; h

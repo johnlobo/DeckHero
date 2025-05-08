@@ -216,7 +216,7 @@ sys_render_update_icon_numbers::
 sys_render_update_hand::
     call sys_render_erase_hand
     call sys_render_hand
-    call sys_render_selected_card
+    ;;call sys_render_selected_card
     ret
 
 ;;-----------------------------------------------------------------

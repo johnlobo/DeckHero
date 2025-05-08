@@ -168,7 +168,9 @@ srsc_erase_previous_card:
     ex de, hl                                               ;; move screen address to de
     ld c, #S_CARD_WIDTH
     ld b, #5
-    ld a,#0                                                 ;; Patern of solid box
+    ;;ld a,#0                                                 ;; Patern of solid box
+    CPCTM_PEN2PIXELPATTERN_M0_ASM OldPen, 12 ;// Produces 'OldPen = 0xF0'
+    ld a, #OldPen
     call cpct_drawSolidBox_asm
     ;; Render card
     push ix                                                 ;; get card pointer from the array of pointers
@@ -189,6 +191,8 @@ srsc_show_current_card:
     ld b, a_selected(ix)                                        ;; b = card to restore
     call sys_render_get_card_x_pos
     ld (card_x_pos), a
+    inc a
+    inc a
     ;; Erase lower part of the card
     ld c, a                                                     ;; C = x coordinate 
     ld b, #(HAND_Y - 5 + S_CARD_HEIGHT)
@@ -196,8 +200,14 @@ srsc_show_current_card:
     call cpct_getScreenPtr_asm                                  ;; Calculate video memory location and return it in HL
     ex de, hl                                                   ;; move screen address to de
     ld c, #S_CARD_WIDTH
+    dec c
+    dec c
+    dec c
+    dec c                                                       ;; c = card with - 2 to fit the card in the screen
     ld b, #5
-    ld a,#0                                                     ;; Patern of solid box
+    ;;ld a,#0                                                     ;; Patern of solid box
+    CPCTM_PEN2PIXELPATTERN_M0_ASM OldPen, 12 ;// Produces 'OldPen = 0xF0'
+    ld a, #OldPen
     call cpct_drawSolidBox_asm
     ;; Render card
     
@@ -309,7 +319,7 @@ _s_r_h_loop0:
     cp b                                                    ;;
     ld b, #HAND_Y                                           ;; b = y coordinate by default
     jr nz, _hand_render_not_selected                        ;; jump if current card not selected
-    ld b, #HAND_Y - 5
+;; selected card
 
     cpctm_push AF, BC, DE, HL                                   ;; Save values              
     ;; Render Card Name
@@ -325,14 +335,17 @@ _s_r_h_loop0:
     ld de, #c_description                                       ;; load description address in hl
     ld__hl_iy                                                   ;; load card index in hl
     add hl, de                                                  ;; add name offset to hl
-    ;;m_screenPtr_backbuffer DESC_X, DESC_Y_2           ;; Calculates backbuffer address
     m_screenPtr_frontbuffer DESC_X, DESC_Y_2           ;; Calculates backbuffer address
 
     ld c, #0                                                    ;; first color
     call sys_text_draw_string                                   ;; draw card name
 
+    call sys_render_selected_card
+
     cpctm_pop HL, DE, BC, AF                                    ;; Restore values    
 
+    jr _srh_after_render                               ;; We don't need to render the card again
+;; not selectd card
 _hand_render_not_selected:
     push iy                                                     ;; move iy to ix for render card
     pop ix                                                      ;;
@@ -340,6 +353,8 @@ _hand_render_not_selected:
     ;;ld_de_backbuffer
     ld_de_frontbuffer
     call  sys_render_card                                       ;; render card
+
+_srh_after_render:
 
     pop ix                      ;; Move ix to the next card
     ld de, #sizeof_e          ;;
