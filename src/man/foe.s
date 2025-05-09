@@ -99,7 +99,7 @@ man_foe_create::
 ;;
 ;; man_foe_remove
 ;;
-;;  Initializes a fight
+;;  removes a foe from the array
 ;;  Input: 
 ;;  Output: 
 ;;  Modified: 
@@ -140,6 +140,31 @@ man_foe_kill_foe::
     pop ix
     ret
 
+;;-----------------------------------------------------------------
+;;
+;; man_foe_clean_dead_foes
+;;
+;;  Kills the corresponding foe
+;;  Input: a number of foe to kill
+;;  Output:
+;;  Modified: 
+;;
+man_foe_clean_dead_foes::
+    push ix
+    ld ix, #foes
+    ld a, a_count(ix)                     ;; load the number of foes in a
+    or a                                    ;;
+    ret z                                   ;; return if no foes
+
+    ld b, a                                 ;; save foes count in b   
+foe_check_alive_loop:
+    ld a, b                             ;; load the index of foes in a
+    call man_array_get_element          ;; call the function to get in hl the element "a"
+    ld__ix_hl
+    
+
+    djnz foe_check_alive_loop
+    ret
 
 
 

@@ -180,7 +180,7 @@ sys_behaviour_damage_oponent::
     pop bc
     
     ;; Substract damage
-    ld a, o_shield(ix)          ;; check if shield is enought to get the damage
+    ld a, o_shield(ix)          ;; check if shield is enough to get the damage
     sub c                       ;;
     jp p, sbdp_shield_enough
 
@@ -190,7 +190,7 @@ sys_behaviour_damage_oponent::
     ld o_shield(ix), a          ;;
     ld a, o_life(ix)            ;; load life in a
     sub c                       ;; substract remainign damge
-    jp p, sbdp_exit             ;; jump if the player is alive
+    jp p, sbdp_exit             ;; jump if the oponent is alive
     xor a                       ;; set life to 0
 sbdp_exit:
     ld o_life(ix), a            ;; updates players life
@@ -229,10 +229,10 @@ sys_behaviour_update::
     or a                        ;;
     ret z                       ;; return if no foes
 
-    ld b, a
-    ld ix, #foes_array
+    ld b, a                     ;; save foes count in b   
+    ld ix, #foes_array          ;; set ix to the start of the foes array
 sbu_loop:
-    push bc
+    push bc                             ;; save bc
     call sys_behaviour_execute_one
     ld de, #sizeof_o
     add ix, de

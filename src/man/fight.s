@@ -408,7 +408,7 @@ man_fight_update::
 _update_main_loop:
 
     ;; Player turn
-    m_msg_w_background 9
+    m_msg_w_background 9                ;; background green
     ld e, #10                           ;; x
     ld d, #78                           ;; y
     ld b, #44                           ;; h
@@ -438,7 +438,7 @@ _mfu_player_loop:
     jr nz, _mfu_player_loop
 
     ;; Enemy turn
-    m_msg_w_background 3
+    m_msg_w_background 3                ;; background red
     ld e, #10                           ;; x
     ld d, #78                           ;; y
     ld b, #44                           ;; h
@@ -456,7 +456,7 @@ _mfu_player_loop:
     jr _update_main_loop
 
 _update_end_of_fight:
-    m_msg_w_background 2
+    m_msg_w_background 2                ;; background blue
     ld e, #10                           ;; x
     ld d, #78                           ;; y
     ld b, #44                           ;; h
