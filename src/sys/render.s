@@ -376,7 +376,7 @@ sys_render_effects_base_coords::
 ;;
 ;; sys_render_effects_clear_icons
 ;;
-;;  Shows the efects 
+;;  Clear the icons of the effects
 ;;  Input: IX: player structure
 ;;  Output: 
 ;;  Modified: AF, BC, DE, HL
@@ -564,6 +564,11 @@ sys_render_erase_oponent::
     
     ;;ld_de_backbuffer
     ld_de_frontbuffer
+
+    ;; Calc the screen address to draw the effect
+    call sys_render_effects_base_coords 
+    ;; Erase effects icon
+    call sys_render_effects_clear_icons
 
     ld c, o_sprite_x(ix)
     ld b, o_sprite_y(ix)

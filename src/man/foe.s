@@ -131,11 +131,15 @@ man_foe_number_of_foes::
 ;;
 man_foe_kill_foe::
     push ix
+    
     ld ix, #foes
-    ld a, #0                                ;; TODO: erase any foe
+    push af
+    call man_array_get_element
+    ld__ix_hl                       ;; move the foe to ix
+    call sys_render_erase_oponent
+    ld ix, #foes                    ;; set ix to the start of the foes array    
+    pop af                          ;; retrieve the index of the foe to kill
     call man_array_remove_element
-
-    m_updated_foe_sprite
 
     pop ix
     ret
@@ -150,20 +154,30 @@ man_foe_kill_foe::
 ;;  Modified: 
 ;;
 man_foe_clean_dead_foes::
-    push ix
+    push ix                                 ;;  
     ld ix, #foes
-    ld a, a_count(ix)                     ;; load the number of foes in a
+    ld a, a_count(ix)                       ;; load the number of foes in a
     or a                                    ;;
     ret z                                   ;; return if no foes
-
     ld b, a                                 ;; save foes count in b   
 foe_check_alive_loop:
-    ld a, b                             ;; load the index of foes in a
-    call man_array_get_element          ;; call the function to get in hl the element "a"
+    push bc
+    ld ix, #foes
+    ld a, b                                 ;; load the index of foes in a
+    dec a                                   ;; foes are indexed from 0
+    ld (foe_kill_foe+1), a                  ;; store the index of foes to kill
+    call man_array_get_element              ;; call the function to get in hl the element "a"
     ld__ix_hl
-    
-
+    ld a, o_life(ix)                        ;; load the life of the foe in a
+    or a                                    ;; check if the foe is dead
+    jr nz, foe_next_foe                     ;; if not dead, go to the next foe
+foe_kill_foe:
+    ld a, #0                                ;; load the number of foe to kill
+    call man_foe_kill_foe                   ;; kill the foe if dead
+foe_next_foe:
+    pop bc
     djnz foe_check_alive_loop
+    pop ix
     ret
 
 

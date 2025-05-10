@@ -204,6 +204,7 @@ MGAD_BORDER_COLOR = . +1
 ;;  Modified: AF, BC, DE, HL
 ;;
 man_game_add_new_card::
+    call sys_render_clear_front_buffer
     m_screenPtr_frontbuffer 8, 15           ;; Calculates backbuffer address
     ld c, #64
     ld b, #180

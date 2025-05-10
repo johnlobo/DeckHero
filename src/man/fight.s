@@ -429,6 +429,7 @@ _mfu_player_loop:
     jr z, _update_end_of_fight          ;;
     jp m, _update_end_of_fight          ;;
 
+    call man_foe_clean_dead_foes        ;; clean dead foes
     call man_foe_number_of_foes         ;; Check if thera are enemies left
     or a                                ;;
     jr z, _update_end_of_fight          ;;
@@ -465,12 +466,4 @@ _update_end_of_fight:
     ld a,#1                             ;; wait for a key
     call sys_messages_show              ;; End of fight message
     
-
-;; Turn structure
-;; 1) Show foes intentions
-;; 2) hero play cards
-;; 3) Foes execute intention
-;; 4) Upate effects
-;; 5) Check end of combat
-;;
     ret

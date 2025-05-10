@@ -68,7 +68,7 @@ map_nodes_address::
 ;;
 man_map_init::
     call sys_render_clear_front_buffer
-    cpctm_setBorder_asm HW_WHITE            ;; Set Border
+    ;;cpctm_setBorder_asm HW_WHITE            ;; Set Border
     ret
 
 ;;-----------------------------------------------------------------
