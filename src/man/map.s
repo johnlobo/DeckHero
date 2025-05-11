@@ -245,7 +245,8 @@ _m_m_r_c_process_exit:
 ;;
 ;;  renders the map based on tilemaps
 ;;  Input: 
-;;  Output: 
+;;  Output: b : level reached
+;;          c : enemy type
 ;;  Modified: 
 ;;
 man_map_render::
@@ -266,5 +267,9 @@ man_map_render::
     call man_map_render_cells
 
     call sys_input_wait4anykey          ;; wait for any key
+
+    ;; Return the selected enemy type and level in bc
+    ld b, #1
+    ld c, #0
 
     ret
