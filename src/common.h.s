@@ -39,6 +39,8 @@
 .globl _s_player_1
 .globl _s_blob_0
 .globl _s_blob_1
+.globl _s_mini_blob_0
+.globl _s_mini_blob_1
 .globl _s_small_icons_00
 .globl _s_small_icons_01
 .globl _s_small_icons_02
@@ -166,6 +168,10 @@
 
 null_ptr = 0x0000
 
+;; game status
+g_status_fight              = 0x00
+g_status_dead               = 0xff
+
 ;;tipos de cartas
 e_type_invalid              = 0x00
 e_type_card_in_hand         = 0x01
@@ -197,6 +203,8 @@ S_PLAYER_WIDTH = 8
 S_PLAYER_HEIGHT = 40
 S_BLOB_WIDTH = 16
 S_BLOB_HEIGHT = 25
+S_MINI_BLOB_WIDTH = 8
+S_MINI_BLOB_HEIGHT = 16
 
 S_SMALL_ICONS_WIDTH = 4
 S_SMALL_ICONS_HEIGHT = 10

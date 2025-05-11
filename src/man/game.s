@@ -60,6 +60,8 @@ DefineOponent 1, ^/BLOB           /, _s_blob_0, 60, 40, S_BLOB_WIDTH, S_BLOB_HEI
 foe::
 DefineOponent 1, ^/FOE   1        /, _s_blob_0, 60, 40, S_BLOB_WIDTH, S_BLOB_HEIGHT, 100, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, #sys_behaviour_blob, 0
 
+game_status:: .db #00
+
 ;;
 ;; Start of _CODE area
 ;; 
@@ -80,13 +82,10 @@ man_game_init::
 
     call man_map_init
     
-    call man_map_render    ;; New map Render routine
-
-    call sys_render_clear_front_buffer
-    
-    call man_game_add_new_card
-    
     call man_fight_init     ;; Initialize fight
+
+    ld a, #g_status_fight
+    ld (game_status), a
     ret
 
 ;;-----------------------------------------------------------------
@@ -324,9 +323,18 @@ ac_cancel:
 ;;  Modified: AF, BC, DE, HL
 ;;
 man_game_update::
+
+mgu_main_loop:
+    call man_map_render    ;; New map Render routine
+
+    call man_fight_init
+    
     call man_fight_update
 
     call man_game_add_new_card
+
+    ld a, (game_status) 
+    cp #g_status_dead
+    jr nz, mgu_main_loop
     
-    call man_fight_init
     ret
