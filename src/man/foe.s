@@ -99,11 +99,12 @@ man_foe_init::
 man_foe_create::
     ld de, #sizeof_o
     ld hl, #foe_blob
+    ld a, c
 mfc_loop:
-    ld c, a
     or a
     jr z, mfc_loop_exit
     adc hl, de
+    dec a
     jr mfc_loop
 mfc_loop_exit:
     ld ix, #foes

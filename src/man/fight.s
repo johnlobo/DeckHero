@@ -80,15 +80,29 @@ ended_fight:: .db 0
 ;; man_fight_init
 ;;
 ;;  Initializes a fight
+;;  Input: 
+;;  Output: 
+;;  Modified: 
+;;
+man_fight_init::
+       
+    ld ix, #fight_deck                  ;; initialize fight_deck
+    call man_array_init                 ;;
+
+    ret
+
+;;-----------------------------------------------------------------
+;;
+;; man_fight_prepare_fight
+;;
+;;  Initializes a fight
 ;;  Input: b : level reached
 ;;         c : enemy type
 ;;  Output: 
 ;;  Modified: 
 ;;
-man_fight_init::
-    push bc               ;; save level and enemy type
-
-    call sys_render_clear_front_buffer
+man_fight_prepare_fight::
+    push bc
 
     m_msg_w_background 2                ;; background blue
     ld e, #10                           ;; x
@@ -102,9 +116,7 @@ man_fight_init::
     ld b, #100                          ;; delay 1 sec.
     call cpct_waitHalts_asm
 
-    ld ix, #fight_deck                  ;; initialize fight_deck
-    call man_array_init                 ;;
-
+    ld ix, #fight_deck                  ;; load ix with fight_deck
     call man_deck_load_array_from_deck  ;; loads all the cards in deck in the pointer array
 
     ld ix, #hand                        ;; initialize hand
@@ -119,7 +131,6 @@ man_fight_init::
     ld a, (player_max_energy)           ;; Load the max of energy of this fight to the player energy
     ld (player_energy), a               ;;
 
-
     pop bc                              ;; restore level and enemy type
     call man_foe_init
 
@@ -133,7 +144,6 @@ man_fight_init::
     ld (ended_fight), a                 ;;
 
     ret
-
 
 ;;-----------------------------------------------------------------
 ;;

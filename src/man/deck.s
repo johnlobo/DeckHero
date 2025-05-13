@@ -210,7 +210,7 @@ ret
 ;;
 man_deck_load_array_from_deck::
     ld hl, #deck_array                  ;; hl points to the array of cards
-    ld a, (#deck_count)                   ;; a holds the number of cards to copy
+    ld a, (#deck_count)                 ;; a holds the number of cards to copy
     ld b, a                             ;; b = number of cards to copy
 _l_a_loop:
     cpctm_push bc, hl                   ;; save bc and hl

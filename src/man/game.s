@@ -329,7 +329,7 @@ man_game_update::
 mgu_main_loop:
     call man_map_render    ;; New map Render routine
 
-    call man_fight_init
+    call man_fight_prepare_fight
     
     call man_fight_update
 

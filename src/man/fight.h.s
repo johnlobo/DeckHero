@@ -130,5 +130,6 @@ updated_zone_messages   = 0b10000000
 ;; PUBLIC METHODS
 ;;===============================================================================
 .globl man_fight_init
+.globl man_fight_prepare_fight
 .globl man_fight_update
 .globl man_fight_execute_card
