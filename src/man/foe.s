@@ -61,11 +61,13 @@ DefineComponentArrayStructure_Size foes, MAX_FOES, sizeof_o
 ;; man_foe_init
 ;;
 ;;  Initializes a fight
-;;  Input: 
+;;  Input: b : level reached
+;;         c : enemy type
 ;;  Output: 
 ;;  Modified: 
 ;;
 man_foe_init::
+    push bc                 ;; save level and enemy type
     ld ix, #foes
     xor a
     ld a_count(ix), a
@@ -78,6 +80,10 @@ man_foe_init::
     ld a_pend+1(ix), h
 
     ld  (hl), #o_type_invalid   ;;ponemos el primer elemento del array con tipo invalido
+
+    pop bc                  ;; retrieve level and enemy type
+    call man_foe_create
+
     ret
 
 ;;-----------------------------------------------------------------
@@ -85,12 +91,21 @@ man_foe_init::
 ;; man_foe_create
 ;;
 ;;  Initializes a fight
-;;  Input: 
+;;  Input: b : level reached
+;;         c : enemy type
 ;;  Output: 
 ;;  Modified: 
 ;;
 man_foe_create::
+    ld de, #sizeof_o
     ld hl, #foe_blob
+mfc_loop:
+    ld c, a
+    or a
+    jr z, mfc_loop_exit
+    adc hl, de
+    jr mfc_loop
+mfc_loop_exit:
     ld ix, #foes
     call man_array_create_element
     ld a, #o_type_alive             ;; Update the status of the new foe

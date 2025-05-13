@@ -80,16 +80,17 @@ ended_fight:: .db 0
 ;; man_fight_init
 ;;
 ;;  Initializes a fight
-;;  Input: 
+;;  Input: b : level reached
+;;         c : enemy type
 ;;  Output: 
 ;;  Modified: 
 ;;
 man_fight_init::
+    push bc               ;; save level and enemy type
 
     call sys_render_clear_front_buffer
-    ;;call sys_render_clear_back_buffer
 
-    m_msg_w_background 2
+    m_msg_w_background 2                ;; background blue
     ld e, #10                           ;; x
     ld d, #78                           ;; y
     ld b, #44                           ;; h
@@ -118,8 +119,9 @@ man_fight_init::
     ld a, (player_max_energy)           ;; Load the max of energy of this fight to the player energy
     ld (player_energy), a               ;;
 
+
+    pop bc                              ;; restore level and enemy type
     call man_foe_init
-    call man_foe_create
 
     call sys_render_full_fight_screen   ;; renders the fight screen
 

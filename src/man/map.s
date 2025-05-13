@@ -241,7 +241,7 @@ _m_m_r_c_process_exit:
 
 ;;-----------------------------------------------------------------
 ;;
-;; man_map_render::
+;; man_map_render
 ;;
 ;;  renders the map based on tilemaps
 ;;  Input: 
@@ -250,6 +250,8 @@ _m_m_r_c_process_exit:
 ;;  Modified: 
 ;;
 man_map_render::
+
+    call sys_render_clear_front_buffer   ;; clear the screen
 
     call man_map_generate
 
@@ -269,7 +271,9 @@ man_map_render::
     call sys_input_wait4anykey          ;; wait for any key
 
     ;; Return the selected enemy type and level in bc
+    ld a, #1
+    call sys_util_get_random_number
+    ld c, a
     ld b, #1
-    ld c, #0
 
     ret
