@@ -62,7 +62,7 @@ DefineCard #00, e_type_card_in_hand, 1, _s_cards_0, ^/HIT            /, 1,      
 model_defend:
 DefineCard #00, e_type_card_in_hand, 2, _s_cards_1, ^/DEFEND         /, 1,      1,      1,      ^/SIMPLE DEFENCE - 5BK          /,  0,      5,      0,          0,      0,          0,          0,       #man_deck_execute_defend
 model_bash:
-DefineCard #00, e_type_card_in_hand, 2, _s_cards_2, ^/BASH           /, 1,      1,      2,      ^/STRONG HIT - 8DM+2VN          /,  8,      0,      2,          0,      0,          0,          0,       #man_deck_execute_hit
+DefineCard #00, e_type_card_in_hand, 2, _s_cards_2, ^/BASH           /, 1,      1,      2,      ^/STRONG HIT - 8DM+2VN          /,  8,      0,      2,          0,      0,          0,          0,       #man_deck_execute_bash
 model_unbreakeable:
 DefineCard #00, e_type_card_in_hand, 2, _s_cards_3, ^/UNBREAKABLE    /, 1,      1,      1,      ^/GREAT DEFENCE - 30BK (E)      /,  0,      30,      0,          0,      0,          0,          0,       #man_deck_execute_defend
 model_ignore:
@@ -169,8 +169,8 @@ man_deck_execute_vulnerable::
     ld a, c_vulnerable(ix)                      ;; load the block to add
     ld (mdev_add_vulnerable+1), a
     push ix
-    ld ix, #player                              ;;
-    ld hl, #anim_effect                            ;;
+    ld ix, #foes_array                          ;;
+    ld hl, #anim_effect                         ;;
     ld c, a                                     ;; block to add
     call man_effects_animate                    ;;
 mdev_add_vulnerable:
@@ -187,6 +187,7 @@ mdev_add_vulnerable:
 ;;
 ;;
 man_deck_execute_bash::
+    cpctm_WINAPE_BRK                                                ;; debug
     call man_deck_execute_hit
     call man_deck_execute_vulnerable
     ret
@@ -226,6 +227,9 @@ _d_i_hit_loop:
     ld hl, #model_defend
     call man_array_create_element
     ld hl, #model_defend
+    call man_array_create_element
+;; bash
+    ld hl, #model_bash
     call man_array_create_element
 
 ret

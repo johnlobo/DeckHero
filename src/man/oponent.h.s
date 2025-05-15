@@ -30,7 +30,7 @@ o_type_alive                = 0x01
 o_type_dead                 = 0x02
 
 ;; Constants
-NUM_EFFECTS = 10
+NUM_EFFECTS = 11
 
 ;;Efeccts
 beh_life            = 0

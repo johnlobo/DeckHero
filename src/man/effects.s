@@ -123,10 +123,12 @@ man_effects_update_one::
 ;;          ix: oponent
 ;;  Output:
 ;;
-;;  Modified: af, bc, hl
+;;  Modified: af, bc, hl, ix, de
 ;;
 man_effects_animate::
     ;; save parameters
+    push ix
+    ld ix, #effects         
     ld (effect_animation), hl
     ld a, c
     ld (effect_damage), a
@@ -252,7 +254,7 @@ mea_delay:
     ld a, b                                     ;;
     cp #4                                       ;;
     jp nz, mea_anim_loop                        ;;
-    
+    pop ix
     ret
 
 

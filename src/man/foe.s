@@ -44,32 +44,8 @@ foe_blob::
 DefineOponent 1,^/BLOB           /,_s_blob_0,50,65,S_BLOB_WIDTH,S_BLOB_HEIGHT,20,50,2,20,10,0,0,0,0,0,0,0,0,0,0,#sys_behaviour_blob,0
 
 foe_mini_blob::
-DefineOponent 
-    1,                      ;; _status
-    ^/MINI-BLOB      /,     ;; _name
-    _s_mini_blob_0,         ;; _sprite
-    54,                     ;; _sprite_x
-    74,                     ;; _sprite_y
-    S_MINI_BLOB_WIDTH,      ;; _sprite_w
-    S_MINI_BLOB_HEIGHT,     ;; _sprite_h
-    25,                     ;; _max_life    
-    50,                     ;; _money   
-    2,                      ;; _effects_count  
-    20,                     ;; _life    
-    10,                     ;; _shield
-    0,                      ;; _force
-    0,                      ;; _dexterity                   
-    0,                      ;; _buffer
-    0,                      ;; _blessing    
-    0,                      ;; _thorns  
-    0,                      ;; _regen
-    0,                      ;; _draw_card
-    0,                      ;; _confuse 
-    0,                      ;; _poison  
-    0,                      ;; _vulnerable
-    #sys_behaviour_blob,    ;;  _behaviour_func                                        
-    0                       ;; _behaviour_step    
-
+DefineOponent 1,^/MINI-BLOB      /,_s_mini_blob_0,54,74,S_MINI_BLOB_WIDTH,S_MINI_BLOB_HEIGHT,25,50,2,20,10,0,0,0,0,0,0,0,0,0,0,#sys_behaviour_blob,0                   
+    
 ;; Characters
 foes::
 DefineComponentArrayStructure_Size foes, MAX_FOES, sizeof_o     

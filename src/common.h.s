@@ -52,6 +52,7 @@
 .globl _s_small_icons_08
 .globl _s_small_icons_09
 .globl _s_small_icons_10
+.globl _s_small_icons_11
 .globl _s_coin
 .globl _s_small_numbers_00
 .globl _s_small_numbers_01
