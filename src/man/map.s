@@ -98,7 +98,7 @@ man_map_generate_cell::
 ;;  Modified: AF, BC
 ;;
 man_map_generate::
-;;    cpctm_WINAPE_BRK        ;; debug
+
     ld b, #7
     ld hl, #game_map_0
 _m_m_g_looph:
@@ -228,7 +228,7 @@ _m_m_r_c_loopv:
     call man_map_render_single_cell
 
     pop hl
-    ld (hl), a
+    ;;ld (hl), a
 _m_m_r_c_process_exit:
     INC HL                ; Mover al siguiente elemento (siguiente columna)
     DEC C                 ; Decrementar el contador de columnas
@@ -250,7 +250,7 @@ _m_m_r_c_process_exit:
 ;;  Modified: 
 ;;
 man_map_render::
-
+    ;;cpctm_WINAPE_BRK                      ;; debug
     call sys_render_clear_front_buffer   ;; clear the screen
 
     call man_map_generate

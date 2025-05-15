@@ -43,7 +43,8 @@ beh_thorns          = 6
 beh_regen           = 7
 beh_confuse         = 8
 beh_poison          = 9
-beh_damage          = 10
+beh_vulnerable      = 10
+beh_damage          = 11
 
 beh_eof_behaviour    = 255
 
@@ -51,7 +52,7 @@ beh_eof_behaviour    = 255
 ;; OPONENT DEFINITION MACRO
 ;;===============================================================================
 .mdelete DefineOponent
-.macro DefineOponent _status, _name, _sprite, _sprite_x, _sprite_y, _sprite_w, _sprite_h, _max_life, _money, _effects_count,_life, _shield, _force, _dexterity, _buffer, _blessing, _thorns, _regen, _confuse, _poison, _draw_card, _behaviour_func, _behaviour_step
+.macro DefineOponent _status, _name, _sprite, _sprite_x, _sprite_y, _sprite_w, _sprite_h, _max_life, _money, _effects_count,_life, _shield, _force, _dexterity, _buffer, _blessing, _thorns, _regen, _confuse, _poison, _vulnerable, _draw_card, _behaviour_func, _behaviour_step
     .db _status
     .asciz "_name"
     .dw _sprite
@@ -72,6 +73,7 @@ beh_eof_behaviour    = 255
     .db _regen
     .db _confuse
     .db _poison
+    .db _vulnerable
     .db _draw_card
     .dw _behaviour_func
     .db _behaviour_step
@@ -101,6 +103,7 @@ Field o, thorns , 1
 Field o, regen , 1
 Field o, confuse , 1
 Field o, poison , 1
+Field o, vulnerable , 1
 Field o, draw_card , 1
 Field o, behaviour_func, 2
 Field o, behaviour_step, 1
@@ -114,6 +117,7 @@ EndStruct o
 .globl man_oponent_create
 .globl man_oponent_update
 .globl man_oponent_add_block
+.globl man_oponent_add_vulnerable
 .globl man_oponent_one_damage
 .globl man_oponent_all_damage
 .globl man_oponent_get_life

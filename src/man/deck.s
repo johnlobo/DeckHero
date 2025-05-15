@@ -62,9 +62,9 @@ DefineCard #00, e_type_card_in_hand, 1, _s_cards_0, ^/HIT            /, 1,      
 model_defend:
 DefineCard #00, e_type_card_in_hand, 2, _s_cards_1, ^/DEFEND         /, 1,      1,      1,      ^/SIMPLE DEFENCE - 5BK          /,  0,      5,      0,          0,      0,          0,          0,       #man_deck_execute_defend
 model_bash:
-DefineCard #00, e_type_card_in_hand, 2, _s_cards_2, ^/BASH           /, 1,      1,      2,      ^/STRONG HIT - 8DM+2VN          /,  0,      3,      0,          0,      0,          0,          0,       #man_deck_dummy_routine
+DefineCard #00, e_type_card_in_hand, 2, _s_cards_2, ^/BASH           /, 1,      1,      2,      ^/STRONG HIT - 8DM+2VN          /,  8,      0,      2,          0,      0,          0,          0,       #man_deck_execute_hit
 model_unbreakeable:
-DefineCard #00, e_type_card_in_hand, 2, _s_cards_3, ^/UNBREAKABLE    /, 1,      1,      1,      ^/GREAT DEFENCE - 30BK (E)      /,  0,      3,      0,          0,      0,          0,          0,       #man_deck_dummy_routine
+DefineCard #00, e_type_card_in_hand, 2, _s_cards_3, ^/UNBREAKABLE    /, 1,      1,      1,      ^/GREAT DEFENCE - 30BK (E)      /,  0,      30,      0,          0,      0,          0,          0,       #man_deck_execute_defend
 model_ignore:
 DefineCard #00, e_type_card_in_hand, 2, _s_cards_4, ^/IGNORE         /, 1,      1,      1,      ^/GOOD BLOCK - 8BK+1C           /,  0,      3,      0,          0,      0,          0,          0,       #man_deck_dummy_routine
 
@@ -116,9 +116,9 @@ man_deck_remove_card_from_hand::
 ;;
 ;; man_deck_execute_hit
 ;;
-;;  Dummy execute routine to initialize a card
+;;  Excuetes a hit
 ;;
-;;  Input: ix: card 
+;;  Input: ix: card
 ;; 
 
 man_deck_execute_hit::
@@ -158,7 +158,38 @@ mded_add_block:
     pop ix
     ret
 
+;;-----------------------------------------------------------------
+;;
+;; man_deck_execute_vulnerable
+;;
+;;  Executes a shield increasement
+;;
+;;
+man_deck_execute_vulnerable::
+    ld a, c_vulnerable(ix)                      ;; load the block to add
+    ld (mdev_add_vulnerable+1), a
+    push ix
+    ld ix, #player                              ;;
+    ld hl, #anim_effect                            ;;
+    ld c, a                                     ;; block to add
+    call man_effects_animate                    ;;
+mdev_add_vulnerable:
+    ld b, #00                                   ;; add block
+    call man_oponent_add_vulnerable                  ;;
+    pop ix
+    ret
 
+;;-----------------------------------------------------------------
+;;
+;; man_deck_execute_defend
+;;
+;;  Executes a shield increasement
+;;
+;;
+man_deck_execute_bash::
+    call man_deck_execute_hit
+    call man_deck_execute_vulnerable
+    ret
 
 
 ;;-----------------------------------------------------------------

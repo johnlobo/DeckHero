@@ -239,6 +239,7 @@ man_array_get_random_element::
     push hl                         ;; save hl (array address)
 
     ld a, a_count(ix)               ;; load max number in a
+    dec a
     SUB_OFFSET = . +1
     sub #0x00
     call sys_util_get_random_number

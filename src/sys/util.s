@@ -18,6 +18,8 @@
 
 .module sys_util
 
+.include "cpctelera.h.s"
+.include "sys/util.h.s"
 .include "../common.h.s"
 ;;
 ;; Start of _DATA area 
@@ -193,6 +195,7 @@ BCD_cp_direct:
 ;;  Destroyed: af, bc,de, hl
 
 sys_util_get_random_number::
+  inc a                               ;; Increment a to make the modulus calculation work
   ld (#random_max_number), a
   call cpct_getRandom_mxor_u8_asm
   ld a, l                             ;; Calculates a pseudo modulus of max number
@@ -201,10 +204,10 @@ random_max_number = .+1
   ld c, #0                            ;; Load c with the max number
   ld b, #0
 _random_mod_loop:
-  or a                                ;; ??
+  or a                                ;; reset carry
   sbc hl,bc                           ;; hl = hl - bc
   jp p, _random_mod_loop              ;; Jump back if hl > 0
-  add hl,bc                           ;; Adds MAX_MODEL_CARD to hl back to get back to positive values
+  add hl,bc                           ;; Adds max number to hl back to get back to positive values
   ld a,l                              ;; loads the normalized random number in a
 ret
 

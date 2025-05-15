@@ -36,11 +36,59 @@
 
 ;; Character templates
 player_template::
-;;_status,        _name,             _sprite, sprite x, sprite y, sprite w, sprite h, _max_life, _money, _effects_count, _life, _shield, _force, _dexterity, _buffer, _blessing, _thorns, _regen, _draw_card, _confuse, _poison
-DefineOponent 1, ^/PLAYER1        /, _s_player_0, PLAYER_SPRITE_X, PLAYER_SPRITE_Y, S_PLAYER_WIDTH, S_PLAYER_HEIGHT, 99  1,  3, 80,  5, 1, 0, 0, 0, 0, 0, 0, 0, 0, #null_ptr, 0
+DefineOponent 
+    1,                      ;; _status    
+    ^/PLAYER1        /,     ;; _name 
+    _s_player_0,            ;; _sprite
+    PLAYER_SPRITE_X,        ;; _sprite_x    
+    PLAYER_SPRITE_Y,        ;; _sprite_y     
+    S_PLAYER_WIDTH,         ;; _sprite_w
+    S_PLAYER_HEIGHT,        ;; _sprite_h
+    99,                     ;; _max_life   
+    1,                      ;; _money  
+    3,                      ;; _effects_count
+    80,                     ;; _life
+    5,                      ;; _shield
+    1,                      ;; _force
+    0,                      ;; _dexterity
+    0,                      ;; _buffer
+    0,                      ;; _blessing
+    0,                      ;; _thorns
+    0,                      ;; _regen
+    0,                      ;; _draw_card
+    0,                      ;; confuse
+    0,                      ;; _poison
+    0,                      ;; _vulnerable
+    #null_ptr,              ;; _behaviour_func
+    0                       ;; _behaviour_step
 ;; Characters
 player::
-DefineOponent 1, ^/PLAYER1        /, _s_player_0, PLAYER_SPRITE_X, PLAYER_SPRITE_Y, S_PLAYER_WIDTH, S_PLAYER_HEIGHT, 99, 100, 0, 99,0, 0, 0, 0, 0, 0, 0, 0, 0, 0, #null_ptr, 0
+player::
+DefineOponent 
+    1,                      ;; _status    
+    ^/PLAYER1        /,     ;; _name 
+    _s_player_0,            ;; _sprite
+    PLAYER_SPRITE_X,        ;; _sprite_x    
+    PLAYER_SPRITE_Y,        ;; _sprite_y     
+    S_PLAYER_WIDTH,         ;; _sprite_w
+    S_PLAYER_HEIGHT,        ;; _sprite_h
+    80,                     ;; _max_life   
+    0,                      ;; _money  
+    3,                      ;; _effects_count
+    80,                     ;; _life
+    5,                      ;; _shield
+    1,                      ;; _force
+    0,                      ;; _dexterity
+    0,                      ;; _buffer
+    0,                      ;; _blessing
+    0,                      ;; _thorns
+    0,                      ;; _regen
+    0,                      ;; _draw_card
+    0,                      ;; confuse
+    0,                      ;; _poison
+    0,                      ;; _vulnerable
+    #null_ptr,              ;; _behaviour_func
+    0                       ;; _behaviour_step
 
 ;;
 ;; Start of _CODE area

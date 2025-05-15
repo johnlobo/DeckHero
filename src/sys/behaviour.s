@@ -98,9 +98,9 @@ sys_behaviour_execute_one::
 sbe_damage_oponent:         
     push ix                             ;; damage oponent always damage player
     ld ix, #player                      ;;
-
+    push bc                             ;; save damage amount
     call temblor
-
+    pop bc                              ;; restore damage amount
     call sys_behaviour_damage_oponent   ;;
     pop ix                              ;;
     m_updated_player_effects            ;; update player effects flag
@@ -169,8 +169,6 @@ sys_behaviour_add2Effect::
 ;;
 sys_behaviour_damage_oponent::
 
-;;cpctm_WINAPE_BRK                    ;; debug
-
     ;; Create hit effect
     push bc
     push ix
@@ -206,13 +204,13 @@ sbdp_shield_enough:
 ;; sys_behaviour_blob
 ;;
 sys_behaviour_blob::
-    .db beh_damage, 6, beh_oponent
+    .db beh_damage, 10, beh_oponent
     .db beh_shield, 5, beh_self
-    .db beh_damage, 6, beh_oponent
-    .db beh_shield, 5, beh_self
-    .db beh_damage, 6, beh_oponent
-    .db beh_shield, 5, beh_self
-    .db beh_damage, 6, beh_oponent
+    .db beh_damage, 15, beh_oponent
+    .db beh_shield, 8, beh_self
+    .db beh_damage, 20, beh_oponent
+    .db beh_shield, 10, beh_self
+    .db beh_damage, 25, beh_oponent
     .db beh_eof_behaviour, 0, 0
 
 ;;-----------------------------------------------------------------

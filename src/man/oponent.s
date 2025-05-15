@@ -137,6 +137,21 @@ man_oponent_add_block::
 
 ;;-----------------------------------------------------------------
 ;;
+;; man_oponent_add_vulnerable
+;;
+;;  adds vulnerable to a oponent
+;;  Input: ix: oponent to add block
+;;  Output: b: amount of block to add
+;;  Modified: 
+;;
+man_oponent_add_vulnerable::
+    ld a, o_vulnerable(ix)    ;;
+    add b               ;;
+    ld o_vulnerable(ix), a    ;;
+    ret
+
+;;-----------------------------------------------------------------
+;;
 ;; man_oponent_get_life
 ;;
 ;;  Returns the life of the oponent
