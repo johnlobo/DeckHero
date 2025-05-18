@@ -127,8 +127,7 @@ man_effects_update_one::
 ;;
 man_effects_animate::
     ;; save parameters
-    push ix
-    ld ix, #effects         
+    ;;push ix       
     ld (effect_animation), hl
     ld a, c
     ld (effect_damage), a
@@ -212,7 +211,6 @@ mea_anim_loop:
 
     call cpct_drawSpriteMaskedAlignedTable_asm
 
-
     ;; Draw damage
     ld hl, (#effect_damage_memory_address)
     ex de, hl
@@ -254,9 +252,8 @@ mea_delay:
     ld a, b                                     ;;
     cp #4                                       ;;
     jp nz, mea_anim_loop                        ;;
-    pop ix
+    ;;pop ix
     ret
-
 
     effect_buffer:: .ds (#S_EFFECT_WIDTH*#S_EFFECT_HEIGHT)
     effect_memory_address:: .dw #0000

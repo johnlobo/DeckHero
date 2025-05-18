@@ -40,11 +40,13 @@
 .area _DATA
 
 ;; Character templates
+
+;;_status,_name,_sprite,_sprite_x,_sprite_y,_sprite_w,_sprite_h,_max_life,_money,_effects_count,_life,_shield,_force,_dexterity,_buffer,_blessing,_thorns,_regen,_confuse,_poison,_vulnerable,_draw_card,_behaviour_func,_behaviour_step
 foe_blob::
-DefineOponent 1,^/BLOB           /,_s_blob_0,50,65,S_BLOB_WIDTH,S_BLOB_HEIGHT,20,50,2,20,10,0,0,0,0,0,0,0,0,0,0,#sys_behaviour_blob,0
+DefineOponent 1,^/BLOB           /,_s_blob_0,50,65,S_BLOB_WIDTH,S_BLOB_HEIGHT,20,50,3,20,10,0,0,0,0,0,0,0,0,1,0,#sys_behaviour_blob,0
 
 foe_mini_blob::
-DefineOponent 1,^/MINI-BLOB      /,_s_mini_blob_0,54,74,S_MINI_BLOB_WIDTH,S_MINI_BLOB_HEIGHT,25,50,2,20,10,0,0,0,0,0,0,0,0,0,0,#sys_behaviour_blob,0                   
+DefineOponent 1,^/MINI-BLOB      /,_s_mini_blob_0,54,74,S_MINI_BLOB_WIDTH,S_MINI_BLOB_HEIGHT,25,50,3,20,10,0,0,0,0,0,0,0,0,1,0,#sys_behaviour_blob,0                   
     
 ;; Characters
 foes::

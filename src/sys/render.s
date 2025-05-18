@@ -410,6 +410,9 @@ sys_render_effects_clear_icons::
 ;;  Modified: AF, BC, DE, HL
 ;;
 sys_render_effects::
+
+    ;;cpctm_WINAPE_BRK
+
     ;; Calc the screen address to draw the effect
     call sys_render_effects_base_coords 
     ;; Erase effects icon
@@ -437,12 +440,16 @@ _effects_loop:
 
     ;; x_coord
     ld a, (_x_coord_base)
-    ld c, b                         ;; c = current effect
-    inc c                           ;; c = current effect + 1
-    sla c                           ;; c = (current effect + 1) * 2
-    sla c                           ;; c = (current effect + 1) * 4
-    add c                           ;; a = _x_coord_base + ((current effect + 1) * 4)
-    ld c,a
+    ;;ld c, b                         ;; c = current effect
+    ;;inc c                           ;; c = current effect + 1
+    ;;sla c                           ;; c = (current effect + 1) * 2
+    ;;sla c                           ;; c = (current effect + 1) * 4
+    ;;add c                           ;; a = _x_coord_base + ((current effect + 1) * 4)
+    ld c, a
+    ld a, #S_SMALL_ICONS_WIDTH
+    add c
+    ld (_x_coord_base), a
+    ld c, a
     ld (_X_COORD_EFFECT), a         ;; store in a memory spot for later use
 
     ;; y_coord

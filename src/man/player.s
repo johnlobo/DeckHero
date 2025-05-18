@@ -35,13 +35,15 @@
 .area _DATA
 
 ;; Character templates
+
+;;_status,_name,_sprite,_sprite_x,_sprite_y,_sprite_w,_sprite_h,_max_life,_money,_effects_count,_life,_shield,_force,_dexterity,_buffer,_blessing,_thorns,_regen,_confuse,_poison,_vulnerable,_draw_card,_behaviour_func,_behaviour_step
 player_template::
 DefineOponent 1,^/PLAYER1        /,_s_player_0,PLAYER_SPRITE_X,PLAYER_SPRITE_Y,S_PLAYER_WIDTH,S_PLAYER_HEIGHT,80,0,3,80,5,1,0,0,0,0,0,0,0,0,0,#null_ptr,0
     
 ;; Characters
 player::
-
 DefineOponent 1,^/PLAYER1        /,_s_player_0,PLAYER_SPRITE_X,PLAYER_SPRITE_Y,S_PLAYER_WIDTH,S_PLAYER_HEIGHT,80,0,3,80,5,1,0,0,0,0,0,0,0,0,0,#null_ptr,0                     
+
 ;;
 ;; Start of _CODE area
 ;; 
