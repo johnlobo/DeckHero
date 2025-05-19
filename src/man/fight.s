@@ -69,6 +69,7 @@ player_energy:: .db 0
 player_max_energy:: .db 3
 player_updates:: .db 0
 ended_fight:: .db 0
+selected_foe:: .dw 0
 
 ;;
 ;; Start of _CODE area

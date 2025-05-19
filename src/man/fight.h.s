@@ -62,6 +62,7 @@ updated_zone_messages   = 0b10000000
 .globl sacrifice_selected
 
 .globl player_energy
+.globl selected_foe
 
 .globl player_updates
 

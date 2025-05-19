@@ -140,8 +140,9 @@ man_oponent_add_block::
 ;; man_oponent_add_vulnerable
 ;;
 ;;  adds vulnerable to a oponent
-;;  Input: ix: oponent to add block
-;;  Output: b: amount of block to add
+;;  Input: ix: oponent to add vulnerable
+;;          b: amount of block to add
+;;  Output:
 ;;  Modified: 
 ;;
 man_oponent_add_vulnerable::

@@ -30,5 +30,6 @@ beh_oponent = 1
 .globl sys_behaviour_update_one_entity
 .globl sys_behaviour_update
 .globl sys_behaviour_damage_oponent
+.globl sys_behaviour_calculate_damage
 .globl sys_behaviour_get_behaviour
 .globl sys_behaviour_blob

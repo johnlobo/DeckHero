@@ -97,10 +97,14 @@ sys_behaviour_execute_one::
     jr sbe_exit
 sbe_damage_oponent:         
     push ix                             ;; damage oponent always damage player
-    ld ix, #player                      ;;
     push bc                             ;; save damage amount
+    
     call temblor
+    
+    ld hl, (selected_foe)               ;;
+    ld de, #player                      ;; set de to player 
     pop bc                              ;; restore damage amount
+    call sys_behaviour_calculate_damage ;; calculate damage
     call sys_behaviour_damage_oponent   ;;
     pop ix                              ;;
     m_updated_player_effects            ;; update player effects flag
@@ -162,7 +166,7 @@ sys_behaviour_add2Effect::
 ;;  sys_behaviour_damage_player
 ;;
 ;;  Excutes the current beahviour of an entity
-;;  Input: ix: Oponent entity
+;;  Input: de: Oponent entity
 ;;          c: of damage to add
 ;;  Output: 
 ;;  Modified: af, bc
@@ -170,14 +174,17 @@ sys_behaviour_add2Effect::
 sys_behaviour_damage_oponent::
 
     ;; Create hit effect
-    push bc
     push ix
+    push de
+    push bc
+    ld__ix_de
     ld hl, #anim_hit            ;;  
     call man_effects_animate    ;;
-    pop ix
     pop bc
+    pop de
     
     ;; Substract damage
+    ld__ix_de
     ld a, o_shield(ix)          ;; check if shield is enough to get the damage
     sub c                       ;;
     jp p, sbdp_shield_enough
@@ -196,6 +203,7 @@ sbdp_exit:
 
 sbdp_shield_enough:
     ld o_shield(ix), a          ;; updates players shield
+    pop ix
     ret
 
 
@@ -238,3 +246,42 @@ sbu_loop:
     djnz sbu_loop
 
     ret
+
+
+;;-----------------------------------------------------------------
+;;
+;; sys_behaviour_calculate_damage
+;;
+;;  Calculates the damage of a card 
+;;  Input: hl: damager
+;;         de: damaged
+;;          c: initial damage
+;;  Output: c: calculated damage
+;;  Modified: HL, 
+;;    
+sys_behaviour_calculate_damage::
+    push ix
+    push hl
+    push de
+    ld__ix_hl
+    ld a, o_force(ix)           ;; load force of the damager
+    or a                        ;; check if force is 0   
+    jr z, sbcd_damaged          ;; if so, jump to the next step
+    ld a, o_force(ix)           ;; load force of the damager in b
+    add c
+    ld c, a                     ;; store the result in c
+sbcd_damaged:
+    ld__de_hl
+    ld a, o_vulnerable(ix)      ;; load vulnerable of the damaged
+    or a
+    jr z, sbcd_exit
+    ld a, c                     ;; load the damage in a
+    srl a                       ;; calculate half of the calculated damage    
+    add c                       ;; add the damage to the calculated damage
+    ld c, a                     ;; store the result in c
+sbcd_exit:
+    pop de
+    pop hl  
+    pop ix
+    ret
+    

@@ -85,7 +85,9 @@ man_foe_init::
 
     pop bc                  ;; retrieve level and enemy type
     call man_foe_create
-
+    
+    ld hl, #foes_array
+    ld (selected_foe), hl
     ret
 
 ;;-----------------------------------------------------------------

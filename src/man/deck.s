@@ -58,9 +58,9 @@ model_deck_pselected: .db #0x00
 model_deck_array:
 ;;         _status,        _class  _sprite     _name              _rarity   _type   _energy  _description,                    _damage _block, _vulnerable _weak   _strengh    _exhaust    _add_card _execute_routine
 model_hit:
-DefineCard #00, e_type_card_in_hand, 1, _s_cards_0, ^/HIT            /, 1,      1,      1,      ^/SINGLE ATTACK - 6DM           /,  6,      0,      0,          0,      0,          0,          0,       #man_deck_execute_hit
+DefineCard #00, e_type_card_in_hand, 1, _s_cards_0, ^/HIT            /, 1,      1,      1,      ^/SINGLE ATTACK - 6DM           /,  6,      0,      0,          0,      0,          0,          0,       #man_deck_execute_hit_player
 model_defend:
-DefineCard #00, e_type_card_in_hand, 2, _s_cards_1, ^/DEFEND         /, 1,      1,      1,      ^/SIMPLE DEFENCE - 5BK          /,  0,      5,      0,          0,      0,          0,          0,       #man_deck_execute_defend
+DefineCard #00, e_type_card_in_hand, 2, _s_cards_1, ^/DEFEND         /, 1,      1,      1,      ^/SIMPLE DEFENCE - 5BK          /,  0,      5,      0,          0,      0,          0,          0,       #man_deck_execute_defend_player
 model_bash:
 DefineCard #00, e_type_card_in_hand, 2, _s_cards_2, ^/BASH           /, 1,      1,      2,      ^/STRONG HIT - 8DM+2VN          /,  8,      0,      2,          0,      0,          0,          0,       #man_deck_execute_bash
 model_unbreakeable:
@@ -119,22 +119,59 @@ man_deck_remove_card_from_hand::
 ;;  Excuetes a hit
 ;;
 ;;  Input: ix: card
+;;         hl: damager
+;;         de: target
+;;  Output:
 ;; 
-
 man_deck_execute_hit::
     push ix                                 ;; store card address
+    push hl                                 ;; store damager address    
+    push de                                 ;; store target address
     ld a, c_damage(ix)                      ;; get damage from card
     ld (mdeh_damage+1), a                   ;; smc for later use of damage
 
     call temblor
 
-    ld ix, #foes_array                      ;;
-
+    pop de
+    pop hl
 mdeh_damage:
     ld c, #00                               ;; make damage
+    call sys_behaviour_calculate_damage     ;; calculate damage
     call sys_behaviour_damage_oponent       ;;
     m_updated_foe_effects                   ;; update effects
+
     pop ix
+    ret
+
+;;-----------------------------------------------------------------
+;;
+;; man_deck_execute_hit_player
+;;
+;;  Excutes a hit by the player
+;;
+;;  Input: ix: card
+;;  Output:
+;; 
+man_deck_execute_hit_player::
+    cpctm_WINAPE_BRK
+    ld hl, #player
+    ld de, (#selected_foe)
+    call man_deck_execute_hit
+    ret
+
+;;-----------------------------------------------------------------
+;;
+;; man_deck_execute_defend_player
+;;
+;;  Excutes a defend by the player
+;;
+;;  Input: ix: card
+;;  Output:
+;; 
+man_deck_execute_defend_player::
+    cpctm_WINAPE_BRK
+    ld hl, #player
+    call man_deck_execute_defend
     ret
 
 ;;-----------------------------------------------------------------
@@ -143,18 +180,23 @@ mdeh_damage:
 ;;
 ;;  Executes a shield increasement
 ;;
+;;  Input: ix: card
+;;         hl: damager
 ;;
 man_deck_execute_defend::
     ld a, c_block(ix)                           ;; load the block to add
     ld (mded_add_block+1), a
     push ix
-    ld ix, #player                              ;;
+    push hl
+    ;;ld ix, #player                              ;;
+    ld__ix_hl
     ld hl, #anim_shield                         ;;
     ld c, a                                     ;; block to add
     call man_effects_animate                    ;;
 mded_add_block:
     ld b, #00                                   ;; add block
     call man_oponent_add_block                  ;;
+    pop hl
     pop ix
     ret
 
@@ -162,33 +204,46 @@ mded_add_block:
 ;;
 ;; man_deck_execute_vulnerable
 ;;
-;;  Executes a shield increasement
+;;  Executes a vulnerable increase
 ;;
+;;  Input: ix: card
+;;         hl: damager
+;;         de: target
 ;;
 man_deck_execute_vulnerable::
-    ld a, c_vulnerable(ix)                      ;; load the block to add
+    push ix                                 ;; store card address
+    ld a, c_vulnerable(ix)                  ;; load the block to add
     ld (mdev_add_vulnerable+1), a
-    push ix
-    ld ix, #foes_array                          ;;
+    push hl
+    push de
+    ;;ld ix, #foes_array                          ;;
+    ld__ix_de
     ld hl, #anim_effect                         ;;
     ld c, a                                     ;; block to add
     call man_effects_animate                    ;;
+    pop de
+    pop hl
 mdev_add_vulnerable:
     ld b, #00                                   ;; add block
-    call man_oponent_add_vulnerable                  ;;
+    ;;ld ix, #foes_array
+    ld__ix_de
+    call man_oponent_add_vulnerable             ;;
     pop ix
     ret
 
 ;;-----------------------------------------------------------------
 ;;
-;; man_deck_execute_defend
+;; man_deck_execute_bash
 ;;
 ;;  Executes a shield increasement
 ;;
 ;;
 man_deck_execute_bash::
-    cpctm_WINAPE_BRK                                                ;; debug
+    ld hl, #player
+    ld de, #foes_array
     call man_deck_execute_hit
+    ld hl, #player
+    ld de, #foes_array
     call man_deck_execute_vulnerable
     ret
 
