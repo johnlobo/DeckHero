@@ -30,6 +30,7 @@
 .include "cpctelera.h.s"
 .include "sys/messages.h.s"
 .include "sys/behaviour.h.s"
+.include "sys/util.h.s"
 
 
 
@@ -459,7 +460,7 @@ _mfu_player_loop:
     ld c, #60                           ;; w
     ld hl, #_fight_enemy_turn_string   ;; message
     ld a,#2                             ;; wait for a key
-    call sys_messages_show              ;; End of fight message
+    call sys_messages_show              ;; Enemy turn message
 
     call sys_behaviour_update
     call sys_render_update_fight        ;; renders the screen
@@ -470,6 +471,8 @@ _mfu_player_loop:
     jr _update_main_loop
 
 _update_end_of_fight:
+    call sys_util_temblor
+    call sys_util_temblor
     m_msg_w_background 2                ;; background blue
     ld e, #10                           ;; x
     ld d, #78                           ;; y

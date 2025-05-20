@@ -24,7 +24,6 @@
 .include "sys/render.h.s"
 .include "sys/behaviour.h.s"
 .include "sys/animation.h.s"
-.include "sys/crtc.h.s"
 .include "man/array.h.s"
 .include "man/fight.h.s"
 .include "man/oponent.h.s"
@@ -64,7 +63,7 @@ DefineCard #00, e_type_card_in_hand, 2, _s_cards_1, ^/DEFEND         /, 1,      
 model_bash:
 DefineCard #00, e_type_card_in_hand, 2, _s_cards_2, ^/BASH           /, 1,      1,      2,      ^/STRONG HIT - 8DM+2VN          /,  8,      0,      2,          0,      0,          0,          0,       #man_deck_execute_bash
 model_unbreakeable:
-DefineCard #00, e_type_card_in_hand, 2, _s_cards_3, ^/UNBREAKABLE    /, 1,      1,      1,      ^/GREAT DEFENCE - 30BK (E)      /,  0,      30,      0,          0,      0,          0,          0,       #man_deck_execute_defend
+DefineCard #00, e_type_card_in_hand, 2, _s_cards_3, ^/UNBREAKABLE    /, 1,      1,      1,      ^/GREAT DEFENCE - 30BK (E)      /,  0,      30,      0,          0,      0,          0,          0,       #man_deck_execute_defend_player
 model_ignore:
 DefineCard #00, e_type_card_in_hand, 2, _s_cards_4, ^/IGNORE         /, 1,      1,      1,      ^/GOOD BLOCK - 8BK+1C           /,  0,      3,      0,          0,      0,          0,          0,       #man_deck_dummy_routine
 
@@ -130,7 +129,7 @@ man_deck_execute_hit::
     ld a, c_damage(ix)                      ;; get damage from card
     ld (mdeh_damage+1), a                   ;; smc for later use of damage
 
-    call temblor
+    call sys_util_temblor
 
     pop de
     pop hl
@@ -153,7 +152,6 @@ mdeh_damage:
 ;;  Output:
 ;; 
 man_deck_execute_hit_player::
-    cpctm_WINAPE_BRK
     ld hl, #player
     ld de, (#selected_foe)
     call man_deck_execute_hit
@@ -169,7 +167,6 @@ man_deck_execute_hit_player::
 ;;  Output:
 ;; 
 man_deck_execute_defend_player::
-    cpctm_WINAPE_BRK
     ld hl, #player
     call man_deck_execute_defend
     ret
@@ -181,19 +178,21 @@ man_deck_execute_defend_player::
 ;;  Executes a shield increasement
 ;;
 ;;  Input: ix: card
-;;         hl: damager
+;;         hl: damaged
 ;;
 man_deck_execute_defend::
     ld a, c_block(ix)                           ;; load the block to add
-    ld (mded_add_block+1), a
+    ld (mded_add_block1+1), a
+    ld (mded_add_block2+1), a
     push ix
     push hl
     ;;ld ix, #player                              ;;
     ld__ix_hl
     ld hl, #anim_shield                         ;;
-    ld c, a                                     ;; block to add
+mded_add_block1:
+    ld c, #00                                   ;; block to add
     call man_effects_animate                    ;;
-mded_add_block:
+mded_add_block2:
     ld b, #00                                   ;; add block
     call man_oponent_add_block                  ;;
     pop hl

@@ -25,7 +25,7 @@
 .include "man/fight.h.s"
 .include "man/effects.h.s"
 .include "sys/animation.h.s"
-.include "sys/crtc.h.s"
+.include "sys/util.h.s"
 
 
 ;;-----------------------------------------------------------------
@@ -70,7 +70,7 @@ sys_behaviour_get_behaviour::
 
 ;;-----------------------------------------------------------------
 ;;
-;;  sys_behaviour_execute
+;;  sys_behaviour_execute_one
 ;;
 ;;  Excutes the current beahviour of an entity
 ;;  Input: ix: Oponent entity
@@ -88,18 +88,14 @@ sys_behaviour_execute_one::
 
     ld a, b                             ;; load behaviour id in a
                                     
-    cp #10                              ;; check if behaviour id addable 
-    jp m, sbe_add_effect                ;;
+    cp #beh_damage                      ;; check if behaviour is a damage
+    jp nz, sbe_add_effect               ;;
 
-    ;;cp #10                            ;; already compared to 10
-    jr z, sbe_damage_oponent            ;; if id = 10 -> damage oponent
-
-    jr sbe_exit
 sbe_damage_oponent:         
     push ix                             ;; damage oponent always damage player
     push bc                             ;; save damage amount
     
-    call temblor
+    call sys_util_temblor
     
     ld hl, (selected_foe)               ;;
     ld de, #player                      ;; set de to player 
@@ -199,6 +195,7 @@ sys_behaviour_damage_oponent::
     xor a                       ;; set life to 0
 sbdp_exit:
     ld o_life(ix), a            ;; updates players life
+    pop ix
     ret                         
 
 sbdp_shield_enough:
@@ -271,7 +268,7 @@ sys_behaviour_calculate_damage::
     add c
     ld c, a                     ;; store the result in c
 sbcd_damaged:
-    ld__de_hl
+    ld__ix_de
     ld a, o_vulnerable(ix)      ;; load vulnerable of the damaged
     or a
     jr z, sbcd_exit

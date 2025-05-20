@@ -32,3 +32,6 @@
 .globl sys_util_BCD_Compare
 .globl sys_util_get_random_number
 .globl sys_util_delay
+.globl sys_util_fadeOut
+.globl sys_util_fadeIn
+.globl sys_util_temblor

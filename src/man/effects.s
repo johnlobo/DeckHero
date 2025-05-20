@@ -119,7 +119,7 @@ man_effects_update_one::
 ;;
 ;;  
 ;;  Input:  hl: animation
-;;          c: damage
+;;          c: amount
 ;;          ix: oponent
 ;;  Output:
 ;;
