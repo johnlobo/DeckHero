@@ -23,6 +23,7 @@
 .include "sys/util.h.s"
 .include "sys/render.h.s"
 .include "sys/input.h.s"
+.include "sys/messages.h.s"
 .include "common.h.s"
 
 
@@ -52,6 +53,13 @@ map_nodes_address::
     .dw #0xDA3D,	#0xDA49,	#0xDA55,	#0xDA61,	#0xDA6D
     .dw #0xD94D,	#0xD959,	#0xD965,	#0xD971,	#0xD97D
     
+map_moved:: .db #00
+map_max:: .db #03
+map_action:: .db #00
+map_selected:: .db #00
+map_previous:: .db #00
+
+
 ;;
 ;; Start of _CODE area
 ;; 
@@ -241,6 +249,47 @@ _m_m_r_c_process_exit:
 
 ;;-----------------------------------------------------------------
 ;;
+;; man_map_anc_drawbox
+;;
+;;  Input: a: pintar(1) o borrar (0)
+;;  Output: 
+;;  Modified: AF, BC, DE, HL
+;;
+man_map_anc_drawbox::
+    or a
+    jr nz, mmad_draw
+mmad_erase:
+    xor a
+    ld (MGAD_BORDER_COLOR), a
+    ld a, (map_previous)       ;;
+    jr mmad_continue
+mmad_draw:
+    ld a, #0x3c
+    ld (MGAD_BORDER_COLOR), a
+    ld a, (map_selected)       ;;
+mmad_continue:
+    
+    ld e, a                         ;;
+    ld h, #0x10                       ;;
+    call sys_util_h_times_e         ;;
+    ld a, #0x12                       ;;
+    add l                           ;;
+    ld c, a                         ;;
+    ld b, #0x28                       ;;
+    ld_de_frontbuffer                ;;
+    call cpct_getScreenPtr_asm      ;; Calculate video memory location and return it in HL
+    ex de, hl                       ;; move screen address to de
+
+    ld c, #(S_CARD_WIDTH + 4)
+    ld b, #(S_CARD_HEIGHT + 14)
+    ld l, #0x00                     ;; Empty box
+MGAD_BORDER_COLOR = . +1
+    ld a, #0x33                     ;; Border color
+    call sys_messages_draw_box
+    ret
+
+;;-----------------------------------------------------------------
+;;
 ;; man_map_render
 ;;
 ;;  renders the map based on tilemaps
@@ -275,5 +324,34 @@ man_map_render::
     call sys_util_get_random_number
     ld c, a
     ld b, #1
+
+mmr_input_loop:
+    call sys_input_map_update          ;; Check players actions
+    ld a, (map_action)                 ;; read action from input
+    cp #255                                 ;; check if esc has been clicked
+    jr z, mmr_cancel                         ;;
+    cp #1                                   ;; check if space has been clicked
+    jr z, mmr_action                         ;;
+
+    ld a, (map_moved)
+    or a
+    jr z, mmr_input_loop
+
+    xor a                                   ;; borrar
+    call man_map_anc_drawbox
+    ld a, #1                                ;; pintar
+    call man_map_anc_drawbox
+    ld b, #2                              ;; Delay
+    call sys_util_delay                   ;;
+    xor a
+    ld (map_moved),a 
+    jr mmr_input_loop                        ;; No action -> loop
+
+mmr_action:
+    ;;call man_game_get_selected_card
+    ;;ld ix, #deck
+    ;;call man_array_create_element
+
+mmr_cancel:
 
     ret

@@ -204,12 +204,12 @@ MGAD_BORDER_COLOR = . +1
 ;;
 man_game_add_new_card::
     call sys_render_clear_front_buffer
-    m_screenPtr_frontbuffer 8, 15           ;; Calculates backbuffer address
+    m_screenPtr_frontbuffer 8, 15           ;; Calculates frontbuffer address
     ld c, #64
     ld b, #180
     ld a, #0x33
     ld l, #0x01                             ;; Filled box
-    call sys_messages_draw_box
+    call sys_messages_draw_box              ;; Draw outer frame
     ;; title
     ld hl, #_add_card_string
     m_screenPtr_frontbuffer 18, 20          ;; Calculates frontbuffer address
