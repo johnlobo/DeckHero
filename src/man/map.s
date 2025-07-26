@@ -24,6 +24,7 @@
 .include "sys/render.h.s"
 .include "sys/input.h.s"
 .include "sys/messages.h.s"
+.include "man/game.h.s"
 .include "common.h.s"
 
 
@@ -52,6 +53,18 @@ map_nodes_address::
     .dw #0xDB2D,	#0xDB39,	#0xDB45,	#0xDB51,	#0xDB5D
     .dw #0xDA3D,	#0xDA49,	#0xDA55,	#0xDA61,	#0xDA6D
     .dw #0xD94D,	#0xD959,	#0xD965,	#0xD971,	#0xD97D
+
+map_nodes_connection::
+    .db #0b00000000, #0b00011100, #0b00011100, #0b00000011, #0b00000000
+    .db #0b00010000, #0b00001000, #0b00000100, #0b00000100, #0b00000001
+    .db #0b00010000, #0b00000100, #0b00000100, #0b00000000, #0b00000011
+    .db #0b00010000, #0b00000000, #0b00000111, #0b00000111, #0b00000111
+    .db #0b00001100, #0b00001100, #0b00001100, #0b00000001, #0b00000001
+    .db #0b00000000, #0b00011000, #0b00000100, #0b00000000, #0b00000011
+
+
+map_connected_nodes:: .db #0
+
     
 map_moved:: .db #00
 map_max:: .db #03
@@ -286,6 +299,35 @@ mmad_continue:
 MGAD_BORDER_COLOR = . +1
     ld a, #0x33                     ;; Border color
     call sys_messages_draw_box
+    ret
+
+;;-----------------------------------------------------------------
+;;
+;; man_map_generate_room_candidates
+;;  generate the list of candidates to choose in the map
+;;   
+;;  Input: 
+;;  Output: 
+;;  Modified: AF, BC, DE, HL
+;;
+man_map_generate_room_candidates::
+    ld a, (game_room_y)
+    ;; check if the y room coord is 0
+    or a                        
+    jr z, mmgrc_loop0_exit
+    ;; if it's not 0 calculate offset
+    ld b, a                     ;; b = game_room_y
+    xor a                       ;; init a
+mmgrc_loop0:
+    add #5
+    djnz mmgrc_loop0
+mmgrc_loop0_exit:
+    ld b, a                     ;; save the offset in b
+    ld a, (game_room_x)         ;; add the game_room_x to the offset
+    add b                       ;;
+    ld hl, #map_nodes_connection
+    add_hl_a
+
     ret
 
 ;;-----------------------------------------------------------------

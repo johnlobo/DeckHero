@@ -54,6 +54,9 @@ add_card_action:: .db #00
 add_card_selected:: .db #00
 add_card_previous:: .db #00
 
+game_room_x:: .db #00
+game_room_y:: .db #00
+
 blob_template::
 DefineOponent 1, ^/BLOB           /, _s_blob_0, 60, 40, S_BLOB_WIDTH, S_BLOB_HEIGHT, 20, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, #sys_behaviour_blob, 0
 
@@ -77,6 +80,12 @@ game_status:: .db #00
 ;;  Modified: AF, BC, DE, HL
 ;;
 man_game_init::
+    ;; Set initial room of the gane
+    xor a                   ;; init a = 0
+    ld (game_room_y), a
+    ld a, #0xff
+    ld (game_room_x), a
+    
     call man_player_init    ;; Initialize player
     call man_deck_init      ;; Initialize deck
 
@@ -312,7 +321,6 @@ ac_action:
 ac_cancel:
 
     ret
-
 
     
 ;;-----------------------------------------------------------------

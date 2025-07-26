@@ -348,3 +348,32 @@ crt_delay:
 	dec a
 	jr nz, crt_delay
 	ret
+
+; Z80 Assembly Routine: Count Set Bits (1s)
+;
+; Description: Counts the number of '1' bits in an 8-bit binary number.
+;
+; Input:
+;   Register A: The 8-bit number to be analyzed.
+;
+; Output:
+;   Register B: Contains the count of '1's found in the input number.
+;
+; Affected Registers:
+;   A, B, C, F (Flags)
+
+sys_util_count_set_bits::
+    XOR B           ; Initialize '1's counter (register B) to zero.
+    LD C, #8         ; Initialize bit counter (register C) to 8 (for 8 bits).
+
+BIT_LOOP:
+    RLA             ; Rotate Accumulator A left. The Most Significant Bit (MSB)
+                    ; moves into the Carry Flag (CF). The previous CF moves into the Least Significant Bit (LSB).
+    JR NC, NEXT_BIT ; If Carry Flag is CLEAR (the bit was 0), jump to NEXT_BIT.
+    INC B           ; If Carry Flag is SET (the bit was 1), increment the '1's counter.
+
+NEXT_BIT:
+    DEC C           ; Decrement the bit counter.
+    JR NZ, BIT_LOOP ; If C is not zero, more bits to check, loop again.
+
+    RET             ; Return from the routine. The result is in B.
