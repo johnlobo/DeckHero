@@ -27,6 +27,7 @@
 .include "man/deck.h.s"
 .include "man/array.h.s"
 .include "man/game.h.s"
+.include "man/map.h.s"
 
 ;;
 ;; Start of _DATA area 
@@ -339,7 +340,7 @@ sys_input_map_selected_right::
 ;;
 sys_input_map_cancel::
     ld a, #255
-    ld (add_card_action), a
+    ld (map_action), a
     ret
 ;;-----------------------------------------------------------------
 ;;
@@ -351,7 +352,7 @@ sys_input_map_cancel::
 ;;
 sys_input_map_action::
     ld a, #1
-    ld (add_card_action), a
+    ld (map_action), a
     ret
 
 ;;-----------------------------------------------------------------

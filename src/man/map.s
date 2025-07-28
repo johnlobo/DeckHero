@@ -63,8 +63,10 @@ map_nodes_connection::
     .db #0b00000000, #0b00011000, #0b00000100, #0b00000000, #0b00000011
 
 
-map_connected_nodes:: .db #0
+map_room_candidates:: .db #0xff, #0, #0, #0, #0, #0
+map_num_room_candidates:: .db #0
 
+map_connected_nodes:: .db #0
     
 map_moved:: .db #00
 map_max:: .db #03
@@ -269,6 +271,7 @@ _m_m_r_c_process_exit:
 ;;  Modified: AF, BC, DE, HL
 ;;
 man_map_anc_drawbox::
+;;cpctm_WINAPE_BRK
     or a
     jr nz, mmad_draw
 mmad_erase:
@@ -281,24 +284,81 @@ mmad_draw:
     ld (MGAD_BORDER_COLOR), a
     ld a, (map_selected)       ;;
 mmad_continue:
-    
-    ld e, a                         ;;
-    ld h, #0x10                       ;;
+    ;; calculate x coord
+;;    ld e, a                         ;; selected/previous room
+    ld e, #2                         ;; selected/previous room
+    ld h, #(S_NODES_WIDTH+6)        ;; multiply by NODE WIDTH
     call sys_util_h_times_e         ;;
-    ld a, #0x12                       ;;
+    ld a, #10                      ;; plus x coord offset
     add l                           ;;
-    ld c, a                         ;;
-    ld b, #0x28                       ;;
-    ld_de_frontbuffer                ;;
+    push af                         ;; save x coord for later
+    ;; calculate y coord
+    ld a, (game_room_y)             ;;
+    ld b, a                         ;;
+    ld a, #8                        ;;  y level = 8 - game_room_y
+    sub b                           ;;
+;;    ld e, a                         ;;
+    ld e, #7                       ;;
+    ld a, #(S_NODES_HEIGHT+12)       ;;
+    ld h, a
+    call sys_util_h_times_e         ;; multiply y level by S_NODES_ICON HEIGHT
+    ld a, #4                        ;; add vertical offset
+    add l                           ;;
+    ;; calculate address
+    ld b, a                         ;; store y_coord y b    
+    pop af                          ;; retrieve x coord
+    ld c, a                         ;; move x coord to c
+    ld_de_frontbuffer               ;;
     call cpct_getScreenPtr_asm      ;; Calculate video memory location and return it in HL
     ex de, hl                       ;; move screen address to de
 
-    ld c, #(S_CARD_WIDTH + 4)
-    ld b, #(S_CARD_HEIGHT + 14)
+    ld c, #(S_NODES_WIDTH + 6)
+    ld b, #(S_NODES_HEIGHT + 10)
     ld l, #0x00                     ;; Empty box
 MGAD_BORDER_COLOR = . +1
     ld a, #0x33                     ;; Border color
     call sys_messages_draw_box
+    ret
+
+;;-----------------------------------------------------------------
+;;
+;; man_map_reset_room_candidates
+;;  generate the list of candidates to choose in the map
+;;   
+;;  Input: 
+;;  Output: 
+;;  Modified: AF, HL
+;;
+man_map_reset_room_candidates::
+    ld hl, #map_room_candidates
+    ld a, #0xff
+    ld (hl), a
+    ret
+
+;;-----------------------------------------------------------------
+;;
+;; man_map_add_room_candidates
+;;  generate the list of candidates to choose in the map
+;;   
+;;  Input: 
+;;  Output: 
+;;  Modified: AF, HL
+;;
+man_map_add_room_candidate::
+    push af
+    ld hl, #map_room_candidates
+mmadrc_loop:    
+    ld a, (hl)
+    cp #0xff
+    jr z, mmadrc_loop_exit
+    inc hl
+    jr mmadrc_loop
+mmadrc_loop_exit:    
+    pop af
+    ld (hl), a
+    inc hl
+    ld a, #0xff
+    ld (hl), a
     ret
 
 ;;-----------------------------------------------------------------
@@ -311,6 +371,21 @@ MGAD_BORDER_COLOR = . +1
 ;;  Modified: AF, BC, DE, HL
 ;;
 man_map_generate_room_candidates::
+    call man_map_reset_room_candidates          ;; reset the room candidates
+    ld a, (game_room_x)                         ;; check if we are starting
+    cp #0xff                                    ;;
+    jr nz, mmgrc_not_start                      ;;
+    
+    ;; Load the starting rooms
+    ld a, #1
+    call man_map_add_room_candidate
+    ld a, #2
+    call man_map_add_room_candidate
+    ld a, #3
+    call man_map_add_room_candidate
+    ret
+
+mmgrc_not_start:
     ld a, (game_room_y)
     ;; check if the y room coord is 0
     or a                        
@@ -326,7 +401,13 @@ mmgrc_loop0_exit:
     ld a, (game_room_x)         ;; add the game_room_x to the offset
     add b                       ;;
     ld hl, #map_nodes_connection
-    add_hl_a
+    add_hl_a                    ;;hl points to the correct value
+
+    ld a, (hl)                  ;; load connected cells in a
+    push af
+    call sys_util_count_set_bits
+    ld b, a                     ;; save the number of coonnected rooms in b
+    pop af
 
     ret
 
@@ -359,21 +440,18 @@ man_map_render::
 
     call man_map_render_cells
 
-    call sys_input_wait4anykey          ;; wait for any key
+    call man_map_generate_room_candidates       ;; build the list of candidate cells
 
-    ;; Return the selected enemy type and level in bc
-    ld a, #1
-    call sys_util_get_random_number
-    ld c, a
-    ld b, #1
+    ld a, #1                                    ;; pintar
+    call man_map_anc_drawbox   
 
 mmr_input_loop:
-    call sys_input_map_update          ;; Check players actions
-    ld a, (map_action)                 ;; read action from input
-    cp #255                                 ;; check if esc has been clicked
-    jr z, mmr_cancel                         ;;
-    cp #1                                   ;; check if space has been clicked
-    jr z, mmr_action                         ;;
+    call sys_input_map_update                   ;; Check players actions
+    ld a, (map_action)                          ;; read action from input
+    cp #255                                     ;; check if esc has been clicked
+    jr z, mmr_cancel                            ;;
+    cp #1                                       ;; check if space has been clicked
+    jr z, mmr_action                            ;;
 
     ld a, (map_moved)
     or a
@@ -390,9 +468,12 @@ mmr_input_loop:
     jr mmr_input_loop                        ;; No action -> loop
 
 mmr_action:
-    ;;call man_game_get_selected_card
-    ;;ld ix, #deck
-    ;;call man_array_create_element
+ ;; Return the selected enemy type and level in bc
+    ld a, #1
+    call sys_util_get_random_number
+    ld c, a
+    ld b, #1
+
 
 mmr_cancel:
 

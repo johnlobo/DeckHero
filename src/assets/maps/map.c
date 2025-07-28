@@ -1,5 +1,5 @@
 //
-// File assets/maps/map.tmx converted to csv using cpct_tmx2data [Fri Jul 25 19:29:26 2025]
+// File assets/maps/map.tmx converted to csv using cpct_tmx2data [Mon Jul 28 02:28:05 2025]
 //   * Visible Layers:  1
 //   * Layer Width:     14
 //   * Layer Height:    23
@@ -31,7 +31,7 @@ const u8 m_map[322] = {
    ,15,14, 0, 5, 6, 7, 9,14, 0,12,13, 7, 9,14
    , 1, 2, 0, 1, 2, 0, 1, 2, 0, 0, 0, 0, 1, 2
    , 3, 4, 0, 3, 4, 0, 3, 4, 0, 0, 0, 0, 3, 4
-   ,15,14, 0,15,14, 0,12,13, 7, 8,11, 0,15,14
+   ,15,14, 0,15,14, 0,15,10, 7, 8,11, 0,15,14
    , 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2
    , 3, 4, 0, 3, 4, 0, 3, 4, 0, 3, 4, 0, 3, 4
    ,12,13, 7, 9,10, 7, 9,14, 0,15,10, 7,16,17

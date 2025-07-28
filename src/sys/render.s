@@ -125,8 +125,8 @@ sys_render_init::
     ld de, #16                              ;;
     call cpct_setPalette_asm                ;;
 
-    cpctm_setBorder_asm HW_BLACK            ;; Set Border
-    ;;cpctm_setBorder_asm HW_WHITE            ;; Set Border
+    ;;cpctm_setBorder_asm HW_BLACK            ;; Set Border
+    cpctm_setBorder_asm HW_WHITE            ;; Set Border
 
     ;;call sys_render_clear_back_buffer
     call sys_render_clear_front_buffer
