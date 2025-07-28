@@ -64,7 +64,6 @@ map_nodes_connection::
 
 
 map_room_candidates:: .db #0xff, #0, #0, #0, #0, #0
-map_num_room_candidates:: .db #0
 
 map_connected_nodes:: .db #0
     
@@ -285,20 +284,26 @@ mmad_draw:
     ld a, (map_selected)       ;;
 mmad_continue:
     ;; calculate x coord
-;;    ld e, a                         ;; selected/previous room
-    ld e, #2                         ;; selected/previous room
+    
+    ;; get the corresponding value of the map_room_candidates
+    ld hl, #map_room_candidates
+    add_hl_a
+    ld a, (hl)
+    ld e, a                         ;; selected/previous room
+
     ld h, #(S_NODES_WIDTH+6)        ;; multiply by NODE WIDTH
     call sys_util_h_times_e         ;;
-    ld a, #10                      ;; plus x coord offset
+    ld a, #10                       ;; plus x coord offset
     add l                           ;;
     push af                         ;; save x coord for later
+    
     ;; calculate y coord
     ld a, (game_room_y)             ;;
     ld b, a                         ;;
-    ld a, #8                        ;;  y level = 8 - game_room_y
+    ld a, #7                        ;;  y level = 8 - game_room_y
     sub b                           ;;
-;;    ld e, a                         ;;
-    ld e, #7                       ;;
+    ld e, a                         ;;
+
     ld a, #(S_NODES_HEIGHT+12)       ;;
     ld h, a
     call sys_util_h_times_e         ;; multiply y level by S_NODES_ICON HEIGHT
@@ -333,6 +338,9 @@ man_map_reset_room_candidates::
     ld hl, #map_room_candidates
     ld a, #0xff
     ld (hl), a
+    ;; reset the number of room candidates
+    xor a
+    ld (map_max), a
     ret
 
 ;;-----------------------------------------------------------------
@@ -359,6 +367,10 @@ mmadrc_loop_exit:
     inc hl
     ld a, #0xff
     ld (hl), a
+    ;; Update the number of room candidates
+    ld a, (map_max)
+    inc a
+    ld (map_max), a
     ret
 
 ;;-----------------------------------------------------------------
@@ -413,6 +425,23 @@ mmgrc_loop0_exit:
 
 ;;-----------------------------------------------------------------
 ;;
+;; man_map_input_init
+;;
+;;  Initializes the input loop 
+;;  Input: 
+;;  Output: 
+;;  Modified: 
+;;
+man_map_input_init::
+    call man_map_generate_room_candidates       ;; build the list of candidate cells
+
+    ;; draw marker
+    ld a, #1                                    ;; pintar
+    call man_map_anc_drawbox   
+    ret
+
+;;-----------------------------------------------------------------
+;;
 ;; man_map_render
 ;;
 ;;  renders the map based on tilemaps
@@ -439,12 +468,10 @@ man_map_render::
     call cpct_etm_drawTilemap4x8_ag_asm
 
     call man_map_render_cells
-
-    call man_map_generate_room_candidates       ;; build the list of candidate cells
-
-    ld a, #1                                    ;; pintar
-    call man_map_anc_drawbox   
-
+    ;;
+    ;; Input loop
+    ;;
+    call man_map_input_init
 mmr_input_loop:
     call sys_input_map_update                   ;; Check players actions
     ld a, (map_action)                          ;; read action from input

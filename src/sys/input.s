@@ -300,14 +300,14 @@ sys_input_ac_action::
 ;;  Modified: 
 ;;
 sys_input_map_selected_left::
-    ld a, (add_card_selected)           ;; check if we are not in the first card
-    or a                                ;;
-    ret z                               ;;
-    ld (add_card_previous), a           ;; store current value in previous variable
-    dec a                               ;; update a
-    ld (add_card_selected), a           ;; store new value in a
+    ld a, (map_selected)           ;; check if we are not in the first card
+    or a                           ;;
+    ret z                          ;;
+    ld (map_previous), a           ;; store current value in previous variable
+    dec a                          ;; update a
+    ld (map_selected), a           ;; store new value in a
     ld a, #1
-    ld (add_card_moved), a
+    ld (map_moved), a
     ret
 ;;-----------------------------------------------------------------
 ;;
@@ -318,17 +318,17 @@ sys_input_map_selected_left::
 ;;  Modified: 
 ;;
 sys_input_map_selected_right::
-    ld a, (add_card_max)
+    ld a, (map_max)
     dec a
     ld b,a
-    ld a, (add_card_selected)           ;; check if we are not in the first card
+    ld a, (map_selected)           ;; check if we are not in the first card
     cp b                                ;;
     ret z                               ;;
-    ld (add_card_previous), a           ;; store current value in previous variable
+    ld (map_previous), a           ;; store current value in previous variable
     inc a                               ;; update a
-    ld (add_card_selected), a           ;; store new value in a
+    ld (map_selected), a           ;; store new value in a
     ld a, #1
-    ld (add_card_moved), a
+    ld (map_moved), a
     ret
 ;;-----------------------------------------------------------------
 ;;
