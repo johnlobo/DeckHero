@@ -65,8 +65,6 @@ map_nodes_connection::
 
 map_room_candidates:: .db #0xff, #0, #0, #0, #0, #0
 
-map_connected_nodes:: .db #0
-    
 map_moved:: .db #00
 map_max:: .db #03
 map_action:: .db #00
@@ -270,7 +268,6 @@ _m_m_r_c_process_exit:
 ;;  Modified: AF, BC, DE, HL
 ;;
 man_map_anc_drawbox::
-;;cpctm_WINAPE_BRK
     or a
     jr nz, mmad_draw
 mmad_erase:
@@ -279,7 +276,14 @@ mmad_erase:
     ld a, (map_previous)       ;;
     jr mmad_continue
 mmad_draw:
+    cp #1
+    jr nz, mmad_orange
     ld a, #0x3c
+    ld (MGAD_BORDER_COLOR), a
+    ld a, (map_selected)       ;;
+    jr mmad_continue
+mmad_orange:
+    ld a, #0x0f
     ld (MGAD_BORDER_COLOR), a
     ld a, (map_selected)       ;;
 mmad_continue:
@@ -300,7 +304,7 @@ mmad_continue:
     ;; calculate y coord
     ld a, (game_room_y)             ;;
     ld b, a                         ;;
-    ld a, #7                        ;;  y level = 8 - game_room_y
+    ld a, #7                        ;;  y level = 7 - game_room_y
     sub b                           ;;
     ld e, a                         ;;
 
@@ -383,6 +387,7 @@ mmadrc_loop_exit:
 ;;  Modified: AF, BC, DE, HL
 ;;
 man_map_generate_room_candidates::
+cpctm_WINAPE_BRK
     call man_map_reset_room_candidates          ;; reset the room candidates
     ld a, (game_room_x)                         ;; check if we are starting
     cp #0xff                                    ;;
@@ -409,17 +414,60 @@ mmgrc_loop0:
     add #5
     djnz mmgrc_loop0
 mmgrc_loop0_exit:
-    ld b, a                     ;; save the offset in b
-    ld a, (game_room_x)         ;; add the game_room_x to the offset
-    add b                       ;;
+    ld b, a                             ;; save the offset in b
+    ld a, (game_room_x)                 ;; add the game_room_x to the offset
+    add b                               ;;
     ld hl, #map_nodes_connection
-    add_hl_a                    ;;hl points to the correct value
+    add_hl_a                            ;;hl points to the correct value
 
-    ld a, (hl)                  ;; load connected cells in a
-    push af
-    call sys_util_count_set_bits
-    ld b, a                     ;; save the number of coonnected rooms in b
+    ld a, (hl)                          ;; load connected cells in a
+    push af                             ;; save the connected cells in the stack
+    bit 4,a
+    jr z, mmgrc_bit3
+    xor a                               ;; add room 0 to the candidates list
+    call man_map_add_room_candidate
+mmgrc_bit3:
     pop af
+    push af
+    bit 3,a
+    jr z, mmgrc_bit2
+    ld a, #1                            ;; add room 0 to the candidates list
+    call man_map_add_room_candidate
+mmgrc_bit2:
+    pop af
+    push af
+    bit 2,a
+    jr z, mmgrc_bit1
+    ld a, #2                            ;; add room 0 to the candidates list
+    call man_map_add_room_candidate
+mmgrc_bit1:
+    pop af
+    push af
+    bit 1,a
+    jr z, mmgrc_bit0
+    ld a, #3                            ;; add room 0 to the candidates list
+    call man_map_add_room_candidate
+mmgrc_bit0:
+    pop af
+    bit 0,a
+    ret z
+    ld a, #4                            ;; add room 0 to the candidates list
+    call man_map_add_room_candidate
+    ret
+
+;;-----------------------------------------------------------------
+;;
+;; man_map_draw_game_path
+;;
+;;  draws the path of the game 
+;;  Input: 
+;;  Output: 
+;;  Modified: 
+;;
+man_map_draw_game_path::
+    ld a, (game_room_path)
+    cp #0xff                    ;; check if the path is empty
+    ret z                       ;;
 
     ret
 
@@ -434,6 +482,10 @@ mmgrc_loop0_exit:
 ;;
 man_map_input_init::
     call man_map_generate_room_candidates       ;; build the list of candidate cells
+    call man_map_draw_game_path                 ;; draw game path in map
+    ld a, (game_room_y)                         ;; increment game_room_y
+    inc a
+    ld (game_room_y), a
 
     ;; draw marker
     ld a, #1                                    ;; pintar

@@ -30,8 +30,11 @@
 .globl game_room_x
 .globl game_room_y
 
+.globl game_room_path
+
 ;;===============================================================================
 ;; PUBLIC METHODS
 ;;===============================================================================
+.globl man_game_add_room_to_path
 .globl man_game_init
 .globl man_game_update

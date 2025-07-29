@@ -56,6 +56,7 @@ add_card_previous:: .db #00
 
 game_room_x:: .db #00
 game_room_y:: .db #00
+game_room_path:: .db #0xff, #00, #00, #00, #00, #00, #00, #00
 
 blob_template::
 DefineOponent 1, ^/BLOB           /, _s_blob_0, 60, 40, S_BLOB_WIDTH, S_BLOB_HEIGHT, 20, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, #sys_behaviour_blob, 0
@@ -72,6 +73,47 @@ game_status:: .db #00
 
 ;;-----------------------------------------------------------------
 ;;
+;; man_game_reset_room_path
+;;
+;;  
+;;  Input: a : room coordinates (xy) to add to path
+;;  Output: 
+;;  Modified: AF, BC, DE, HL
+;;
+man_game_reset_room_path::
+    ;; initialize game room path
+    ld a, #0xff
+    ld (game_room_path), a
+    ret
+
+;;-----------------------------------------------------------------
+;;
+;; man_game_add_room_to_path
+;;
+;;  
+;;  Input: a : room coordinates (xy) to add to path
+;;  Output: 
+;;  Modified: AF, BC, DE, HL
+;;
+man_game_add_room_to_path::
+    push af
+    ld hl, #game_room_path
+mgartp_loop:
+    ld a, (hl)
+    cp #0xff
+    jr z, mgartp_loop_exit
+    inc hl
+    jr mgartp_loop
+mgartp_loop_exit:
+    pop af                      ;; retrive room to add to the path
+    ld (hl), a                  ;; add room to the path
+    inc hl                      ;;
+    ld a, #0xff                 ;; insert the terminator at the end of the path
+    ld (hl), a                  ;;
+    ret
+
+;;-----------------------------------------------------------------
+;;
 ;; man_game_init
 ;;
 ;;  
@@ -83,8 +125,13 @@ man_game_init::
     ;; Set initial room of the gane
     xor a                   ;; init a = 0
     ld (game_room_y), a
-    ld a, #0xff
+;;    ld a, #0xff
+    ld a, #0x1
     ld (game_room_x), a
+    ;; initialize game room path
+    ;; call man_game_add_room_to_path
+    ld a, #00
+    call man_game_add_room_to_path
     
     call man_player_init    ;; Initialize player
     call man_deck_init      ;; Initialize deck
