@@ -261,13 +261,58 @@ _m_m_r_c_process_exit:
 
 ;;-----------------------------------------------------------------
 ;;
+;; man_map_calculate_xcoord
+;;
+;;  Input:  a: selected room
+;;          b: y_coord
+;;  Output: b: y_coord
+;;          c: x_coord
+;;  Modified: AF, BC, DE, HL
+;;
+man_map_calculate_coords::
+    push bc                          ;; save y_coord for later
+    ;; calculate x coord
+    ;; get the corresponding value of the map_room_candidates
+    ld hl, #map_room_candidates
+    add_hl_a
+    ld a, (hl)
+    ld e, a                         ;; selected/previous room
+    ld h, #(S_NODES_WIDTH+6)        ;; multiply by NODE WIDTH
+    call sys_util_h_times_e         ;;
+    ld a, #10                       ;; plus x coord offset
+    add l                           ;;
+
+    ;; calculate y coord
+    pop bc                          ;; retrieve y_coord
+    push af                         ;; save x_coord for later
+    ld a, #7                        ;;  y level = 7 - game_room_y
+    sub b                           ;;
+    ld e, a                         ;;
+
+    ld a, #(S_NODES_HEIGHT+12)      ;;
+    ld h, a
+    call sys_util_h_times_e         ;; multiply y level by S_NODES_ICON HEIGHT
+    ld a, #4                        ;; add vertical offset
+    add l                           ;;
+    ;; prepare output
+    ld b, a
+    pop af
+    ld c, a
+    ret
+
+
+;;-----------------------------------------------------------------
+;;
 ;; man_map_anc_drawbox
 ;;
-;;  Input: a: pintar(1) o borrar (0)
+;;  Input:  a: color (0 black, 1 yellow, 3 orange)
+;;          b: y_coord
+;;          c: x_coord
 ;;  Output: 
 ;;  Modified: AF, BC, DE, HL
 ;;
 man_map_anc_drawbox::
+    push bc                         ;; save xcoord & y_coord for later
     or a
     jr nz, mmad_draw
 mmad_erase:
@@ -287,36 +332,8 @@ mmad_orange:
     ld (MGAD_BORDER_COLOR), a
     ld a, (map_selected)       ;;
 mmad_continue:
-    ;; calculate x coord
-    
-    ;; get the corresponding value of the map_room_candidates
-    ld hl, #map_room_candidates
-    add_hl_a
-    ld a, (hl)
-    ld e, a                         ;; selected/previous room
-
-    ld h, #(S_NODES_WIDTH+6)        ;; multiply by NODE WIDTH
-    call sys_util_h_times_e         ;;
-    ld a, #10                       ;; plus x coord offset
-    add l                           ;;
-    push af                         ;; save x coord for later
-    
-    ;; calculate y coord
-    ld a, (game_room_y)             ;;
-    ld b, a                         ;;
-    ld a, #7                        ;;  y level = 7 - game_room_y
-    sub b                           ;;
-    ld e, a                         ;;
-
-    ld a, #(S_NODES_HEIGHT+12)       ;;
-    ld h, a
-    call sys_util_h_times_e         ;; multiply y level by S_NODES_ICON HEIGHT
-    ld a, #4                        ;; add vertical offset
-    add l                           ;;
     ;; calculate address
-    ld b, a                         ;; store y_coord y b    
-    pop af                          ;; retrieve x coord
-    ld c, a                         ;; move x coord to c
+    pop bc                          ;; retrieve x_coord & y_coord
     ld_de_frontbuffer               ;;
     call cpct_getScreenPtr_asm      ;; Calculate video memory location and return it in HL
     ex de, hl                       ;; move screen address to de
@@ -387,7 +404,6 @@ mmadrc_loop_exit:
 ;;  Modified: AF, BC, DE, HL
 ;;
 man_map_generate_room_candidates::
-cpctm_WINAPE_BRK
     call man_map_reset_room_candidates          ;; reset the room candidates
     ld a, (game_room_x)                         ;; check if we are starting
     cp #0xff                                    ;;
@@ -465,10 +481,31 @@ mmgrc_bit0:
 ;;  Modified: 
 ;;
 man_map_draw_game_path::
-    ld a, (game_room_path)
-    cp #0xff                    ;; check if the path is empty
-    ret z                       ;;
+;;cpctm_WINAPE_BRK
+    ld hl, #game_room_path
+    ld b, #0
+mmdgp_loop:
+    ;; calculate y_coord
+    push hl
+    push bc                                 
+    ld a, (hl)
+    cp #0xff
+    jr z, mmdgp_loop_exit
+    ;; calculate x_coord
+    and #0b00001111                              ;; x_coord
+    ld c, a                                     ;; 
+    call man_map_calculate_coords               ;; calculate coords
 
+    ld a, #3                                    ;; yellow color
+    call man_map_anc_drawbox
+    pop bc 
+    inc b
+    pop hl
+    inc hl
+    jr mmdgp_loop
+mmdgp_loop_exit:
+    pop bc
+    pop hl
     ret
 
 ;;-----------------------------------------------------------------
@@ -487,8 +524,13 @@ man_map_input_init::
     inc a
     ld (game_room_y), a
 
-    ;; draw marker
-    ld a, #1                                    ;; pintar
+    ;; draw marker                                      
+    ld a, (game_room_y)                         ;; y_coord
+    ld b, a                                     ;; 
+    ld a, (map_selected)                        ;; x_coord 
+    call man_map_calculate_coords               ;; calculate coords
+
+    ld a, #1                                    ;; yellow color
     call man_map_anc_drawbox   
     ret
 
@@ -520,6 +562,7 @@ man_map_render::
     call cpct_etm_drawTilemap4x8_ag_asm
 
     call man_map_render_cells
+
     ;;
     ;; Input loop
     ;;
@@ -536,12 +579,26 @@ mmr_input_loop:
     or a
     jr z, mmr_input_loop
 
-    xor a                                   ;; borrar
+
+    ld a, (game_room_y)                         ;; y_coord
+    ld b, a                                     ;; 
+    ld a, (map_previous)                        ;; x_coord 
+    call man_map_calculate_coords               ;; calculate coords
+
+    xor a                                       ;; black color
     call man_map_anc_drawbox
-    ld a, #1                                ;; pintar
+
+    ld a, (game_room_y)                         ;; y_coord
+    ld b, a                                     ;; 
+    ld a, (map_selected)                        ;; x_coord 
+    call man_map_calculate_coords               ;; calculate coords
+
+    ld a, #1                                    ;; yellow color
     call man_map_anc_drawbox
+
     ld b, #2                              ;; Delay
     call sys_util_delay                   ;;
+    
     xor a
     ld (map_moved),a 
     jr mmr_input_loop                        ;; No action -> loop

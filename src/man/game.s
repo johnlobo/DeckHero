@@ -91,7 +91,7 @@ man_game_reset_room_path::
 ;; man_game_add_room_to_path
 ;;
 ;;  
-;;  Input: a : room coordinates (xy) to add to path
+;;  Input: a : room to add to path
 ;;  Output: 
 ;;  Modified: AF, BC, DE, HL
 ;;
@@ -123,14 +123,16 @@ mgartp_loop_exit:
 ;;
 man_game_init::
     ;; Set initial room of the gane
-    xor a                   ;; init a = 0
+    ld a, #1                   ;; init a = 0
     ld (game_room_y), a
 ;;    ld a, #0xff
     ld a, #0x1
     ld (game_room_x), a
     ;; initialize game room path
     ;; call man_game_add_room_to_path
-    ld a, #00
+    ld a, #01
+    call man_game_add_room_to_path
+    ld a, #01
     call man_game_add_room_to_path
     
     call man_player_init    ;; Initialize player
