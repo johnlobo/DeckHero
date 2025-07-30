@@ -261,6 +261,22 @@ _m_m_r_c_process_exit:
 
 ;;-----------------------------------------------------------------
 ;;
+;; man_map_calculate_candidate_xcoord
+;;
+;;  Input:  a: selected room
+;;  Output: a: x_coord
+;;  Modified: AF, HL
+;;
+man_map_calculate_candidate_xcoord::
+    ;; calculate x coord
+    ;; get the corresponding value of the map_room_candidates
+    ld hl, #map_room_candidates
+    add_hl_a
+    ld a, (hl)
+    ret
+
+;;-----------------------------------------------------------------
+;;
 ;; man_map_calculate_xcoord
 ;;
 ;;  Input:  a: selected room
@@ -273,10 +289,7 @@ man_map_calculate_coords::
     push bc                          ;; save y_coord for later
     ;; calculate x coord
     ;; get the corresponding value of the map_room_candidates
-    ld hl, #map_room_candidates
-    add_hl_a
-    ld a, (hl)
-    ld e, a                         ;; selected/previous room
+    ld e, c                         ;; selected/previous room
     ld h, #(S_NODES_WIDTH+6)        ;; multiply by NODE WIDTH
     call sys_util_h_times_e         ;;
     ld a, #10                       ;; plus x coord offset
@@ -328,7 +341,7 @@ mmad_draw:
     ld a, (map_selected)       ;;
     jr mmad_continue
 mmad_orange:
-    ld a, #0x0f
+    ld a, #0xf3
     ld (MGAD_BORDER_COLOR), a
     ld a, (map_selected)       ;;
 mmad_continue:
@@ -492,10 +505,18 @@ mmdgp_loop:
     cp #0xff
     jr z, mmdgp_loop_exit
     ;; calculate x_coord
-    and #0b00001111                              ;; x_coord
+    and #0b00001111                             ;; x_coord
     ld c, a                                     ;; 
-    call man_map_calculate_coords               ;; calculate coords
+    push bc                                     ;; store coords for later use
+    call man_map_get_cell_address               ;; get the screen addres of the icon in hl
+    ex de, hl                                   ;; move the screen address to de
+    ld hl, #_s_nodes_5
+    ld c, #S_NODES_WIDTH
+    ld b, #S_NODES_HEIGHT 
+    call cpct_drawSprite_asm                    ;; draw icon room passed
 
+    pop bc
+    call man_map_calculate_coords
     ld a, #3                                    ;; yellow color
     call man_map_anc_drawbox
     pop bc 
@@ -527,7 +548,10 @@ man_map_input_init::
     ;; draw marker                                      
     ld a, (game_room_y)                         ;; y_coord
     ld b, a                                     ;; 
-    ld a, (map_selected)                        ;; x_coord 
+    ;; calculate room x_coord from map selected
+    ld a, (map_selected)                        ;; 
+    call man_map_calculate_candidate_xcoord     ;; 
+    ld c, a                                     ;; move the x_coord value to c
     call man_map_calculate_coords               ;; calculate coords
 
     ld a, #1                                    ;; yellow color
@@ -582,7 +606,10 @@ mmr_input_loop:
 
     ld a, (game_room_y)                         ;; y_coord
     ld b, a                                     ;; 
+    ;; calculate room x_coord from map_previous
     ld a, (map_previous)                        ;; x_coord 
+    call man_map_calculate_candidate_xcoord     ;; 
+    ld c, a                                     ;; move x_coord to c
     call man_map_calculate_coords               ;; calculate coords
 
     xor a                                       ;; black color
@@ -590,7 +617,10 @@ mmr_input_loop:
 
     ld a, (game_room_y)                         ;; y_coord
     ld b, a                                     ;; 
+    ;; calculate room x_coord from map_selected
     ld a, (map_selected)                        ;; x_coord 
+    call man_map_calculate_candidate_xcoord     ;; 
+    ld c, a                                     ;; move x_coord to c 
     call man_map_calculate_coords               ;; calculate coords
 
     ld a, #1                                    ;; yellow color

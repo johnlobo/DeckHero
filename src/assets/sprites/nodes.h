@@ -18,5 +18,8 @@ extern const u8 s_nodes_3[6 * 12];
 #define S_NODES_4_W 6
 #define S_NODES_4_H 12
 extern const u8 s_nodes_4[6 * 12];
+#define S_NODES_5_W 6
+#define S_NODES_5_H 12
+extern const u8 s_nodes_5[6 * 12];
 
 #endif

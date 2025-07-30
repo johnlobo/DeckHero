@@ -79,7 +79,8 @@
 .globl _s_nodes_2
 .globl _s_nodes_3
 .globl _s_nodes_4
-.globl _s_pipes_0
+.globl _s_nodes_5
+.globl _s_pipes_0   
 .globl _s_pipes_1
 .globl _s_pipes_2
 .globl _s_pipes_3
