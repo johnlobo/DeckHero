@@ -1,0 +1,17 @@
+{
+    "alphabet": "!()$+,-./0123456789?@ABCDEFGHIJKLMNOPQRSTUVWXYZ",
+    "sprite_path": "font_chars_0.png",
+    "atlas": {
+        "rows": 47,
+        "cols": 1,
+        "grid_width": 4,
+        "grid_height": 9,
+        "common_width": 4,
+        "character_widths": {
+            "i": 4,
+            "j": 4,
+            "t": 4
+        }
+    },
+    "default_spacing": 0
+}

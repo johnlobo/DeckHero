@@ -118,6 +118,7 @@
 .globl _s_tileset_16
 .globl _s_tileset_17
 .globl _s_tileset_18
+.globl _s_question
 
 .globl transparency_table
 
@@ -225,6 +226,9 @@ S_NODES_HEIGHT = 12
 
 S_EFFECT_WIDTH = 8
 S_EFFECT_HEIGHT = 16
+
+S_QUESTION_WIDTH = 32
+S_QUESTION_HEIGHT = 80
 
 ;; GAME CONSTANTS
 MAX_FOES = 4

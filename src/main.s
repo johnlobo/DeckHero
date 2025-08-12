@@ -23,6 +23,7 @@
 .include "sys/render.h.s"
 .include "sys/messages.h.s"
 .include "man/game.h.s"
+.include "man/question.h.s"
 
 .module main
 
@@ -105,6 +106,8 @@ main_init::
    ;; set random seed using hl form message show
 
    call cpct_setSeed_mxor_asm
+
+   call man_question_init
      
    ret
    
