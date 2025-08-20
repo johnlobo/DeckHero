@@ -276,7 +276,7 @@ sys_render_erase_description::
     ;; Erase description
 
     m_screenPtr_frontbuffer DESC_X,DESC_Y_1      ;; Calculates backbuffer address
-    ld c, #64
+    ld c, #62
     ld b, #20    
     ld a, #0
     call cpct_drawSolidBox_asm

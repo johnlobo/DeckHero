@@ -19,6 +19,7 @@
 .include "cpctelera.h.s"
 .include "common.h.s"
 .include "sys/util.h.s"
+.include "sys/render.h.s"
 
 
 ;;
@@ -355,21 +356,62 @@ _ns8_Num2:
 ;;  af, bc, hl, de
 ;;      
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;sys_text_draw_small_char_number::
+;;    push de                             ;; store video memory address in stack
+;;    
+;;    ld h, #10                           ;; calculate the offset from the first char
+;;    ld e, a                             ;;
+;;    call sys_util_h_times_e             ;; l = 20 * number
+;;
+;;    ld a, b
+;;    ld (COLOR_REP), a                ;; self modifying code to pass color
+;;
+;;    ld b, #0                            ;;
+;;    ld c, l                             ;;
+;;    ld hl, #_s_small_numbers_00         ;; point hl to the start of the numbers
+;;    add hl, bc                          ;; address of the number to show
+;;    push hl                             ;; store sprite address in stack
+;;
+;;    ld d, #15                               ;; Calculate in DE the replacement patern
+;;COLOR_REP = . +1
+;;    ld e, #0                                ;;
+;;    call cpct_pens2pixelPatternPairM0_asm   ;;
+;;    ex de, hl                               ;; move replacement patern to hl
+;;    
+;;    pop af                                  ;; retrieve sprite address
+;;    pop de                                  ;; retrieve video memory address
+;;    
+;;    ld c, #S_SMALL_NUMBERS_WIDTH            
+;;    ld b, #S_SMALL_NUMBERS_HEIGHT
+;;    push ix
+;;    call cpct_drawSpriteColorizeM0_asm  ;; draw the number in color b
+;;    pop ix
+;;    ret
+
 sys_text_draw_small_char_number::
     push de                             ;; store video memory address in stack
-    
+  
     ld h, #10                           ;; calculate the offset from the first char
     ld e, a                             ;;
     call sys_util_h_times_e             ;; l = 20 * number
 
     ld a, b
-    ld (COLOR_REP), a                ;; self modifying code to pass color
+    ld (COLOR_REP), a                   ;; self modifying code to pass color
 
     ld b, #0                            ;;
     ld c, l                             ;;
     ld hl, #_s_small_numbers_00         ;; point hl to the start of the numbers
     add hl, bc                          ;; address of the number to show
     push hl                             ;; store sprite address in stack
+
+    ;; Parameters to call cpct_drawSpriteMaskedAlignedColorizeM0_asm are wrong in the documentation
+    ;; there is a wrong pop hl in the asm bindings file
+    ;; and the paramters shoudl be like this...
+    ;; AF: Sprite address
+    ;; DE: Video memory destination
+    ;; BC: Height and width of the sprite
+    ;; HL: Replace Pattern formed with cpct_pens2pixelPatternPairM0_asm
+    ;; IX: Transparency table
 
     ld d, #15                               ;; Calculate in DE the replacement patern
 COLOR_REP = . +1
@@ -383,9 +425,12 @@ COLOR_REP = . +1
     ld c, #S_SMALL_NUMBERS_WIDTH            
     ld b, #S_SMALL_NUMBERS_HEIGHT
     push ix
-    call cpct_drawSpriteColorizeM0_asm  ;; draw the number in color b
+    ld ix, #transparency_table
+    call sys_render_drawSpriteMaskedAlignedColorizeM0_asm  ;; draw the number in color b with transparency
     pop ix
     ret
+
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; sys_text_draw_small_number

@@ -99,26 +99,10 @@
 .globl _s_effect_10
 .globl _s_effect_11
 
-.globl _s_tileset_00
-.globl _s_tileset_01
-.globl _s_tileset_02
-.globl _s_tileset_03
-.globl _s_tileset_04
-.globl _s_tileset_05
-.globl _s_tileset_06
-.globl _s_tileset_07
-.globl _s_tileset_08
-.globl _s_tileset_09
-.globl _s_tileset_10
-.globl _s_tileset_11
-.globl _s_tileset_12
-.globl _s_tileset_13
-.globl _s_tileset_14
-.globl _s_tileset_15
-.globl _s_tileset_16
-.globl _s_tileset_17
-.globl _s_tileset_18
 .globl _s_question
+.globl _s_endturn_0
+.globl _s_endturn_1
+.globl _s_endturn_2
 
 .globl transparency_table
 
@@ -163,6 +147,7 @@
 .globl cpct_pens2pixelPatternPairM0_asm
 .globl cpct_etm_setDrawTilemap4x8_ag_asm
 .globl cpct_etm_drawTilemap4x8_ag_asm
+;;.globl cpct_drawSpriteMaskedAlignedColorizeM0_asm
 
 ;;===============================================================================
 ;; DEFINED CONSTANTS
@@ -229,6 +214,10 @@ S_EFFECT_HEIGHT = 16
 
 S_QUESTION_WIDTH = 32
 S_QUESTION_HEIGHT = 80
+
+S_ENDTURN_WIDTH = 14
+S_ENDTURN_HEIGHT = 19
+
 
 ;; GAME CONSTANTS
 MAX_FOES = 4

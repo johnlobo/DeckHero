@@ -64,7 +64,7 @@ sacrifice::
 DefineComponentArrayStructure_Size sacrifice, MAX_DECK_CARDS, sizeof_e     
 .db 0   ;;ponemos este aqui como trampita para que siempre haya un tipo invalido al final
 
-hand_max:: .db 5
+hand_max:: .db 10
 player_energy:: .db 0
 player_max_energy:: .db 3
 player_updates:: .db 0

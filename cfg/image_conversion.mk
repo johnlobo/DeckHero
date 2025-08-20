@@ -65,7 +65,7 @@ $(eval $(call IMG2SP, CONVERT         , assets/explotion.png , 16, 16, s_exploti
 $(eval $(call IMG2SP, CONVERT         , assets/nodes.png , 12, 12, s_nodes, ,))
 $(eval $(call IMG2SP, CONVERT         , assets/pipes.png , 12, 12, s_pipes, ,))
 $(eval $(call IMG2SP, CONVERT         , assets/effect.png , 16, 16, s_effect, ,))
-#$(eval $(call IMG2SP, CONVERT         , assets/question.png , 64, 80, s_question, ,))
+$(eval $(call IMG2SP, CONVERT         , assets/endturn.png , 28, 19, s_endturn, ,))
 
 $(eval $(call IMG2SP, SET_FOLDER     , src/assets/maps/))
 $(eval $(call IMG2SP, SET_IMG_FORMAT , zgtiles))

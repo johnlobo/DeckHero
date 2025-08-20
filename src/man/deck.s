@@ -57,6 +57,7 @@ model_deck_array:
 ;;         _status,        _class  _sprite     _name              _rarity   _type   _energy  _description,                    _damage _block, _vulnerable _weak   _strengh    _exhaust    _add_card _execute_routine
 model_hit:
 DefineCard #00, e_type_card_in_hand, 1, _s_cards_0, ^/HIT            /, 1,      1,      1,      ^/SINGLE ATTACK - 6DM           /,  6,      0,      0,          0,      0,          0,          0,       #man_deck_execute_hit_player
+;;DefineCard #00, e_type_card_in_hand, 1, _s_cards_0, ^/123456789012345/, 1,      1,      1,      ^/123456789012345678901234567890/,  6,      0,      0,          0,      0,          0,          0,       #man_deck_execute_hit_player
 model_defend:
 DefineCard #00, e_type_card_in_hand, 2, _s_cards_1, ^/DEFEND         /, 1,      1,      1,      ^/SIMPLE DEFENCE - 5BK          /,  0,      5,      0,          0,      0,          0,          0,       #man_deck_execute_defend_player
 model_bash:
@@ -269,7 +270,7 @@ man_deck_init::
     
 ;; Load default cards in deck 4 hits + 2 defends
 ;; hit loop
-    ld b, #4
+    ld b, #8
 _d_i_hit_loop:
     push bc
     ld hl, #model_hit
